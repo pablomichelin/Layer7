@@ -30,12 +30,22 @@ function layer7_events_render_row($ex)
 	if ($tone === "") {
 		$tone = "info";
 	}
-	echo '<div class="l7-event-row l7-event-row--' . htmlspecialchars($tone) . '">';
-	echo '<span class="l7-event-meta">' . htmlspecialchars((string)($ex["when"] ?? "")) . '</span>';
-	echo '<span class="l7-event-title">' . htmlspecialchars((string)($ex["title"] ?? "")) . '</span>';
-	echo '<p class="l7-event-summary">' . htmlspecialchars((string)($ex["summary"] ?? "")) . '</p>';
-	echo '<div class="l7-event-raw">' . htmlspecialchars((string)($ex["raw"] ?? "")) . '</div>';
-	echo '</div>';
+	$itemClass = "list-group-item";
+	if ($tone === "block") {
+		$itemClass .= " list-group-item-danger";
+	} elseif ($tone === "monitor") {
+		$itemClass .= " list-group-item-info";
+	} elseif ($tone === "warn" || $tone === "warning") {
+		$itemClass .= " list-group-item-warning";
+	}
+	echo '<div class="' . $itemClass . ' l7-event-row">';
+	echo '<div class="small text-muted">' . htmlspecialchars((string)($ex["when"] ?? "")) . '</div>';
+	echo '<div><strong>' . htmlspecialchars((string)($ex["title"] ?? "")) . '</strong></div>';
+	echo '<div class="small">' . htmlspecialchars((string)($ex["summary"] ?? "")) . '</div>';
+	echo '<details class="l7-event-raw-wrap"><summary class="small text-muted">' .
+	    htmlspecialchars(l7_t("Mostrar detalhe tecnico")) . '</summary>';
+	echo '<pre class="pre-scrollable small">' . htmlspecialchars((string)($ex["raw"] ?? "")) . '</pre>';
+	echo '</details></div>';
 }
 
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
@@ -82,128 +92,136 @@ foreach ($all_logs as $line) {
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Events"));
 include("head.inc");
-layer7_render_styles();
 ?>
-<div class="panel panel-default layer7-page">
+<?php layer7_render_tabs("eventos"); ?>
+<div id="l7-events-root">
+
+<div class="panel panel-default" id="l7-events-storage">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - Eventos"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Armazenamento de logs"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("eventos"); ?>
-		<div class="layer7-content">
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Armazenamento de logs"); ?></div>
-			<div class="layer7-admin-block__body">
-				<div class="row">
-					<div class="col-sm-4">
-						<strong><?= l7_t("Operacional"); ?>:</strong>
-						<?= htmlspecialchars(layer7_events_human_bytes($storage["operational"]["bytes"])); ?>
-						<span class="text-muted">(<?= (int)$storage["operational"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
-					</div>
-					<div class="col-sm-4">
-						<strong><?= l7_t("Eventos"); ?>:</strong>
-						<?= htmlspecialchars(layer7_events_human_bytes($storage["events"]["bytes"])); ?>
-						<span class="text-muted">(<?= (int)$storage["events"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
-					</div>
-					<div class="col-sm-4">
-						<strong>SQLite:</strong>
-						<?= htmlspecialchars(layer7_events_human_bytes($storage["db_bytes"])); ?>
-						<span class="text-muted">/ <?= (int)$storage["db_max_mb"]; ?> MiB</span>
-					</div>
-				</div>
-				<p class="small text-muted" style="margin-top:8px; margin-bottom:0;">
-					<?= sprintf(l7_t("Rotacao automatica: %d MiB por arquivo, %d copias antigas."),
-					    (int)$storage["max_mb_per_file"], (int)$storage["keep_files"]); ?>
-					<?= !empty($storage["event_log_enabled"])
-					    ? l7_t("Log detalhado activo.")
-					    : l7_t("Log detalhado desactivado; bloqueios continuam auditados."); ?>
-				</p>
+		<div class="row">
+			<div class="col-sm-4">
+				<strong><?= l7_t("Operacional"); ?>:</strong>
+				<?= htmlspecialchars(layer7_events_human_bytes($storage["operational"]["bytes"])); ?>
+				<span class="text-muted">(<?= (int)$storage["operational"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
+			</div>
+			<div class="col-sm-4">
+				<strong><?= l7_t("Eventos"); ?>:</strong>
+				<?= htmlspecialchars(layer7_events_human_bytes($storage["events"]["bytes"])); ?>
+				<span class="text-muted">(<?= (int)$storage["events"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
+			</div>
+			<div class="col-sm-4">
+				<strong>SQLite:</strong>
+				<?= htmlspecialchars(layer7_events_human_bytes($storage["db_bytes"])); ?>
+				<span class="text-muted">/ <?= (int)$storage["db_max_mb"]; ?> MiB</span>
 			</div>
 		</div>
+		<p class="help-block text-muted">
+			<?= sprintf(l7_t("Rotacao automatica: %d MiB por arquivo, %d copias antigas."),
+			    (int)$storage["max_mb_per_file"], (int)$storage["keep_files"]); ?>
+			<?= !empty($storage["event_log_enabled"])
+			    ? l7_t("Log detalhado activo.")
+			    : l7_t("Log detalhado desactivado; bloqueios continuam auditados."); ?>
+		</p>
+	</div>
+</div>
 
-		<div class="layer7-toolbar" style="margin-bottom:12px;">
-			<a class="btn btn-sm <?= $source === "events" ? "btn-primary" : "btn-default"; ?>"
-				href="layer7_events.php?source=events"><?= l7_t("Eventos de trafego"); ?></a>
-			<a class="btn btn-sm <?= $source === "operational" ? "btn-primary" : "btn-default"; ?>"
-				href="layer7_events.php?source=operational"><?= l7_t("Log operacional"); ?></a>
-			<label class="checkbox-inline" style="margin-left:12px;">
-				<input type="checkbox" id="l7-show-tech" />
-				<?= l7_t("Mostrar detalhe tecnico"); ?>
-			</label>
-		</div>
+<div class="panel panel-default" id="l7-events-source">
+	<div class="panel-body">
+		<a class="btn btn-sm <?= $source === "events" ? "btn-primary" : "btn-default"; ?>"
+			href="layer7_events.php?source=events"><?= l7_t("Eventos de trafego"); ?></a>
+		<a class="btn btn-sm <?= $source === "operational" ? "btn-primary" : "btn-default"; ?>"
+			href="layer7_events.php?source=operational"><?= l7_t("Log operacional"); ?></a>
+		<label class="checkbox-inline">
+			<input type="checkbox" id="l7-show-tech" />
+			<?= l7_t("Mostrar detalhe tecnico"); ?>
+		</label>
+	</div>
+</div>
 
-		<div class="l7-event-legend">
-			<p><?= l7_t("O que significa cada linha"); ?></p>
-			<ul>
-				<li><?= l7_t("Trafego observado: o Layer7 viu um acesso e nao bloqueou."); ?></li>
-				<li><?= l7_t("Pedido de nome (DNS): o aparelho perguntou o endereco de um site."); ?></li>
-				<li><?= l7_t("Nome encontrado (DNS): o sistema descobriu o numero (IP) desse site."); ?></li>
-			</ul>
-		</div>
+<div class="panel panel-default" id="l7-events-legend">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("O que significa cada linha"); ?></h2>
+	</div>
+	<div class="panel-body">
+		<ul class="help-block">
+			<li><?= l7_t("Trafego observado: o Layer7 viu um acesso e nao bloqueou."); ?></li>
+			<li><?= l7_t("Pedido de nome (DNS): o aparelho perguntou o endereco de um site."); ?></li>
+			<li><?= l7_t("Nome encontrado (DNS): o sistema descobriu o numero (IP) desse site."); ?></li>
+		</ul>
+	</div>
+</div>
 
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Monitor ao vivo"); ?></div>
-			<div class="layer7-admin-block__body">
-				<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
-			<div class="layer7-toolbar">
-				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
-				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
-				<button type="button" class="btn btn-default btn-sm" id="l7-live-clear"><?= l7_t("Limpar visualizacao"); ?></button>
-				<span id="l7-live-count" class="text-muted" style="font-size:12px; margin-left:8px;"></span>
-			</div>
-				<div id="l7-live-view" class="l7-event-list l7-event-list--live">
-					<div class="l7-event-empty"><?= l7_t("Aguardando eventos..."); ?></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Filtrar logs"); ?></div>
-			<div class="layer7-admin-block__body">
-				<form method="get" class="form-inline">
-					<input type="hidden" name="source" value="<?= htmlspecialchars($source); ?>">
-					<div class="form-group">
-						<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
-							value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: TikTok, bloqueado, 172.16..."); ?>" />
-					</div>
-					<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
-					<?php if ($filter !== "") { ?>
-					<a href="layer7_events.php?source=<?= urlencode($source); ?>" class="btn btn-default"><?= l7_t("Limpar filtro"); ?></a>
-					<?php } ?>
-				</form>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header">
-				<?= l7_t("Todos os logs"); ?>
-				<span class="badge"><?= count($filtered_logs); ?></span>
-			</div>
-			<div class="layer7-admin-block__body">
-				<?php if ($filter !== "") { ?>
-				<p class="small text-muted"><?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?></p>
-				<?php } ?>
-				<?php if (count($filtered_logs) > 0) { ?>
-				<div class="l7-event-list">
-					<?php foreach ($filtered_logs as $line) {
-						layer7_events_render_row(layer7_event_explain_line($line));
-					} ?>
-				</div>
-				<?php } else { ?>
-				<div class="alert alert-info">
-					<?php if ($filter !== "") { ?>
-					<?= l7_t("Nenhum log correspondente ao filtro."); ?>
-					<?php } else { ?>
-					<?= sprintf(l7_t("Nenhum evento encontrado em %s."), htmlspecialchars($log_path)); ?>
-					<?php } ?>
-				</div>
-				<?php } ?>
-			</div>
-		</div>
-
+<div class="panel panel-default" id="l7-events-live">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Monitor ao vivo"); ?></h2>
+	</div>
+	<div class="panel-body">
+		<p class="help-block text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
+		<p>
+			<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
+			<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
+			<button type="button" class="btn btn-default btn-sm" id="l7-live-clear"><?= l7_t("Limpar visualizacao"); ?></button>
+			<span id="l7-live-count" class="text-muted small"></span>
+		</p>
+		<div id="l7-live-view" class="list-group pre-scrollable" role="log" aria-live="polite">
+			<p class="list-group-item text-muted"><?= l7_t("Aguardando eventos..."); ?></p>
 		</div>
 	</div>
+</div>
+
+<div class="panel panel-default" id="l7-events-filter">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Filtrar logs"); ?></h2>
+	</div>
+	<div class="panel-body">
+		<form method="get" action="layer7_events.php" class="form-inline">
+			<input type="hidden" name="source" value="<?= htmlspecialchars($source); ?>">
+			<div class="form-group">
+				<label class="sr-only" for="l7-events-filter-input"><?= l7_t("Filtrar"); ?></label>
+				<input type="text" name="filter" id="l7-events-filter-input" class="form-control"
+					maxlength="100" value="<?= htmlspecialchars($filter); ?>"
+					placeholder="<?= l7_t("Ex: TikTok, bloqueado, 172.16..."); ?>" />
+			</div>
+			<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
+			<?php if ($filter !== "") { ?>
+			<a href="layer7_events.php?source=<?= urlencode($source); ?>" class="btn btn-default"><?= l7_t("Limpar filtro"); ?></a>
+			<?php } ?>
+		</form>
+	</div>
+</div>
+
+<div class="panel panel-default" id="l7-events-all">
+	<div class="panel-heading">
+		<h2 class="panel-title">
+			<?= l7_t("Todos os logs"); ?>
+			<span class="badge"><?= count($filtered_logs); ?></span>
+		</h2>
+	</div>
+	<div class="panel-body">
+		<?php if ($filter !== "") { ?>
+		<p class="help-block text-muted"><?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?></p>
+		<?php } ?>
+		<?php if (count($filtered_logs) > 0) { ?>
+		<div id="l7-events-list" class="list-group pre-scrollable">
+			<?php foreach ($filtered_logs as $line) {
+				layer7_events_render_row(layer7_event_explain_line($line));
+			} ?>
+		</div>
+		<?php } else { ?>
+		<div class="alert alert-info">
+			<?php if ($filter !== "") { ?>
+			<?= l7_t("Nenhum log correspondente ao filtro."); ?>
+			<?php } else { ?>
+			<?= sprintf(l7_t("Nenhum evento encontrado em %s."), htmlspecialchars($log_path)); ?>
+			<?php } ?>
+		</div>
+		<?php } ?>
+	</div>
+</div>
+
 </div>
 <script>
 (function() {
@@ -213,7 +231,6 @@ layer7_render_styles();
 	var clearBtn  = document.getElementById('l7-live-clear');
 	var countEl   = document.getElementById('l7-live-count');
 	var techBox   = document.getElementById('l7-show-tech');
-	var pageEl    = document.querySelector('.layer7-page');
 	var paused    = false;
 	var timer     = null;
 	var refreshMs = 2000;
@@ -235,33 +252,64 @@ layer7_render_styles();
 	function renderRow(ex) {
 		var tone = String((ex && ex.tone) || 'info').replace(/[^a-z]/g, '');
 		if (!tone) tone = 'info';
+		var itemClass = 'list-group-item l7-event-row';
+		if (tone === 'block') {
+			itemClass = 'list-group-item list-group-item-danger l7-event-row';
+		} else if (tone === 'monitor') {
+			itemClass = 'list-group-item list-group-item-info l7-event-row';
+		} else if (tone === 'warn' || tone === 'warning') {
+			itemClass = 'list-group-item list-group-item-warning l7-event-row';
+		}
 		var row = document.createElement('div');
-		row.className = 'l7-event-row l7-event-row--' + tone;
-		var meta = document.createElement('span');
-		meta.className = 'l7-event-meta';
+		row.className = itemClass;
+		var meta = document.createElement('div');
+		meta.className = 'small text-muted';
 		meta.textContent = (ex && ex.when) ? ex.when : '';
-		var title = document.createElement('span');
-		title.className = 'l7-event-title';
+		var titleWrap = document.createElement('div');
+		var title = document.createElement('strong');
 		title.textContent = (ex && ex.title) ? ex.title : '';
-		var summary = document.createElement('p');
-		summary.className = 'l7-event-summary';
+		titleWrap.appendChild(title);
+		var summary = document.createElement('div');
+		summary.className = 'small';
 		summary.textContent = (ex && ex.summary) ? ex.summary : '';
-		var raw = document.createElement('div');
-		raw.className = 'l7-event-raw';
+		var details = document.createElement('details');
+		details.className = 'l7-event-raw-wrap';
+		var summaryEl = document.createElement('summary');
+		summaryEl.className = 'small text-muted';
+		summaryEl.textContent = <?= json_encode(l7_t("Mostrar detalhe tecnico")); ?>;
+		var raw = document.createElement('pre');
+		raw.className = 'pre-scrollable small';
 		raw.textContent = eventRaw(ex);
+		details.appendChild(summaryEl);
+		details.appendChild(raw);
 		row.appendChild(meta);
-		row.appendChild(title);
+		row.appendChild(titleWrap);
 		row.appendChild(summary);
-		row.appendChild(raw);
+		row.appendChild(details);
+		if (techBox && techBox.checked) {
+			details.open = true;
+		}
 		return row;
+	}
+
+	function applyTech() {
+		if (!techBox) return;
+		var open = techBox.checked;
+		var nodes = document.querySelectorAll('.l7-event-raw-wrap');
+		for (var i = 0; i < nodes.length; i++) {
+			nodes[i].open = open;
+		}
+		try {
+			localStorage.setItem(techKey, open ? '1' : '0');
+		} catch (e) {}
 	}
 
 	function updateView() {
 		if (!liveView) return;
 		liveView.textContent = '';
 		if (seenLines.length === 0) {
-			var empty = document.createElement('div');
-			empty.className = 'l7-event-empty';
+			var empty = document.createElement('p');
+			empty.className = 'list-group-item text-muted';
 			empty.textContent = l7WaitingEvents;
 			liveView.appendChild(empty);
 		} else {
@@ -274,6 +322,7 @@ layer7_render_styles();
 			countEl.textContent = seenLines.length > 0
 				? seenLines.length + ' ' + l7LineSuffix : '';
 		}
+		applyTech();
 	}
 
 	function mergeIncoming(incoming) {
@@ -341,19 +390,7 @@ layer7_render_styles();
 		timer = setInterval(fetchLive, refreshMs);
 	}
 
-	function applyTech() {
-		if (!pageEl || !techBox) return;
-		if (techBox.checked) {
-			pageEl.classList.add('l7-show-tech');
-		} else {
-			pageEl.classList.remove('l7-show-tech');
-		}
-		try {
-			localStorage.setItem(techKey, techBox.checked ? '1' : '0');
-		} catch (e) {}
-	}
-
-	if (techBox && pageEl) {
+	if (techBox) {
 		try {
 			techBox.checked = localStorage.getItem(techKey) === '1';
 		} catch (e) {}
@@ -388,5 +425,9 @@ layer7_render_styles();
 	schedule();
 })();
 </script>
-<?php layer7_render_footer(); ?>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 <?php require_once("foot.inc"); ?>

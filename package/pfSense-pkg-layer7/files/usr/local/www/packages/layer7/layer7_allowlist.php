@@ -100,58 +100,61 @@ $user_entries = isset($data["layer7"]["dst_allowlist"]) &&
     ? $data["layer7"]["dst_allowlist"] : array();
 $seed_entries = layer7_dst_allowlist_seed_entries();
 
+require_once("classes/Form.class.php");
+
+$l7_allow_entries_display = implode("\n", $user_entries);
+if (($_POST["save_allowlist"] ?? false) && empty($savemsg)) {
+	$l7_allow_entries_display = (string)($_POST["entries"] ?? "");
+}
+
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Allowlist"));
 include("head.inc");
-layer7_render_styles();
+layer7_render_tabs("allowlist");
+layer7_render_messages();
 ?>
-<div class="panel panel-default layer7-page">
+<div class="alert alert-info">
+	<?= htmlspecialchars(l7_t("A lista do operador e somada a lista-semente embutida. Aceita dominios e subdominios por sufixo, IPv4/IPv6 e CIDRs. Politicas de bloqueio explicitas e regras nativas do pfSense continuam a aplicar-se.")); ?>
+</div>
+<?php
+$form = new Form(false);
+$form->setAction("layer7_allowlist.php");
+$sec = new Form_Section(l7_t("Entradas do operador"));
+$hid = new Form_Input("save_allowlist", "", "hidden", "1");
+$sec->addInput($hid);
+$entries_in = new Form_Textarea("entries", l7_t("Entradas"), $l7_allow_entries_display);
+$entries_in->setRows(14);
+$entries_in->setAttribute("id", "l7-allow-entries");
+$entries_in->setHelp(l7_t("1 entrada por linha. Linhas vazias e linhas que comecem por '#' sao ignoradas. Exemplos validos: bb.com.br, 8.8.8.8, 200.201.0.0/16, 2001:db8::1, 2001:db8::/32."));
+$sec->addInput($entries_in);
+$submit_html = '<button type="submit" class="btn btn-primary" id="l7-allow-submit">' .
+	'<i class="fa fa-save"></i> ' . htmlspecialchars(l7_t("Gravar allowlist")) . '</button>';
+$sec->addInput(new Form_StaticText("", $submit_html));
+$form->add($sec);
+print($form);
+?>
+<div class="panel panel-default" id="l7-allow-seed">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - allowlist de destinos"); ?></h2>
+		<h2 class="panel-title">
+			<?= htmlspecialchars(l7_t("Lista-semente embutida")); ?>
+			<span class="badge"><?= (int)count($seed_entries); ?></span>
+		</h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("allowlist"); ?>
-		<div class="layer7-content">
-			<?php layer7_render_messages(); ?>
-
-			<p class="layer7-lead">
-				<?= l7_t("Destinos que NUNCA devem ser bloqueados pelo Layer7, mesmo em enforce. Aceita dominios (cobrem subdominios por sufixo), IPv4/IPv6 host e CIDRs IPv4/IPv6. A lista do operador e somada a uma lista-semente embutida (bancos BR, gov, push mobile)."); ?>
-			</p>
-
-			<form method="post" action="layer7_allowlist.php" class="form-horizontal">
-				<input type="hidden" name="save_allowlist" value="1" />
-
-				<div class="layer7-admin-block">
-					<div class="layer7-admin-block__header"><?= l7_t("Entradas do operador"); ?></div>
-					<div class="layer7-admin-block__body">
-						<p class="text-muted"><?= l7_t("1 entrada por linha. Linhas vazias e linhas que comecem por '#' sao ignoradas. Exemplos validos: bb.com.br, 8.8.8.8, 200.201.0.0/16, 2001:db8::1, 2001:db8::/32."); ?></p>
-						<textarea name="entries" rows="14" class="form-control" style="font-family:monospace;"><?= htmlspecialchars(implode("\n", $user_entries)); ?></textarea>
-						<div style="margin-top:12px;">
-							<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Gravar allowlist"); ?></button>
-						</div>
-					</div>
-				</div>
-
-				<div class="layer7-admin-block">
-					<div class="layer7-admin-block__header">
-						<?= l7_t("Lista-semente embutida"); ?>
-						<span class="badge"><?= count($seed_entries); ?></span>
-					</div>
-					<div class="layer7-admin-block__body">
-						<p class="text-muted"><?= l7_t("Apenas leitura. Instalada pelo pacote em /usr/local/etc/layer7/allowlist-seed.txt. Para remover entradas da seed, adicione-as via blacklists (cobrem a allowlist) ou contacte o suporte."); ?></p>
-						<?php if (empty($seed_entries)) { ?>
-							<p class="text-warning"><?= l7_t("Ficheiro de seed ausente ou ilegivel."); ?></p>
-						<?php } else { ?>
-							<details>
-								<summary style="cursor:pointer;"><?= l7_t("Mostrar/esconder seed"); ?></summary>
-								<pre style="max-height: 300px; overflow:auto; margin-top:8px; background:#f7f7f7; padding:8px 12px;"><?= htmlspecialchars(implode("\n", $seed_entries)); ?></pre>
-							</details>
-						<?php } ?>
-					</div>
-				</div>
-			</form>
-
-			<?php layer7_render_footer(); ?>
-		</div>
+		<p class="help-block"><?= htmlspecialchars(l7_t("Apenas leitura. Esta lista e fornecida pelo pacote. Para solicitar alteracoes, contacte o suporte.")); ?></p>
+		<p class="help-block text-muted"><?= htmlspecialchars(l7_t("Ficheiro do pacote: /usr/local/etc/layer7/allowlist-seed.txt")); ?></p>
+		<?php if (empty($seed_entries)) { ?>
+		<div class="alert alert-warning"><?= htmlspecialchars(l7_t("Ficheiro de seed ausente ou ilegivel.")); ?></div>
+		<?php } else { ?>
+		<details>
+			<summary><?= htmlspecialchars(l7_t("Mostrar/esconder seed")); ?></summary>
+			<pre class="pre-scrollable"><?= htmlspecialchars(implode("\n", $seed_entries)); ?></pre>
+		</details>
+		<?php } ?>
 	</div>
 </div>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 <?php include("foot.inc"); ?>

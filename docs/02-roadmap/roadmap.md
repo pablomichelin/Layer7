@@ -142,8 +142,24 @@ GUI1 piloto Status **PUBLICADO `v1.9.80`** (`releases/latest`; SHA256
 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
 tag `7bd1fd0`; source/build `b84634c`). `v1.9.79` retirada do download
 (latest-only / BG-164; tag git preservada). Appliance/visual **pendentes**
-(`.254` SSH timeout; **não** homologado no appliance). GUI2–GUI7 aguardam
-**GO humano**.
+(`.254` SSH timeout; **não** homologado no appliance). GO visual integral
+`2026-09-04` (não operacional). GUI3 Policies V4-A **implementado, revisão
+local gerente PASS, pendente commit**; **V4-B1 biblioteca implementado, gates
+locais PASS, pendente commit**; **V4-B2a opções de perfil implementado,
+cobertura B2a completa gates locais (harness **158** + jsdom **226** PASS padrão;
+pin opcional +11 = **237** cumulativos), pendente
+revisão final/commit/visual/CE/CSRF/appliance** (**V4-B2b editor/criação revisão
+independente gerente PASS** — harness **135** + jsdom **142** PASS; CSS **21 PASS** (pin env);
+regressão cumulativa Options **158** / Library **194** / View **685** / Library jsdom **93** PASS;
+pendente commit/visual/CE/CSRF/appliance; **V4-B2c wrapper/CSS Policies revisão
+independente gerente PASS** — `test_policies_native_view.php` **88 PASS**; regressão cumulativa Edit/Options/Library/View/jsdom/CSS PASS;
+pendente commit/visual/CE/CSRF/appliance; **GUI2a subnav Políticas gate funcional PASS**
+(`test_policies_subnav_native.php` ALL PASS; auditoria byte-identica opcional via `LAYER7_GUI2A_BASELINE`);
+pendente revisão gerente/commit/visual/CE/CSRF/appliance; **V5 Allowlist revisão independente gerente PASS**, pendente commit/visual/CE/CSRF/appliance; **V6a Exceptions revisão independente final gerente PASS local** (`2026-09-05`; residual 16/64/32; pendente commit/visual/CE/CSRF/appliance); **V6b1 Lista VIP revisão independente final gerente PASS local** (`2026-09-05`; **213** `PASS:` VIP + contrato **10**; pendente commit/visual/CE/CSRF/appliance); **V6b2a DHCP exclusivo revisão independente final gerente PASS local** (`2026-09-05`; **162** `PASS:` DHCP + json audit **36** + regressão VIP **219**; POST limite 32 preserva retry; pendente commit/visual/CE/CSRF/appliance); **V6b2b lote/import/export implementado, revisão local Composer 2.5 PASS** (`2026-09-05`; modos `?vip_bulk=1` / `?vip_import=1`; export Form nativo; avisos estáticos lote; effects **34** + json audit **56** + export **72** + harness **32** + jsdom **46** = **240** `PASS:` V6b2b; headers HTTP export pendentes; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **V6c fechamento visual revisão gerencial local PASS** (`2026-09-05`; native_view **84** + freeze **32**; evidência `revisao-gerente-v6c.md`; pendente commit/visual real/CE/CSRF/HTTP export/appliance); **V7 Eventos implementado, gates locais Composer 2.5 PASS** (`2026-09-05`; native_view **61** + freeze **10** + render_row **13** + payload **12** + jsdom **18** + humanize **31**; pendente revisão independente final/commit/visual/CE/CSRF/appliance);
+V4-B2 modais/CSS global pendente). GUI4
+Devices V1 **implementado, pendente de gates/commit**. GUI4 Groups V2
+**implementado, pendente de gates/commit**. Catálogo nDPI V3 **implementado, pendente de
+gates/commit**. Exceptions e GUI5–GUI7 ainda não neste bloco.
 
 A trilha não substitui F0–F7: mudanças de package/GUI pertencem à manutenção
 F4, a regressão repetível e acessibilidade à F5, e empacotamento/release à F7.

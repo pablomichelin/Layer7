@@ -348,100 +348,89 @@ sort($ndpi_cats);
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Teste"));
 include("head.inc");
-layer7_render_styles();
 ?>
-<div class="panel panel-default layer7-page">
+<?php layer7_render_tabs("policies"); ?>
+
+<?php layer7_render_messages(); ?>
+
+<?php layer7_render_policies_subnav("test"); ?>
+
+<div class="alert alert-info" role="status">
+	<?= htmlspecialchars(l7_t("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce.")); ?>
+</div>
+
+<div id="l7-test-root">
+
+<div class="panel panel-default" id="l7-test">
 	<div class="panel-heading">
 		<h2 class="panel-title"><?= l7_t("Layer 7 - teste de politica"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("policies"); ?>
-		<div class="layer7-content">
-			<?php layer7_render_messages(); ?>
-			<?php layer7_render_policies_subnav("test"); ?>
+<?php
+require_once("classes/Form.class.php");
+$ndpi_app_opts = array("" => l7_t("— qualquer —"));
+foreach ($ndpi_protos as $proto) {
+	$ndpi_app_opts[$proto] = $proto;
+}
+$ndpi_cat_opts = array("" => l7_t("— qualquer —"));
+foreach ($ndpi_cats as $cat) {
+	$ndpi_cat_opts[$cat] = $cat;
+}
 
-			<p class="layer7-lead"><?= l7_t("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce."); ?></p>
+$form = new Form(false);
+$form->setAction("layer7_test.php#l7-test");
+$sec = new Form_Section(l7_t("Parametros do teste"));
 
-		<div class="layer7-admin-block" id="l7-test">
-			<div class="layer7-admin-block__header"><?= l7_t("Parametros do teste"); ?></div>
-			<div class="layer7-admin-block__body">
-			<form method="post" action="layer7_test.php#l7-test" class="form-horizontal">
+$domain_in = new Form_Input("test_domain", l7_t("Dominio ou IP destino"), "text", $test_domain);
+$domain_in->setAttribute("maxlength", "255");
+$domain_in->setAttribute("placeholder", "youtube.com ou 142.250.185.46");
+$domain_in->setHelp(l7_t("Dominio (ex.: youtube.com) ou IPv4 de destino. Dominios sao comparados com match.hosts das politicas."));
+$sec->addInput($domain_in);
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Dominio ou IP destino"); ?></label>
-					<div class="col-sm-6">
-						<input type="text" name="test_domain" class="form-control" maxlength="255"
-							value="<?= htmlspecialchars($test_domain); ?>"
-							placeholder="youtube.com ou 142.250.185.46" />
-						<p class="help-block"><?= l7_t("Dominio (ex.: youtube.com) ou IPv4 de destino. Dominios sao comparados com match.hosts das politicas."); ?></p>
-					</div>
-				</div>
+$src_in = new Form_Input("test_src_ip", l7_t("IP de origem"), "text", $test_src_ip);
+$src_in->setAttribute("maxlength", "48");
+$src_in->setAttribute("placeholder", "10.0.85.50");
+$src_in->setHelp(l7_t("Opcional. IPv4 do cliente. Vazio = ignora filtro por origem."));
+$sec->addInput($src_in);
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("IP de origem"); ?></label>
-					<div class="col-sm-6">
-						<input type="text" name="test_src_ip" class="form-control" maxlength="48"
-							value="<?= htmlspecialchars($test_src_ip); ?>"
-							placeholder="10.0.85.50" />
-						<p class="help-block"><?= l7_t("Opcional. IPv4 do cliente. Vazio = ignora filtro por origem."); ?></p>
-					</div>
-				</div>
+$app_sel = new Form_Select("test_ndpi_app", l7_t("App nDPI"), $test_ndpi_app, $ndpi_app_opts);
+$app_sel->setHelp(l7_t("Opcional. Selecione a app nDPI que o fluxo teria."));
+$sec->addInput($app_sel);
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("App nDPI"); ?></label>
-					<div class="col-sm-6">
-						<select name="test_ndpi_app" class="form-control">
-							<option value=""><?= l7_t("— qualquer —"); ?></option>
-							<?php foreach ($ndpi_protos as $proto) { ?>
-							<option value="<?= htmlspecialchars($proto); ?>" <?= $test_ndpi_app === $proto ? 'selected="selected"' : ''; ?>><?= htmlspecialchars($proto); ?></option>
-							<?php } ?>
-						</select>
-						<p class="help-block"><?= l7_t("Opcional. Selecione a app nDPI que o fluxo teria."); ?></p>
-					</div>
-				</div>
+$cat_sel = new Form_Select("test_ndpi_cat", l7_t("Categoria nDPI"), $test_ndpi_cat, $ndpi_cat_opts);
+$cat_sel->setHelp(l7_t("Opcional. Categoria nDPI do fluxo."));
+$sec->addInput($cat_sel);
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Categoria nDPI"); ?></label>
-					<div class="col-sm-6">
-						<select name="test_ndpi_cat" class="form-control">
-							<option value=""><?= l7_t("— qualquer —"); ?></option>
-							<?php foreach ($ndpi_cats as $cat) { ?>
-							<option value="<?= htmlspecialchars($cat); ?>" <?= $test_ndpi_cat === $cat ? 'selected="selected"' : ''; ?>><?= htmlspecialchars($cat); ?></option>
-							<?php } ?>
-						</select>
-						<p class="help-block"><?= l7_t("Opcional. Categoria nDPI do fluxo."); ?></p>
-					</div>
-				</div>
+$submit_html = '<button type="submit" name="run_test" value="1" class="btn btn-primary">' .
+	'<i class="fa fa-play"></i> ' . htmlspecialchars(l7_t("Testar")) . '</button>';
+$sec->addInput(new Form_StaticText("", $submit_html));
 
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="run_test" value="1" class="btn btn-primary">
-							<i class="fa fa-play"></i> <?= l7_t("Testar"); ?>
-						</button>
-					</div>
-				</div>
-			</form>
-		</div>
-		</div>
+$form->add($sec);
+print($form);
+?>
+	</div>
+</div>
 
 		<?php if ($test_results !== null) {
 			$res = $test_results["results"];
 			$resolved = $test_results["resolved_ips"];
 			$cur_mode = $test_results["mode"];
 		?>
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Resultado do teste"); ?></div>
-			<div class="layer7-admin-block__body">
+<div class="panel panel-default" id="l7-test-results">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Resultado do teste"); ?></h2>
+	</div>
+	<div class="panel-body">
 
 			<?php if (!empty($resolved)) { ?>
-			<div class="alert alert-info">
+			<div class="alert alert-info" role="status">
 				<strong><?= l7_t("DNS:"); ?></strong>
 				<?= htmlspecialchars($test_domain); ?> &rarr;
 				<?= htmlspecialchars(implode(", ", $resolved)); ?>
 			</div>
 			<?php } ?>
 
-			<div class="alert alert-info">
+			<div class="alert alert-info" role="status">
 				<strong><?= l7_t("Modo actual:"); ?></strong>
 				<code><?= htmlspecialchars($cur_mode); ?></code>
 			</div>
@@ -463,16 +452,16 @@ layer7_render_styles();
 					$vclass = "alert-info";
 				}
 			?>
-			<div class="alert <?= $vclass; ?>" style="font-size:16px;">
-				<strong style="font-size:18px;"><?= htmlspecialchars($verdict["label"] ?? l7_test_verdict_label($verdict["action"])); ?></strong>
-				<br /><span style="margin-top:6px;display:inline-block;"><?= htmlspecialchars($verdict["reason"]); ?></span>
+			<div class="alert <?= $vclass; ?>" id="l7-test-verdict" role="status">
+				<strong class="lead"><?= htmlspecialchars($verdict["label"] ?? l7_test_verdict_label($verdict["action"])); ?></strong>
+				<p><?= htmlspecialchars($verdict["reason"]); ?></p>
 				<?php if (!empty($verdict["detail"]) && ($verdict["detail"] ?? "") !== ($verdict["reason"] ?? "")) { ?>
-				<br /><small class="text-muted"><?= htmlspecialchars($verdict["detail"]); ?></small>
+				<p class="text-muted"><small><?= htmlspecialchars($verdict["detail"]); ?></small></p>
 				<?php } ?>
 				<?php if ($verdict["enforce"]) { ?>
-				<br /><small class="text-muted"><?= l7_t("Modo enforce activo: esta accao seria aplicada em producao."); ?></small>
+				<p class="text-muted"><small><?= l7_t("Modo enforce activo: esta accao seria aplicada em producao."); ?></small></p>
 				<?php } else { ?>
-				<br /><small class="text-muted"><?= l7_t("Modo monitor: nenhuma accao de bloqueio seria aplicada."); ?></small>
+				<p class="text-muted"><small><?= l7_t("Modo monitor: nenhuma accao de bloqueio seria aplicada."); ?></small></p>
 				<?php } ?>
 			</div>
 			<?php } ?>
@@ -513,12 +502,15 @@ layer7_render_styles();
 			</div>
 			<?php } ?>
 
-			<p class="layer7-muted-note small"><?= l7_t("Esta simulacao usa as politicas e excepcoes do JSON actual. O daemon nDPI pode ter resultados diferentes dependendo da classificacao real do trafego."); ?></p>
-		</div>
-		</div>
-		<?php } ?>
-		</div>
+			<p class="help-block text-muted"><?= l7_t("Esta simulacao usa as politicas e excepcoes do JSON actual. O daemon nDPI pode ter resultados diferentes dependendo da classificacao real do trafego."); ?></p>
 	</div>
 </div>
-<?php layer7_render_footer(); ?>
+		<?php } ?>
+
+</div>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 <?php require_once("foot.inc"); ?>

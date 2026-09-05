@@ -11635,12 +11635,19 @@ function layer7_render_policies_subnav($active)
 		"categories" => array("href" => "layer7_categories.php", "label" => l7_t("Categorias nDPI")),
 		"test" => array("href" => "layer7_test.php", "label" => l7_t("Simular teste")),
 	);
-	echo '<nav class="l7-policies-subnav" aria-label="' . htmlspecialchars(l7_t("Politicas")) . '">';
+	echo '<nav aria-label="' . htmlspecialchars(l7_t("Politicas")) . '">';
+	echo '<ul class="nav nav-tabs">';
 	foreach ($items as $key => $item) {
-		$cls = ($key === $active) ? ' class="active"' : '';
-		echo '<a href="' . htmlspecialchars($item["href"]) . '"' . $cls . '>' .
-		    htmlspecialchars($item["label"]) . '</a>';
+		$is_active = ($key === $active);
+		echo '<li' . ($is_active ? ' class="active"' : '') . '>';
+		echo '<a href="' . htmlspecialchars($item["href"]) . '"';
+		if ($is_active) {
+			echo ' aria-current="page"';
+		}
+		echo '>' . htmlspecialchars($item["label"]) . '</a>';
+		echo '</li>';
 	}
+	echo '</ul>';
 	echo '</nav>';
 }
 

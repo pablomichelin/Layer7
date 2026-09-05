@@ -149,25 +149,20 @@ $period_label = date("d/m/Y H:i", $from_ts) . " - " . date("d/m/Y H:i", $to_ts);
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Relatorios"));
 include("head.inc");
-layer7_render_styles();
+$l7_clear_reports_confirm = json_encode(
+	l7_t('Apagar o banco detalhado e o historico executivo? Os arquivos rotativos permanecem.'),
+	JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+);
 ?>
-<style>
-.l7r-summary{background:#fbfbfb;border:1px solid #e5e5e5;padding:12px 14px;border-radius:6px}
-.l7r-summary ul{margin:0;padding-left:20px}
-.l7r-summary li{margin:4px 0}
-</style>
-
-<div class="panel panel-default layer7-page">
-<div class="panel-heading">
-	<h2 class="panel-title">Layer 7 — <?= l7_t("Relatorios executivos"); ?></h2>
-</div>
-<div class="panel-body">
 <?php layer7_render_tabs("reports"); ?>
-<div class="layer7-content">
+
 <?php layer7_render_messages(); ?>
+
 <?php if ($clear_msg !== "") { ?>
 <div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($clear_msg); ?></div>
 <?php } ?>
+
+<div id="l7-reports-root">
 
 <?php
 $_rpt_notices = array();
@@ -190,107 +185,163 @@ if ($rpt_enabled && $rpt_detail_enabled && $detail_range_truncated) {
 	$_rpt_notices[] = sprintf(l7_t("Retencao: %d dias."), $rpt_event_retention);
 }
 if (!empty($_rpt_notices)) { ?>
-<div class="alert alert-warning" style="margin-bottom:12px;">
+<div class="alert alert-warning" role="status">
 	<i class="fa fa-info-circle"></i> <?= implode(" &middot; ", array_map('htmlspecialchars', $_rpt_notices)); ?>
 </div>
 <?php } ?>
 
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Filtros e exportacao"); ?></div>
-			<div class="layer7-admin-block__body">
-<form method="get" class="l7r-filters">
+<div class="panel panel-default" id="l7-reports-filters">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Filtros e exportacao"); ?></h2>
+	</div>
+	<div class="panel-body">
+<form method="get" class="form-horizontal" id="l7r-filters-form">
 	<div class="form-group">
-		<label><?= l7_t("Periodo"); ?></label><br>
+		<label class="col-sm-2 control-label"><?= l7_t("Periodo"); ?></label>
+		<div class="col-sm-10">
+			<div class="btn-group" role="group">
 		<?php
 		$ranges = array("1h" => "1h", "6h" => "6h", "24h" => "24h", "7d" => "7d", "30d" => "30d");
 		foreach ($ranges as $rk => $rl) {
 			$cls = ($range === $rk) ? "btn btn-xs btn-primary" : "btn btn-xs btn-default";
-			echo '<a class="' . $cls . '" style="margin-right:4px;" href="?range=' . $rk . '">' . htmlspecialchars($rl) . '</a>';
+			echo '<a class="' . $cls . '" href="?range=' . htmlspecialchars($rk) . '">' . htmlspecialchars($rl) . '</a>';
 		}
 		?>
+			</div>
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Inicio"); ?></label>
-		<input type="date" name="from" class="form-control input-sm" value="<?= htmlspecialchars($custom_from ?: date("Y-m-d", $from_ts)); ?>">
+		<label class="col-sm-2 control-label" for="l7r-filter-from"><?= l7_t("Inicio"); ?></label>
+		<div class="col-sm-4">
+		<input type="date" name="from" id="l7r-filter-from" class="form-control input-sm" value="<?= htmlspecialchars($custom_from ?: date("Y-m-d", $from_ts)); ?>">
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Fim"); ?></label>
-		<input type="date" name="to" class="form-control input-sm" value="<?= htmlspecialchars($custom_to ?: date("Y-m-d", $to_ts)); ?>">
+		<label class="col-sm-2 control-label" for="l7r-filter-to"><?= l7_t("Fim"); ?></label>
+		<div class="col-sm-4">
+		<input type="date" name="to" id="l7r-filter-to" class="form-control input-sm" value="<?= htmlspecialchars($custom_to ?: date("Y-m-d", $to_ts)); ?>">
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Dispositivo (IP)"); ?></label>
-		<input type="text" name="src_ip" class="form-control input-sm" placeholder="192.168.10.50" value="<?= htmlspecialchars($filters["src_ip"]); ?>">
+		<label class="col-sm-2 control-label" for="l7r-filter-src_ip"><?= l7_t("Dispositivo (IP)"); ?></label>
+		<div class="col-sm-4">
+		<input type="text" name="src_ip" id="l7r-filter-src_ip" class="form-control input-sm" placeholder="192.168.10.50" value="<?= htmlspecialchars($filters["src_ip"]); ?>">
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Site"); ?></label>
-		<input type="text" name="host" class="form-control input-sm" placeholder="exemplo.com" value="<?= htmlspecialchars($filters["host"]); ?>">
+		<label class="col-sm-2 control-label" for="l7r-filter-host"><?= l7_t("Site"); ?></label>
+		<div class="col-sm-4">
+		<input type="text" name="host" id="l7r-filter-host" class="form-control input-sm" placeholder="exemplo.com" value="<?= htmlspecialchars($filters["host"]); ?>">
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Resultado"); ?></label>
-		<select name="action" class="form-control input-sm">
+		<label class="col-sm-2 control-label" for="l7r-filter-action"><?= l7_t("Resultado"); ?></label>
+		<div class="col-sm-4">
+		<select name="action" id="l7r-filter-action" class="form-control input-sm">
 			<option value=""><?= l7_t("Todos"); ?></option>
 			<option value="block" <?= $filters["action"] === "block" ? 'selected' : ''; ?>><?= l7_t("Bloqueado"); ?></option>
 			<option value="allow" <?= $filters["action"] === "allow" ? 'selected' : ''; ?>><?= l7_t("Permitido"); ?></option>
 			<option value="monitor" <?= $filters["action"] === "monitor" ? 'selected' : ''; ?>><?= l7_t("Monitorado"); ?></option>
 		</select>
+		</div>
 	</div>
 	<div class="form-group">
-		<label><?= l7_t("Pesquisa livre"); ?></label>
-		<input type="text" name="q" class="form-control input-sm" placeholder="<?= l7_t("app, categoria, politica..."); ?>" value="<?= htmlspecialchars($filters["q"]); ?>">
+		<label class="col-sm-2 control-label" for="l7r-filter-q"><?= l7_t("Pesquisa livre"); ?></label>
+		<div class="col-sm-6">
+		<input type="text" name="q" id="l7r-filter-q" class="form-control input-sm" placeholder="<?= l7_t("app, categoria, politica..."); ?>" value="<?= htmlspecialchars($filters["q"]); ?>">
+		</div>
 	</div>
 	<input type="hidden" name="range" value="custom">
 	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
 		<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-search"></i> <?= l7_t("Aplicar filtros"); ?></button>
 		<a href="layer7_reports.php?range=24h" class="btn btn-default btn-sm"><?= l7_t("Limpar"); ?></a>
+		</div>
 	</div>
 </form>
 
-<div id="l7-tools" style="margin-bottom:0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px;">
-	<div>
+<div id="l7-tools" class="clearfix">
+	<div class="pull-left">
 		<a href="layer7_reports_export.php?format=html&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">HTML</a>
 		<a href="layer7_reports_export.php?format=csv&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">CSV</a>
 		<a href="layer7_reports_export.php?format=json&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">JSON</a>
 	</div>
-	<form method="post" action="layer7_reports.php#l7-tools" style="display:inline;">
-		<button type="submit" name="clear_all_reports" value="1" class="btn btn-sm btn-danger"
-			onclick="return confirm(<?= json_encode(l7_t('Apagar o banco detalhado e o historico executivo? Os arquivos rotativos permanecem.')) ?>);">
+	<form method="post" action="layer7_reports.php#l7-tools" class="pull-right"
+		onsubmit='return confirm(<?= $l7_clear_reports_confirm; ?>);'>
+		<button type="submit" name="clear_all_reports" value="1" class="btn btn-sm btn-danger">
 			<i class="fa fa-trash"></i> <?= l7_t("Limpar dados de relatorios"); ?>
 		</button>
 	</form>
 </div>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Resumo"); ?> <span class="badge"><?= htmlspecialchars($period_label); ?></span></div>
-			<div class="layer7-admin-block__body">
-<div class="l7-kpi-cards">
-	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($total_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas totais"); ?></div></div>
-	<div class="l7-kpi-card l7-kpi-card--danger"><div class="l7-kpi-card__value"><?= number_format($blocked_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas bloqueadas"); ?></div></div>
-	<div class="l7-kpi-card l7-kpi-card--success"><div class="l7-kpi-card__value"><?= number_format($allowed_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas permitidas"); ?></div></div>
-	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= $block_rate; ?>%</div><div class="l7-kpi-card__label"><?= l7_t("Indice de bloqueio"); ?></div></div>
-	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($unique_devices); ?></div><div class="l7-kpi-card__label"><?= l7_t("Dispositivos observados"); ?></div></div>
-	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($unique_sites); ?></div><div class="l7-kpi-card__label"><?= l7_t("Sites observados"); ?></div></div>
-</div>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Evolucao no periodo"); ?></div>
-			<div class="layer7-admin-block__body">
-	<div class="l7r-chart" id="l7r-chart-wrap" style="margin-bottom:0;">
-		<canvas id="timelineChart" height="85"></canvas>
-		<div id="l7r-chart-empty" class="alert alert-info" style="display:none;margin:0;"><?= l7_t("Grafico indisponivel (biblioteca offline ausente ou sem dados no periodo)."); ?></div>
 	</div>
-			</div>
-		</div>
+</div>
 
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Tops"); ?></div>
-			<div class="layer7-admin-block__body">
+<div class="panel panel-default" id="l7-reports-summary">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Resumo"); ?> <span class="badge"><?= htmlspecialchars($period_label); ?></span></h2>
+	</div>
+	<div class="panel-body">
+<div class="row">
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead text-primary"><?= number_format($total_events); ?></p>
+			<p class="text-muted small"><?= l7_t("Tentativas totais"); ?></p>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead text-danger"><?= number_format($blocked_events); ?></p>
+			<p class="text-muted small"><?= l7_t("Tentativas bloqueadas"); ?></p>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead text-success"><?= number_format($allowed_events); ?></p>
+			<p class="text-muted small"><?= l7_t("Tentativas permitidas"); ?></p>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead"><?= $block_rate; ?>%</p>
+			<p class="text-muted small"><?= l7_t("Indice de bloqueio"); ?></p>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead"><?= number_format($unique_devices); ?></p>
+			<p class="text-muted small"><?= l7_t("Dispositivos observados"); ?></p>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-2">
+		<div class="well well-sm text-center">
+			<p class="lead"><?= number_format($unique_sites); ?></p>
+			<p class="text-muted small"><?= l7_t("Sites observados"); ?></p>
+		</div>
+	</div>
+</div>
+	</div>
+</div>
+
+<div class="panel panel-default" id="l7-reports-chart">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Evolucao no periodo"); ?></h2>
+	</div>
+	<div class="panel-body">
+	<div id="l7r-chart-wrap">
+		<canvas id="timelineChart" height="85"></canvas>
+		<div id="l7r-chart-empty" class="alert alert-info hidden" role="status"><?= l7_t("Grafico indisponivel (biblioteca offline ausente ou sem dados no periodo)."); ?></div>
+	</div>
+	</div>
+</div>
+
+<div class="panel panel-default" id="l7-reports-tops">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Tops"); ?></h2>
+	</div>
+	<div class="panel-body">
 <div class="row">
 	<div class="col-md-6">
-		<h4 class="layer7-form-card__title"><?= l7_t("Dispositivos com mais bloqueios"); ?></h4>
+		<h4><?= l7_t("Dispositivos com mais bloqueios"); ?></h4>
 		<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
 		<?php } else { ?>
@@ -315,7 +366,7 @@ if (!empty($_rpt_notices)) { ?>
 		<?php } ?>
 	</div>
 	<div class="col-md-6">
-		<h4 class="layer7-form-card__title"><?= l7_t("Sites mais tentados"); ?></h4>
+		<h4><?= l7_t("Sites mais tentados"); ?></h4>
 		<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
 		<?php } else { ?>
@@ -337,12 +388,14 @@ if (!empty($_rpt_notices)) { ?>
 		<?php } ?>
 	</div>
 </div>
-			</div>
-		</div>
+	</div>
+</div>
 
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Eventos detalhados"); ?></div>
-			<div class="layer7-admin-block__body">
+<div class="panel panel-default" id="l7-reports-events">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Eventos detalhados"); ?></h2>
+	</div>
+	<div class="panel-body">
 	<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Eventos detalhados estao desactivados neste appliance. Active o log detalhado em Definicoes para pesquisa operacional."); ?></div>
 	<?php } else { ?>
@@ -369,7 +422,7 @@ if (!empty($_rpt_notices)) { ?>
 				<td>
 					<?= htmlspecialchars($ev["host"] ?: "-"); ?>
 					<?php if (!empty($ev["host_inferred"])) { ?>
-						<span class="l7r-inferred"><?= l7_t("Host inferido (DNS)"); ?></span>
+						<span class="label label-warning"><?= l7_t("Host inferido (DNS)"); ?></span>
 					<?php } ?>
 				</td>
 				<td><?= htmlspecialchars($ev["app"] ?: "-"); ?></td>
@@ -416,13 +469,15 @@ if (!empty($_rpt_notices)) { ?>
 		</nav>
 	<?php } ?>
 	<?php } ?>
-			</div>
-		</div>
+	</div>
+</div>
 
-<?php layer7_render_footer(); ?>
 </div>
-</div>
-</div>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 
 <script src="/packages/layer7/js/chart.umd.min.js"></script>
 <script>
@@ -447,8 +502,8 @@ if (typeof Chart !== 'undefined' && timeline.length > 0 && chartCanvas) {
 		options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
 	});
 } else {
-	if (chartCanvas) { chartCanvas.style.display = 'none'; }
-	if (chartEmpty) { chartEmpty.style.display = 'block'; }
+	if (chartCanvas) { chartCanvas.classList.add('hidden'); }
+	if (chartEmpty) { chartEmpty.classList.remove('hidden'); }
 }
 </script>
 

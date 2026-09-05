@@ -214,7 +214,9 @@ A tela de Proteção separa:
 - **Políticas aplicadas:** fonte do runtime; editar, activar/desactivar,
   detalhes e remover;
 - **Biblioteca:** factory/custom/override/hidden, pesquisa e filtros;
-- **Rascunho de perfis:** mudanças locais com barra fixa `Descartar` / `Aplicar`;
+- **Rascunho de perfis:** mudanças locais com `print_info_box()`/`alert`
+  junto do formulário e botões no rodapé normal (ADR-0037: sem barra
+  sticky/flutuante);
 - **Criação personalizada:** fluxo dedicado, sem o catálogo acima dele.
 
 O objectivo “Editar Pornografia em até três interações” fica: `Proteção` →
@@ -301,7 +303,22 @@ autorização, validação ou decisão de segurança pode existir apenas no brow
 5. Confirmar se o primeiro bloco técnico autorizado será apenas fundação
    compartilhada (GUI1) ou navegação + fundação (GUI1–GUI2).
 
+GO humano `2026-09-04` autoriza implementação **somente visual** do plano
+integral, com paridade 100%, **um ficheiro por bloco** e revisão do gerente
+entre telas. **Não** é GO operacional (appliance/builder/release).
 GUI1 piloto Status recebeu GO e está **PUBLICADO `v1.9.80`** (`latest`).
-Appliance/visual **pendentes** (`.254` inacessível; **não** homologado).
-GUI2–GUI7 permanecem **analisados e planeados; código GUI não autorizado**
-sem GO próprio.
+Appliance/visual **pendentes** (**não** homologado). **GUI3 Policies V4-A**
+**implementado, revisão local gerente PASS, pendente commit** (modos
+list/edit/view/new; handlers intactos; testes harness/handlers/jsdom;
+biblioteca V4-B1 gates locais PASS; **V4-B2a opções** cobertura B2a completa
+gates locais (harness **158** + jsdom **226** PASS padrão; pin opcional +11 =
+**237** cumulativos), pendente revisão
+final/commit/visual/CE/CSRF/appliance;
+V4-B2b editor/criação revisão independente gerente PASS (harness **135** + jsdom **142** + CSS **21** PASS;
+auditoria independente gerente PASS); pendente commit/visual/CE/CSRF/appliance; **V4-B2c wrapper/CSS Policies**
+revisão independente gerente PASS; pendente commit/visual/CE/CSRF/appliance; **GUI2a subnav Políticas**
+gate funcional PASS (auditoria byte-identica opcional via `LAYER7_GUI2A_BASELINE`), pendente revisão gerente/commit/visual/CE/CSRF/appliance; **V5 Allowlist revisão independente gerente PASS**, pendente commit/visual/CE/CSRF/appliance; **V6a Exceptions revisão independente final gerente PASS local** (`2026-09-05`; residual limites 16/64/32; risco médio); **V6b1 Lista VIP revisão independente final gerente PASS local** (`2026-09-05`; **213** `PASS:` VIP + contrato **10**); **V6b2a DHCP exclusivo revisão independente final gerente PASS local** (`2026-09-05`; **162** `PASS:` DHCP; POST limite 32 preserva retry); **V6b2b lote/import/export implementado, revisão local Composer 2.5 PASS** (`2026-09-05`; modos exclusivos; avisos estáticos lote; lote/import limpam `source_groups`; export Node handler real (**240** `PASS:` V6b2b); headers HTTP pendentes; handlers intactos; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **V6c fechamento visual revisão gerencial local PASS** (`2026-09-05`; native_view **84** + freeze **32**; evidência `revisao-gerente-v6c.md`; pendente commit/visual real/CE/CSRF/HTTP export/appliance); **V7 Eventos implementado, gates locais Composer 2.5 PASS** (`2026-09-05`; native_view **61** + freeze **10** + render_row **13** + payload **12** + jsdom **18** + humanize **31**; pendente revisão independente final/commit/visual/CE/CSRF/appliance); pendente revisão independente final/commit/visual/CE/CSRF/appliance; V4-B2 modais/CSS
+global pendente). GUI4 Devices (bloco V1)
+**implementado, pendente de gates/commit** — consulta paginada + modo
+`batch` com conjunto completo do filtro + editor individual; sem
+`PORTVERSION`. Groups e GUI5–GUI7 ainda não neste bloco. Exceptions apresentação local concluída (**V6c**); homologação integral pendente (visual/appliance/CE/CSRF/commit).

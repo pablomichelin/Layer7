@@ -1,0 +1,3307 @@
+{
+  "baseline_original_files": 2551,
+  "changed_since_baseline": [
+    {
+      "path": "tests/functional/test_devices_native_view.php",
+      "baseline_sha256": "a46fc051b79a7e65ccc76828ac59bff56fa6f00fb1f712c78b12f76fe2c4a4bc",
+      "current_sha256": "f08f67ed7b103a1fb882dc5d1de432e892d4c9da398fbacc6a5c20289a234649"
+    },
+    {
+      "path": "tests/functional/test_policies_native_view.php",
+      "baseline_sha256": "adf1626efb0a71c9a20c1d1c3197b7cd5c6763fb6a09d2c7c7f732b661b43ed0",
+      "current_sha256": "c78fa2446a0eb74eb12cf8cdadd213669ffb62f030be1ff30a7330b4b5944c30"
+    },
+    {
+      "path": ".gitignore",
+      "baseline_sha256": "c5afed58066b12d41c9f5bb3316648e3fd4568bf18d838c528ddbd440efdfea6",
+      "current_sha256": "bea76e35c047a032f296e8d766d265d892fe5e31f5c66f9ae8b59313431554c9"
+    },
+    {
+      "path": "CORTEX.md",
+      "baseline_sha256": "ee71394cbc9e74b67f745b090fbd2e063bbb2a644c653058330d2df328ea3249",
+      "current_sha256": "fc986fa60db4cc7d3c5108ca9613392062388841816e055415e387e4cdb0ee26"
+    },
+    {
+      "path": "docs/00-overview/frontend-redesign-analise.md",
+      "baseline_sha256": "2576ef9c96239afd7c71b3d8857e8b361fa70858378926381fb4fb190b5068f0",
+      "current_sha256": "6955ad1ac9f5f36aed5ec6e804c6a36b572718acef0551b47ce9291ff5a2b933"
+    },
+    {
+      "path": "docs/01-architecture/frontend-redesign-inventario-paridade.md",
+      "baseline_sha256": "707ea5de8f3a6ae9cddb2cf535f69b7709bcfaee108cdd60eacde87d8960c7bc",
+      "current_sha256": "cd03f235f026f52209dd1147fd467021607a039bb81cdfc7dc07a440cc8739f4"
+    },
+    {
+      "path": "docs/02-roadmap/backlog.md",
+      "baseline_sha256": "3455d6bafac52d8ca896964ea145f4fd90c65d8327e5c1ba9d2348da50204ad0",
+      "current_sha256": "9e8a1b65cd28156e8da63bf63e4de3241bf79cf681d789744333ab495f294d67"
+    },
+    {
+      "path": "docs/02-roadmap/checklist-mestre.md",
+      "baseline_sha256": "93673a1f601f24c2263e9e3307c86d86a72928008ef3b0abdc8226846cee80e6",
+      "current_sha256": "2b6bd363a0e1972bc2efee4dcb733be60049b489504cebc4c20bcc525f293d59"
+    },
+    {
+      "path": "docs/02-roadmap/plano-redesign-frontend.md",
+      "baseline_sha256": "fe9412158c4c65d763cd429175e3b080996a14cc93fb25c6613bf46a501be3d2",
+      "current_sha256": "25e267ef53b28d8c2f67bd62fa56cad06362fc053fb282a9f0ef50275d54fead"
+    },
+    {
+      "path": "docs/02-roadmap/roadmap.md",
+      "baseline_sha256": "432c63208b85186b713fc7f8695e1065d62f369eeb3158338d374de0bab6b03e",
+      "current_sha256": "9d38571827e86c4be330e242e7933a74523da5d0621978a0858ff860b2470b88"
+    },
+    {
+      "path": "docs/tests/README.md",
+      "baseline_sha256": "63d3e0595b090b9b32e579b0b651ad85a943c62395ea8a1f51658b4283b50d9c",
+      "current_sha256": "1ce3f2f672490c2436872304881027628822ce64f0a6455535d745d3c1b27ea1"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/en.php",
+      "baseline_sha256": "17a47585de9f565cc1bf29e86d00a8c944967b7d227349139d51dbabe598ebc1",
+      "current_sha256": "5f9ea1ba959f9f780bc09feb82614f378546bf9411ea55adc57a31107b82aa50"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/es.php",
+      "baseline_sha256": "35d7d5f3bc4b28763d59b7a7475e06512a81bd66d306daf07df767414bac1b97",
+      "current_sha256": "59760f2df5febf2793bf755a19c54f2328d88c020eb3c36e4c9c3e34173d6f15"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/pt.php",
+      "baseline_sha256": "40eabd4cff03de1eac8fbcc8c606cd8f735f15e16f1630d967c69b80028484f6",
+      "current_sha256": "71c1cecafa60fbef3863b5ae63f616d8196261638c92e8cbd2e34520d0793e28"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc",
+      "baseline_sha256": "3ed7f3e2d65e5d5ce410b7517011a356fd322c0feb695878acccab5fbdee3fb4",
+      "current_sha256": "1a8985d89af818a907135f3151f85350158ab26b2a0aa95a22c3d60535db9b90"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_allowlist.php",
+      "baseline_sha256": "f36e0a42b2feebf375d677e21dcbcdb39eb9fd80a1e23e7d97cc7d54094d8326",
+      "current_sha256": "49011c4169677b4148e0f1ee22916c67713b390ff6f07e09bb1608e5f75c2390"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_blacklists.php",
+      "baseline_sha256": "926e9099bfb3bde7e9ef3740ce9624b461d300b12b89b13bd2521e8f377452cc",
+      "current_sha256": "878cf7eb8ce699ccb434debdf540608b5a2b0f2015e25422218aaccdf02f71f5"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_categories.php",
+      "baseline_sha256": "ddceefa77845fc69c23acc3cba0a630b921cac79b4f0a4b2f977139b1b94c83d",
+      "current_sha256": "768c697da0aa021557bff1eebd5e617f4a3836ebc85a84ebaf18ad93e0e811b6"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_devices.php",
+      "baseline_sha256": "d0923cf23e534cdfd3c936a102109d74b44cb7874593c5d5ccb6335cffebc307",
+      "current_sha256": "ea3f24ac2e36b2bb0d8d56d4132354cd2afb0e3376c1d198fc37a03e8b53a91d"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_diagnostics.php",
+      "baseline_sha256": "8d47d5efb2db00845e5e125fe457e7c45469f5af0d519a0ef1638a548a12863a",
+      "current_sha256": "58864d5981e6688b71cd03702670379945d4354d7be557d6ee9455e1be8dfefe"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_events.php",
+      "baseline_sha256": "0e146d603df8163d0b4bac21b5c8147cd50bbb034985560cb9e1c433fcdd7de7",
+      "current_sha256": "1fdd7f7079e436cbc46238728236796087f233c4861cc3562656045bc60ee906"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_exceptions.php",
+      "baseline_sha256": "31c84664ece955aeda39815d96d6de977a8d053b9100237439188d6201588b5a",
+      "current_sha256": "20d12d6ef05701c7164c7438f06ad1641fa28f08f4c1f9ee6b37a01939ce57f8"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_groups.php",
+      "baseline_sha256": "c3edca2077f549de0d6993c8392176a75711f4d24b50e622497ebd646ee3d1e9",
+      "current_sha256": "54b046788b9d4ca403d04afbcfa2d3019b145d2b5ad1e1aacaa25f88176616a0"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_identity.php",
+      "baseline_sha256": "60cd816218725d539dfd8215bf4f34db38088261ee0c882aeb73d9b95b7e84ea",
+      "current_sha256": "6f8962f2b9cd74c1534cd228ec7d5420c68fbb1c69ab2c93640f25a652ca49bc"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php",
+      "baseline_sha256": "ee85f080ec44004bec13b04793f2f2f778fa5ba40ad2614ce8bb168bb28fe5ed",
+      "current_sha256": "2c09df74e95811f334799b70d5e3338dbefbbf2738403897e16f31fa03682069"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php",
+      "baseline_sha256": "bf898f40e368aacc2b06e76a6c15dbc82db4d2562404eaf9f65cc838442164f3",
+      "current_sha256": "c38d510777ffd2391b8549a037c26d2488975020ddaac891050b1f19051dc75c"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_removal.php",
+      "baseline_sha256": "342d6eb6946fa2d8c870b222ee55e0e8e076c2fe7988af42bd768d8579c8bccb",
+      "current_sha256": "33584bf354b18e13636409b220344b583c8d42a1d8ad7802df68e9a554a45570"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_reports.php",
+      "baseline_sha256": "17137833c7b60189aa728306ac00caeac5055c7df7afb794989893e4af3259a6",
+      "current_sha256": "03e1cf0882853c4ed40b8e37a6ad925762990040e5558843f1a298bc1480b9be"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_test.php",
+      "baseline_sha256": "a25506028db1d53e2851e9e2ed5627e834fafab8d571ee0c35957090cbf34556",
+      "current_sha256": "d80601bd913f62589c7558178cb9bc952563f2eb069d8aed7c76886af751b0bb"
+    },
+    {
+      "path": "tests/run-local.sh",
+      "baseline_sha256": "9b7c3b257bfacd35004e222279e402c14628ea594cb989b5bf8bbcf17b38b04f",
+      "current_sha256": "972354f235d7c78be8e8568dea89187d32dd0c83e1173751f9aeb4e221fa2dd1"
+    }
+  ],
+  "new_untracked_since_baseline": [
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v10-reports/layer7_reports.php",
+      "sha256": "17137833c7b60189aa728306ac00caeac5055c7df7afb794989893e4af3259a6"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v11-removal/layer7_removal.php",
+      "sha256": "342d6eb6946fa2d8c870b222ee55e0e8e076c2fe7988af42bd768d8579c8bccb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v12-identity/layer7_identity.php",
+      "sha256": "60cd816218725d539dfd8215bf4f34db38088261ee0c882aeb73d9b95b7e84ea"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v13-mitm/layer7_mitm.php",
+      "sha256": "ee85f080ec44004bec13b04793f2f2f778fa5ba40ad2614ce8bb168bb28fe5ed"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v14-blacklists/layer7_blacklists.php",
+      "sha256": "926e9099bfb3bde7e9ef3740ce9624b461d300b12b89b13bd2521e8f377452cc"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/README-form-original.md",
+      "sha256": "694bda5c87dd66832c113c036c030084718fe4d2cff3a20f140b5015d07f2abe"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/form-original.html",
+      "sha256": "a5aa0ccfca7f8bb08a02367e36e6b6174219c52fae68bba805e05917a841cd8c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/layer7_allowlist.php",
+      "sha256": "f36e0a42b2feebf375d677e21dcbcdb39eb9fd80a1e23e7d97cc7d54094d8326"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6a-exceptions/layer7_exceptions.php",
+      "sha256": "31c84664ece955aeda39815d96d6de977a8d053b9100237439188d6201588b5a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b1-vip/layer7_exceptions.php",
+      "sha256": "b0efcd8be554147c0594ad6f341daf3bdf37256f5f8b50f483da0ec71b7669cc"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2a-dhcp/layer7_exceptions.php",
+      "sha256": "e3d216918399a3f2a54538f425e197d24b15ae2d4cd34758aa9801e7ccdfa7ea"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2a-dhcp/status.txt",
+      "sha256": "6646482e45e9348a761ee3f7ed14d7829a788aa6aab7b6828629b491d0fc068f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2b-vip-import/layer7_exceptions.php",
+      "sha256": "c72a5db5c4d61f8c3dbb0405a6932707664f90f929a4020686123e97ecb64754"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2b-vip-import/status.txt",
+      "sha256": "67620396c8a73e3278b59ea4cf1bb5151ec823f2264bd0ec58d030f21407c89b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6c-exceptions/layer7_exceptions.php",
+      "sha256": "749b54d90a33641174f520c6dc19d87c95566d6d28a8466679193766f702cd43"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v7-events/layer7_events.php",
+      "sha256": "0e146d603df8163d0b4bac21b5c8147cd50bbb034985560cb9e1c433fcdd7de7"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v8-diagnostics/layer7_diagnostics.php",
+      "sha256": "8d47d5efb2db00845e5e125fe457e7c45469f5af0d519a0ef1638a548a12863a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v9-test/layer7_test.php",
+      "sha256": "a25506028db1d53e2851e9e2ed5627e834fafab8d571ee0c35957090cbf34556"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/README.md",
+      "sha256": "d5f2968db23bb8142a9e69fc2f57c9bd5f338e466ae8826fc7383522dd4b0119"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/bootstrap.php",
+      "sha256": "b6244934e3e14f0ef687a1330e538a524ef855ae19ddfdbb33f02493481bab80"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/render-parity.php",
+      "sha256": "2bc5da6e6df0e17f14ae52dd4369e1255500b4372c0ecafcb623be4df5ea2fe4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/run.php",
+      "sha256": "b7edd71d4e0de68b1ed5b72531b0865dd8470862a19a0d88bb2f9b083da7148a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-blacklists-view/bootstrap.php",
+      "sha256": "73b96c3781067e13dcee1c9cfe98237ec4d9820de92f74e53b9e084a5141813b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-blacklists-view/render-parity.php",
+      "sha256": "c3c3d2d795920a2251b35250c8b114ce5ea5b6208c4e2ae6612c56f88f9f2931"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/README.md",
+      "sha256": "1ba3f815e76f6d410be86bc6a13f2aa17b9f370974d1977c4a2a685af4debe2f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/bootstrap.php",
+      "sha256": "2a585bfbc3d3582a4a8faae8fe008303d03e11a06b896f69770c732f823a1ec3"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/render-fixture.php",
+      "sha256": "a84045a8072ee12aba557743fd4f0193ef01dd8151a3f6fc376c19177abd920b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/run.php",
+      "sha256": "3dfcdb91cd3d216da690b71ab0c46fdaaa684885d477bbf8e7ae8b68264f37fb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/README.md",
+      "sha256": "2d4b8c1cd1a42ea462ebc07a57df2b8467ed4016518fa6f5234572e65350bdd2"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/bootstrap.php",
+      "sha256": "15ce1667c2e6d20870daad00799dd89f2df7520f8551b8d8fe7924712749b4c9"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/run.php",
+      "sha256": "f9f782430978064105bb8c89cd511fd57cd17433b48db981c09f9b17f10f3c32"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/CITATION.txt",
+      "sha256": "0a0ee746b10d433f2dcaa0d6c112eba5ffdaa38961511b9104b4bf2a517e553d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form.class.php",
+      "sha256": "0b6ea2af2d09318e14f06771a1044c8ebd75e74d22ccf3f83b38817e06437576"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Button.class.php",
+      "sha256": "f504ede52f550298fa4ef4469cc94898da9fa50467cad872a862807190562d99"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Checkbox.class.php",
+      "sha256": "68c09ac5193bb33883e794f9633a0a243f3f6e1ef783350a663fbf4d8461f82b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Element.class.php",
+      "sha256": "42ef0a5d04f3e52838cde63bc52c09cfad80e36ead901240a53dda9e85d71fe0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Group.class.php",
+      "sha256": "50378d56de76d2f3f887f708607eb71597d65be522317d752a5d5505492783a7"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Input.class.php",
+      "sha256": "604f177822a02a15c030c681b139157faf2c7588f800867157c7534d0bab278a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Section.class.php",
+      "sha256": "93d5795c7e2ba02f5575e735a550b4abc3d9dc35edad02990ba1d7d23c7d5678"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Select.class.php",
+      "sha256": "4e434142144b7ae8d2b7cdf9820b3e4bac21057f2b80d169bc36280d1f59cbf9"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/StaticText.class.php",
+      "sha256": "2cb0d9863637794456f7a7ebf62f32039763e468185d13a83952d63131df0213"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Textarea.class.php",
+      "sha256": "5ed4d093d0cf90525fd03a4a200783128ae0df1fe1ed86306562dcfcc3487cf0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/autoload.inc.php",
+      "sha256": "99c8bea9ad5d3e8260ee70dea18d6cbdbbcfda3ec79cee07aaeef9e2bde9e0f4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/README.md",
+      "sha256": "b90cc7f719e0c9a7f1a4437287cb42954c2b00b2cae58d8dcca145ae9c0bf2d4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/bootstrap.php",
+      "sha256": "18dae1ab841489e0df513870142a5412b04f42094c6fe6974c19e3453ec0ba11"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/render-parity.php",
+      "sha256": "6baeaa90c1f2ae66b9bf30ef9c113d18b6b0cc855deb6b09b8440de11ce66124"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/bootstrap.php",
+      "sha256": "696e49a6901574a2ff1736e6c2a2491ddbcd775e223e2fd5286a1196d85ac9de"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-fixtures.php",
+      "sha256": "09c9bcec2640b0aada0fdacd026f502da3f82e89f8094346ec390abd0db89610"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-handler-lib.php",
+      "sha256": "13a2edf47a8bf978339d0ac18fdcc5dd6b35875d8d0bb6e24cb6beaf7c4fb2dd"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-probe.php",
+      "sha256": "5261a4c2c0e73581a3f25b0fbd7197ea1ed748b365d3f7d483253d06925451c0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-subprocess.php",
+      "sha256": "50bc06c77e5cd1421410e0943695617dea175d61d4153e9beb9e168c456f6346"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/inc-pure.php",
+      "sha256": "08bf23e74a15e5801e81d88ea428148e35766c7b2e3cbdd45699761c32be00e7"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-parity.php",
+      "sha256": "15ad185f2f02a4ad00721a080bf024a3c57bff8cd8101b5caf48f91917724211"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-bulk-parity.php",
+      "sha256": "8499a910b1851a4ac8b1773f1d28dd1c06edc4b4f71ace9261aedf4073c4e5d7"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-dhcp-parity.php",
+      "sha256": "ae99ec2d19abda20abe69a1e4cd3cb40dd41f778a6a0ba26e301977a82df3d26"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-parity.php",
+      "sha256": "00a8c5e010ad88fe262130949a6ff062af060d38ac6a6ecd5a9a4c87f21de95a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip-bulk.php",
+      "sha256": "3d17b8c58d66d7c327d873988714236b05846f1ca154f8cf703b592fe1490d4e"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip-dhcp.php",
+      "sha256": "b018214db4283b8f1da8bd073bc932977edac604cb5d3effd9e83dbb133d174a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip.php",
+      "sha256": "cfbacfeb64dc21a62f22423159e091b8ade7f671cbf9e70a620a8f899b6dfb9f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run.php",
+      "sha256": "33a4743fcbadea4f669375ba62a73f8cbad86850d90a0d99250c2a87d49d442d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-form-buttons/render-pages.php",
+      "sha256": "819ba7c08123f1188df55831c606d762ae5ded25f02e0a72037e9e07c15b25e2"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/README.md",
+      "sha256": "dffc1f40c0e4582392ba7d6c42fa75b64748f4b0afca293aec27dbbd33546f8f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/bootstrap.php",
+      "sha256": "267353d654c88530898106cb90c6cf88cb2c263bc94b40473f8c03343b797597"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/run.php",
+      "sha256": "6f856211488dd5c9c2c25e3cb553b5b733301e0d576cbd307a5ed21dd534b35d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/README.md",
+      "sha256": "1bf841c28105e0f370761efa15ca9c5cbfe5bbf11916f5ccfc0354bbb8ee3920"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/bootstrap.php",
+      "sha256": "a125f290296fb185d04838e0fd45f277c3f6a274e93c36386bc045de0408dab8"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/render-parity.php",
+      "sha256": "931d047118f1c7909b460742b0768c18ccf3dd800a9a9a0053162c6fb2332736"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-mitm-view/bootstrap.php",
+      "sha256": "47a225d0fd1460c71e3fb717efe780859a5cc5d1bcad8cb0968c886f73c5c57e"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-mitm-view/render-parity.php",
+      "sha256": "fde554bc3abf6e4703666130981d8d6acd470226349f519ede09e5519122c91d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/bootstrap.php",
+      "sha256": "ad8a69b393a692ccf589565cd6741fb49af8b0b38872965f7d18622dd4045cb3"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/render-baseline-fixture.php",
+      "sha256": "c9070f3c8ea674cd9deabe35dd0c5c4e6400e65041cde7368bf1d6acdb17167a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/render-fixture.php",
+      "sha256": "450cf48d0007d703a0d447e15fc1e4656fc115f1b5cb7fb0846d856d62de0124"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/run.php",
+      "sha256": "cb36b9c4c89da8ab0c279e8339bd59c581ccc6f57e0a3de463bd3d6da7f2cf76"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/source-baseline-v4b2b.php",
+      "sha256": "456e855cf4bcc916cd3fc541272726c2b2cbf5803a153a79fc7910d7b06cd6ca"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/README.md",
+      "sha256": "b3f0ae61b95dbc701fab2caaffb35c1c460e0da736d732c3fe89b87225425908"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/bootstrap.php",
+      "sha256": "4eecef181c0e1c696313790b6d021b835e68e879ebd98022aa882b999631c5fb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/forms-parity-fixture.php",
+      "sha256": "27547c358ee4dde879f64751ed98e8cf14d30d7799ae5dc5ef66542009577945"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-fixture.php",
+      "sha256": "d86c00ccab92b136234bb050736b7723bad2ed3b494ce97535af9062dd558171"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-hidden-active.php",
+      "sha256": "1c8b42e0e53d2d568297d8cc625104d7b08a42f0321003b6514e183d29c1df8e"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-nav-fixture.php",
+      "sha256": "992d54aac5f5b2e9d18a1b46630cbc7370e75291eafc737553694e179d420e66"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/run.php",
+      "sha256": "840eb171d57380fb2e3b5f8dace0bcb00deb88e519992b581f62d1b3a0303c7e"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/source-baseline-v4b.php",
+      "sha256": "5c0ff398155a4e64d53a8fb5b5b47fd17a35f767da2effd8f6a70e6dddb8951a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/bootstrap.php",
+      "sha256": "32282cb5083cdbd9df0c21ef1152af30d7d89a0ac24c33ed04b781a16f525d46"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/render-baseline-fixture.php",
+      "sha256": "0dee11e1017ea2ebb4a7a2ef917d22492e1bc5fddff93dd854fdda9a93751d84"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/render-fixture.php",
+      "sha256": "00de94d719a660ba649ca46dfcff0b2d89d889a71b10cfee8dbcb63ee8098778"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/run.php",
+      "sha256": "fc3b7f45a4e725ba7f50e471b874e9ecc5810e4ffe45db4d7d2b363ea8cb8f5b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/source-baseline-v4b2.php",
+      "sha256": "38988f0662ff1b9fbc893390bec5919ecf70b9b62e1a2f730899adc64501e50d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/README.md",
+      "sha256": "799b46a10d1201ab345d5d78b55aef985e58dc370d311361a494de49fda96c4a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/bootstrap.php",
+      "sha256": "7aa9379e0f3a013f104f024638f0065aa855179cdc4c4a050965ae0ab34b93e9"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/render-fixture.php",
+      "sha256": "f564e1173c6ad2b448c6a6e2bd82c97cf5a46840de4052d69f8ca1cc019b64d5"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/run.php",
+      "sha256": "e4ef9bd721e8748383daa7c5b70d922fdb8e2990353427d70b42f091333fb3bb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/source-baseline.php",
+      "sha256": "bf898f40e368aacc2b06e76a6c15dbc82db4d2562404eaf9f65cc838442164f3"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/README.md",
+      "sha256": "4b05b94f71577050c36ebd38dec55065eaf424245996b2fd31e6712d17b5ed59"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/bootstrap.php",
+      "sha256": "618c5e75f8ea7e4ae88ce2980a5df5e8e35fc9c1cc15bd08f2cb253d0fd54d9d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/render-parity.php",
+      "sha256": "3289f6f73aa62fa5b000af50595c10524d2af6b561d9c83d1a64c6c82975c165"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/README.md",
+      "sha256": "8b9db92497e8fc8b9b3a6dd1bcdea8d9b8bc306650a43170a518b7bc5be0e716"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/bootstrap.php",
+      "sha256": "712b1b361d7f101f2d8ffff93bc5c9774a77af3e959572f08f03326e89892053"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/render-parity.php",
+      "sha256": "3289f6f73aa62fa5b000af50595c10524d2af6b561d9c83d1a64c6c82975c165"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/README.md",
+      "sha256": "97b08438bf6cc79e6a5c5d262ec43c04ab27810a432cdef92a0dc720a21cf471"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/bootstrap.php",
+      "sha256": "04d3b8181747c58f1ada20a78b6e38a17580144656a60365d83cfda278859064"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/render-parity.php",
+      "sha256": "643c75251369c1b191bfd2730d5d400dacb29487055dd4545d777ce1599d229d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/lib/layer7-test-runtime.js",
+      "sha256": "e67351a6148ec5348089a0598940de0b0c01ff869de763bde370e3910b081614"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_handlers_baseline.php",
+      "sha256": "1dcfe248ff1534b9fbcb3489274ce3af186ae9cd5f88b585918d92c0aecc8193"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_native_view.php",
+      "sha256": "49785b7e5dc86bc7f5c6181d2d4bbd0bce670b7eff6a2e6a580043e631275cd4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_payload.js",
+      "sha256": "0cf2a3b405121650b81e37ee7f4b5abf0e5caaba7fbceb48deb115a17b4904e4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_payload.php",
+      "sha256": "0b7f57844e24b019959b55408dec4509e5e707632587c8531ec2a099a5712050"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_freeze.php",
+      "sha256": "85a98fa2f3c33cb32ba6fd0ac9a0beb90277f8ec0acc2d421bcbd4f89ce925a0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_js.js",
+      "sha256": "a9e4fed0231495e56cf4a54eb7ea97c57804195965879763491fcaded91d8fd5"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_native_view.php",
+      "sha256": "d0229f07629c584b5e93820b0a30044712d5c7baf87d321ac3aef05c9f839fec"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_payload.js",
+      "sha256": "48074e7eefb5957d10726277f00cd72626c71e7cce509392664f77ff527f770f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_render.php",
+      "sha256": "2411a3b90ead3b445a7e49a206eb867d006cdc56d3b87322c02066945cd5a6bb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_data_baseline.php",
+      "sha256": "a832da99d60506014394c8b7d10f8682c359e7008e58b0273152b7805f54f4fd"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_native_view.php",
+      "sha256": "b701c123fdc37dddbfa64a03aa53a146647cd0bc07d74cd96d8328374585fc3c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_search.js",
+      "sha256": "58cbf1e1dc59aed7b4820b44507f423a58c181dc7ce31ada3c3a5251efd1901a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_devices_batch_payload.php",
+      "sha256": "65ab08bdf3984c44371441ea51e12b6d14f51e62e2cd0d19cab2f0fa62722e76"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_devices_handlers_baseline.php",
+      "sha256": "13663db4da34a5220ac562002f299f7ecf77edb888a6feffa79871ab3269b633"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_freeze.php",
+      "sha256": "86929dfb2d8ea14823fe433cab62efe61cf44eda163bfa41f2411b10c8d469f1"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_js.js",
+      "sha256": "c7e94e9a33f92513f73c8883278086eafcc172c5e3008fb8a396b70e699c5e23"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_native_view.php",
+      "sha256": "aa0ad6dad769af199efe0a00bd1b694875a9beda9190f10bb0ae219082af7516"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_payload.js",
+      "sha256": "203aaffb06f6c1380140ef7fe13414ca2a65cc66e99404a96f06e6375b2aea01"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_payload.php",
+      "sha256": "fc33805245d45e76015f74ac1ef2e0a65b34e7ee9ee4e2c54691aaf94c555f9c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_freeze.php",
+      "sha256": "31d751b54a887875fb750f611c1307df641a61ad9e0f0ca884aa916513aaa909"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_js.js",
+      "sha256": "afd812753fdc4da443deb5d838e84e3ea0984a6e134a12c2d0ff8d526054f133"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_native_view.php",
+      "sha256": "6e8db50215c38554d3a0b0d70775dacff421930abe2e1627d3fe8f2bd1389b4f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_payload.php",
+      "sha256": "42eb7fee9174537dfae48e6e9fd66be69a47c600f568066aa3143441cfcc8e4f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_render_row.php",
+      "sha256": "39b227b5e5be3eb865589e24a133094c4baa7f924a7979ec57d2c95afbc728e4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_effects.php",
+      "sha256": "3b69bd8a8a5aff99eeab0ba45cdf791b55074a8c4357ce22ddaad30dd0984d9f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_handlers_baseline.php",
+      "sha256": "fea954b0a57ea355db339dfd192468e7b97b925cda0b658fb5ac3a85322aecad"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_harness_bootstrap.php",
+      "sha256": "6a26a5dcf5319c44bf795e510e3cc5a2c72ba9ed27a34f3b8eec5a9439833674"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_js.js",
+      "sha256": "1037a0af2f3b2a8a8f99ad7110da9e18060a66e1fb4274a98f787a22ef576882"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_native_view.php",
+      "sha256": "37f18c0d9fa76385a9bbc276ab0d0f7b773441af6f06e77a3b7e4003801f139c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_payload.js",
+      "sha256": "8f1224979846fa4cabbbe6208ff00cb347ab8d94926baa4653cbe8bce037f117"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_target_summary.php",
+      "sha256": "8e727235e269408ead1ba681c44be96c9803081bc236d253514c08456ca606e2"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_effects.php",
+      "sha256": "6f9d51d67a1c7a028ef8ccded6e3b7353993cdd7af936a3c0ee7a8bfcad4378a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_export.js",
+      "sha256": "03a471b21e01b49fea3fd48637531a8c0ebc5c28e03532cd6ac609dbe98743f6"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_js.js",
+      "sha256": "b4b2722c7c00c28a94ae6205b3f8950080cb8ced33bf5b11e6c559c3e8dc969f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_json_audit.php",
+      "sha256": "778d8468f759419d5fef39bfa70f345812f96ab9218c8916d052c693571836e2"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_payload.js",
+      "sha256": "a131c1ea01149c6774ff6abb7d439df0dcb37e33eae2b6de044d533e6355beed"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_effects.php",
+      "sha256": "83256092884d4c4a0974f45a49587a87c3e8664464749ef78ce1b08dbc9fb0bd"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_js.js",
+      "sha256": "4745df0560e19e8fefbca297037027f99a5745b417501412405fb8241fb8011f"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_json_audit.php",
+      "sha256": "d10094506322c7cd549e92ca1110e7c7ffe469d7c54f22d472a622ea63510110"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_payload.js",
+      "sha256": "fa7704af880c70171f4e752ca6b3673dba14d142878845489fc0939428dcf16b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_effects.php",
+      "sha256": "d962318d5dbb949bccba3254e3449fd0ead5c9cb468c71e513dc55bac5c9338b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_freeze.php",
+      "sha256": "cbad0e8f2b74bc7985a2272c66186755dcacc5c0b2af5e76a53dddb3d81b585a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_js.js",
+      "sha256": "72d288382b52d64ab48cd3f60be897574899048e21e2ad9398ed308a3f31a699"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_payload.js",
+      "sha256": "3c6a52355095f4a04abc9ecb0a6dba7558867c22a6779976c5ec75fd151aa7b1"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_pure.php",
+      "sha256": "6b77564a9b7d0e901a201d3cb11d249f82a993d01e353fe6d0082e02579d2295"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_form_buttons_payload.js",
+      "sha256": "2072b09a7ffe4bbb036be8f8ab4d8cb258a8cb553bdac21817b3e85e62103ef9"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_groups_handlers_baseline.php",
+      "sha256": "8ab2318e7718346e3a6fc62b0df5e20ccb2b169088687565f6a684228ba394d3"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_groups_native_view.php",
+      "sha256": "13571075e961f0b0694b4e933689a1b5be988e045ad919ea269a870fe5bb1c68"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_freeze.php",
+      "sha256": "78a50281a5d49401bc4138cf68e50890aec6414747db6a8bbc32bd75e7de5198"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_native_view.php",
+      "sha256": "daadaaf0205a2fc02128b8e0630eac9baeda80e1346c531ac9f8cec81bb65c71"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_payload.js",
+      "sha256": "18a2611bb0eb2c13286dcb8e2763e6e56c29d48f9669e5b7836ff6df0afde902"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_render.php",
+      "sha256": "d55343d6c56ae6fc159108040614ab845208c7a1a8185735ff53be800657419a"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_freeze.php",
+      "sha256": "b602bc72b480852b80e00519d05ba21cb69ec97d6097a986f9ff7bada4819ba0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_native_view.php",
+      "sha256": "f5f43d6153058d9a05f800ab3eeb564786c601a4429c63d2eaebaf467e9b40b4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_payload.js",
+      "sha256": "b0dee5694fefcfcbd724cc2bee17b55fa77e79967133e701c1df81ef12b09000"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_render.php",
+      "sha256": "89a5d3b7c2a82bdb444bf599f4efc7c2b1b88505593005a591155991618fbee9"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_filters.js",
+      "sha256": "82b58caf2402ddcf331c470af3c15437f5c17b70f3740aa9ea052ff89394fbcb"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_handlers_baseline.php",
+      "sha256": "5f180a5e5161af824fe19e2acf0cea5123114b1e0054ef9c5889964ce81602be"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_library.js",
+      "sha256": "0031d5c741a0c28c4894035e1dbeb870a0291395b02ddcb63dcbf729702dd1f0"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_edit.js",
+      "sha256": "85524f8b61091b4b5c76a182226afc8763f83071d105f4b6d19c63b719e5a767"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_edit_hidden_css.js",
+      "sha256": "710feff959d136b8a9672e7c3b6fc6bb8cf749dbeb73691d29caf32388e84f04"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_options.js",
+      "sha256": "fede7c60f2575087bc3d34ddd0806a830a3444565a59636933a9bdb943a6e309"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_subnav_native.php",
+      "sha256": "f613198328216e721ee28f3608c33432a55ef8b6b74aeb497daa7ea663c08bf5"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_freeze.php",
+      "sha256": "f4f275533ae32c7b6760f0166d519ffcf4ac978d2f85a3900a51402bdb64eb2b"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_native_view.php",
+      "sha256": "f0833f55e3bd875a8d5101ae1006077da0d54611a14ab2adf1f152dbdca18217"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_payload.js",
+      "sha256": "7bc7f2a5d6df027d89b82bcede39dcb84e9148580e0261ad81b7a389f3d8fb2d"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_render.php",
+      "sha256": "79c6e5d9ecbca465c69a96c635736f000703cb5bb0d4c302d101f8bff032403c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_freeze.php",
+      "sha256": "9a06c67b8c87e6cd0956cb2b082b2e4fc3ad1f9760997adddee70dd23e009789"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_js.js",
+      "sha256": "9af46dc6ef942d195431f1ca741ec6b9a680748059a263693ae7937754913c39"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_native_view.php",
+      "sha256": "22d8a12d07eef80a96879ffbc2829d5196e24b044a99ff72775f638b1626f0a5"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_payload.js",
+      "sha256": "da155a61c1cd152fad97db66222048e4eb4424540e112eb859cdd0972a7d86d4"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_render.php",
+      "sha256": "d466fd67cb039fe9ceabc855a05a058759f4a13e48cfe3a039bfdcec36b20377"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_freeze.php",
+      "sha256": "b0c2926a4b864f2ec05592e22fa7463dfaa9a3e30849c09c6824d00fe26fafea"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_native_view.php",
+      "sha256": "2d2492fcc077b8cfc191c8f21b0d04f0dcc638579511c5514d2feef4fcdf3623"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_payload.js",
+      "sha256": "593595c642583b501681877a1148ce02442d444a68392489498572f47d38c206"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_payload.php",
+      "sha256": "1dc99007c461be0ebb47bd10507be609f11e5cf98d057d2072f31ed40e82e28c"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_results.php",
+      "sha256": "3f669a8363229556b404f32e018c3101f8b4dc909f3025d99bd06446926b1f96"
+    }
+  ],
+  "git_status": [
+    {
+      "status": " M",
+      "path": ".gitignore"
+    },
+    {
+      "status": " M",
+      "path": "CORTEX.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/00-overview/frontend-redesign-analise.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/01-architecture/frontend-redesign-inventario-paridade.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/02-roadmap/backlog.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/02-roadmap/checklist-mestre.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/02-roadmap/plano-redesign-frontend.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/02-roadmap/roadmap.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/tests/README.md"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/en.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/es.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/pt.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_allowlist.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_blacklists.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_categories.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_devices.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_diagnostics.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_events.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_exceptions.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_groups.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_identity.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_removal.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_reports.php"
+    },
+    {
+      "status": " M",
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_test.php"
+    },
+    {
+      "status": " M",
+      "path": "tests/run-local.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/+COMPACT_MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/+MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/etc/inc/priv/layer7.priv.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7-protos.txt.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/allowlist-seed.txt"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/lang/en.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/lang/pt.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/layer7-reports-collect.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/layer7-stats-collect.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/layer7-stats-purge.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/pf.conf.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/profiles.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/layer7/update-blacklists.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/etc/rc.d/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/libexec/layer7-pfctl"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/libexec/layer7-unbound-anti-doh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/pkg/layer7.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/pkg/layer7.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/sbin/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/share/pfSense-pkg-layer7/info.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_allowlist.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_bl_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_blacklists.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_categories.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_devices.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_diagnostics.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_events.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_groups.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_policies.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_removal.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_reports.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_reports_export.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_settings.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_status.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.8.11_24/usr/local/www/packages/layer7/layer7_test.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/+COMPACT_MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/+MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/etc/inc/priv/layer7.priv.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7-protos.txt.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/allowlist-seed.txt"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/blacklists/config.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/lang/en.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/lang/pt.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/layer7-reports-collect.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/layer7-stats-collect.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/layer7-stats-purge.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/pf.conf.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/profiles.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/remote-access-catalog.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/layer7/update-blacklists.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/rc.d/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/rc.d/layer7-tlsproxy"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/etc/rc.d/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/libexec/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/libexec/layer7-pfctl"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/libexec/layer7-unbound-anti-doh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/pkg/layer7-fa47-icons.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/pkg/layer7.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/pkg/layer7.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/sbin/layer7-tlsproxy"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/sbin/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/share/pfSense-pkg-layer7/info.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/layer7-blockpage/index.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/layer7-blockpage/router.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/js/chart.umd.min.js"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_allowlist.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_bl_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_blacklists.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_categories.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_devices.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_diagnostics.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_events.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_groups.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_identity.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_mitm.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_policies.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_remote_access.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_removal.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_reports.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_reports_export.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_settings.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_settings_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_settings_update.js"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_status.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.47/usr/local/www/packages/layer7/layer7_test.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/+COMPACT_MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/+MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/etc/inc/priv/layer7.priv.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7-protos.txt.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/allowlist-seed.txt"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/blacklists/config.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/lang/en.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/lang/pt.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/layer7-reports-collect.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/layer7-stats-collect.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/layer7-stats-purge.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/pf.conf.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/profiles.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/layer7/update-blacklists.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/rc.d/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/etc/rc.d/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/libexec/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/libexec/layer7-pfctl"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/libexec/layer7-unbound-anti-doh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/pkg/layer7-fa47-icons.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/pkg/layer7.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/pkg/layer7.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/sbin/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/share/pfSense-pkg-layer7/info.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/layer7-blockpage/index.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/layer7-blockpage/router.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_allowlist.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_bl_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_blacklists.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_categories.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_devices.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_diagnostics.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_events.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_groups.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_policies.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_removal.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_reports.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_reports_export.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_settings.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_settings_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_settings_update.js"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_status.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/ex-1.9.8/usr/local/www/packages/layer7/layer7_test.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/+COMPACT_MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/+MANIFEST"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/etc/inc/priv/layer7.priv.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7-protos.txt.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/allowlist-seed.txt"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/blacklists/config.json.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/lang/en.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/lang/pt.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/layer7-reports-collect.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/layer7-stats-collect.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/layer7-stats-purge.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/pf.conf.sample"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/profiles.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/remote-access-catalog.json"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/layer7/update-blacklists.sh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/rc.d/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/rc.d/layer7-tlsproxy"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/etc/rc.d/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/libexec/layer7-blockpage"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/libexec/layer7-pfctl"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/libexec/layer7-unbound-anti-doh"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/pkg/layer7-fa47-icons.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/pkg/layer7.inc"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/pkg/layer7.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/sbin/layer7-tlsproxy"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/sbin/layer7d"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/share/pfSense-pkg-layer7/info.xml"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/layer7-blockpage/index.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/layer7-blockpage/router.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/js/chart.umd.min.js"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_allowlist.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_bl_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_blacklists.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_categories.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_devices.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_diagnostics.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_events.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_groups.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_identity.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_mitm.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_policies.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_remote_access.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_removal.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_reports.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_reports_export.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_settings.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_settings_ajax.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_settings_update.js"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_status.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/extract-148/usr/local/www/packages/layer7/layer7_test.php"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.3-tmp/pfSense-pkg-layer7-1.9.48.pkg.sha256"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/30.4/pfSense-pkg-layer7-1.9.49.pkg.sha256"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/pfSense-pkg-layer7-1.9.52.pkg.sha256"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/pfSense-pkg-layer7-1.9.53.pkg.sha256"
+    },
+    {
+      "status": "??",
+      "path": "artifacts/pfSense-pkg-layer7-1.9.54.pkg.sha256"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/LAYER7-PRICE-LIST-EN.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/LAYER7-PRICE-LIST-ES.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/LAYER7-PRICE-LIST-PT.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/Layer7-licencas-USD-PT.pdf"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/Layer7-licencias-USD-ES.pdf"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/Layer7-licenses-USD-EN.pdf"
+    },
+    {
+      "status": "??",
+      "path": "docs/commercial/layer7-price-list.html"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T212230Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T212234Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/00-run.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/01-precheck.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/01-ssh24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/02-install-1.9.44.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/02b-hotpatch-inc.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/03-phaseA-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/03-phaseA-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/04-phaseB-route.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/05-phaseC-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/06-mitm-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/06-phaseD-activate.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/07-pf-audit.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/08-edge-console.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/08-edge-list.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/08-edge-pull.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/90-rollback-254.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/91-rollback-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/92-rollback-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/93-post-state.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/02-mitm-ca-thumb.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/08-edge-dom-snip.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/08-edge-dom.html"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/08-edge-screenshot.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/08-edge.stderr.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/08-edge.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/09-rollback.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/remote/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/01-254.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/02-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/03-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/10-cleanup.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260809T223909Z-post-rollback-baseline/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/01-sha256.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/02-pkg-inspect.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/00-run.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/01-precheck.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/01-ssh24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/01b-failsafe-pre.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/02-install-1.9.47.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/03-phaseA-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/03-phaseA-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/04-phaseB-route.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/05-phaseC-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/06-phaseD-activate.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/90-rollback-254.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/91-rollback-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/92-rollback-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/00-run.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/01-precheck.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/01-ssh24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/01b-failsafe-pre.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/02-install-1.9.47.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/03-phaseA-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/03-phaseA-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/04-phaseB-route.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/05-phaseC-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/06-phaseD-activate.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/90-rollback-254.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/91-rollback-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/92-rollback-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/00-RUNID.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/00-run.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/01-precheck.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/01-ssh24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/01b-failsafe-pre.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/02-install-1.9.47.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/03-phaseA-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/03-phaseA-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/04-phaseB-route.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/05-phaseC-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/06-mitm-ca.crt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/06-phaseD-activate.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/07-negatives-scope.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/07-pf-audit.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/08-edge-console.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/08-edge-list.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/08-edge-pull.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/09-negatives-ca.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/90-rollback-254.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/91-rollback-24.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/92-rollback-54.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/93-post-state.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/02-mitm-ca-thumb.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/08-edge-dom.html"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/08-edge-screenshot.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/08-edge.stderr.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/08-edge.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/09-rollback.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260810T104205Z-phaseBD-d1-254/remote/11-VERDICT.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/00-STATUS.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/01-edge-auth-check.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/ATTEMPTS.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/ONE-STEP-CLOUDFLARE-PANEL.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/chrome-cf-session.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/chrome-open-tabs.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/dns-monitor.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/dns-monitor.pid"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/firefox-cf-session.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/gcloud-zones.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/gh-secrets-pablomichelin-Layer7.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/gh-secrets-pablomichelin-pfsense-layer7.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/github-workflows-hits.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/ispconfig-dns.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/keychain-dash-cloudflare.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/keychain-names.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/on-propagate-validate.sh"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/public-validation.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/repo-cloudflare-hits.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/safari-cookie-hosts.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T135140Z-pre-30.11-primary-cdn/dns-attempts/zone-delegation.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T144610Z-pre-30.11-readonly-validate/00-meta.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T144610Z-pre-30.11-readonly-validate/01-254-baseline.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/tests/evidence/20260811T144610Z-pre-30.11-readonly-validate/03-54-readonly-probes.txt"
+    },
+    {
+      "status": "??",
+      "path": "layer7-vip-list-20260813-164116.json"
+    },
+    {
+      "status": "??",
+      "path": "layer7-vip-list-20260813-164116.txt"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v10-reports/layer7_reports.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v11-removal/layer7_removal.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v12-identity/layer7_identity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v13-mitm/layer7_mitm.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v14-blacklists/layer7_blacklists.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/README-form-original.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/form-original.html"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v5-allowlist/layer7_allowlist.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6a-exceptions/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b1-vip/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2a-dhcp/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2a-dhcp/status.txt"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2b-vip-import/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6b2b-vip-import/status.txt"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v6c-exceptions/layer7_exceptions.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v7-events/layer7_events.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v8-diagnostics/layer7_diagnostics.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/baseline-v9-test/layer7_test.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-allowlist-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-blacklists-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-blacklists-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/render-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-categories-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/CITATION.txt"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Button.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Checkbox.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Element.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Group.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Input.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Section.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Select.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/StaticText.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/Form/Textarea.class.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-devices-view/vendor/pfsense-form/autoload.inc.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-diagnostics-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-fixtures.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-handler-lib.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-probe.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/export-subprocess.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/inc-pure.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-bulk-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-dhcp-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/render-vip-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip-bulk.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip-dhcp.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run-vip.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-exceptions-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-form-buttons/render-pages.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-groups-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-identity-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-mitm-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-mitm-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/render-baseline-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/render-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-edit/source-baseline-v4b2b.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/forms-parity-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-hidden-active.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/render-nav-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-library/source-baseline-v4b.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/render-baseline-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/render-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-options/source-baseline-v4b2.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/render-fixture.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/run.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-policies-view/source-baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-removal-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-reports-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/README.md"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/harness-test-view/render-parity.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/lib/layer7-test-runtime.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_handlers_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_allowlist_payload.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_blacklists_render.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_data_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_categories_search.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_devices_batch_payload.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_devices_handlers_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_devices_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_diagnostics_payload.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_payload.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_events_render_row.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_effects.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_handlers_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_harness_bootstrap.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_target_summary.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_effects.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_export.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_json_audit.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_bulk_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_effects.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_json_audit.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_dhcp_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_effects.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_exceptions_vip_pure.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_form_buttons_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_groups_handlers_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_groups_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_identity_render.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_mitm_render.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_filters.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_handlers_baseline.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_library.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_edit.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_edit_hidden_css.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_profile_options.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_policies_subnav_native.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_removal_render.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_js.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_reports_render.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_freeze.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_native_view.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_payload.js"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_payload.php"
+    },
+    {
+      "status": "??",
+      "path": "tests/functional/test_test_results.php"
+    }
+  ],
+  "product_changed_since_baseline": [
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/en.php",
+      "baseline_sha256": "17a47585de9f565cc1bf29e86d00a8c944967b7d227349139d51dbabe598ebc1",
+      "current_sha256": "5f9ea1ba959f9f780bc09feb82614f378546bf9411ea55adc57a31107b82aa50"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/es.php",
+      "baseline_sha256": "35d7d5f3bc4b28763d59b7a7475e06512a81bd66d306daf07df767414bac1b97",
+      "current_sha256": "59760f2df5febf2793bf755a19c54f2328d88c020eb3c36e4c9c3e34173d6f15"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/pt.php",
+      "baseline_sha256": "40eabd4cff03de1eac8fbcc8c606cd8f735f15e16f1630d967c69b80028484f6",
+      "current_sha256": "71c1cecafa60fbef3863b5ae63f616d8196261638c92e8cbd2e34520d0793e28"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc",
+      "baseline_sha256": "3ed7f3e2d65e5d5ce410b7517011a356fd322c0feb695878acccab5fbdee3fb4",
+      "current_sha256": "1a8985d89af818a907135f3151f85350158ab26b2a0aa95a22c3d60535db9b90"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_allowlist.php",
+      "baseline_sha256": "f36e0a42b2feebf375d677e21dcbcdb39eb9fd80a1e23e7d97cc7d54094d8326",
+      "current_sha256": "49011c4169677b4148e0f1ee22916c67713b390ff6f07e09bb1608e5f75c2390"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_blacklists.php",
+      "baseline_sha256": "926e9099bfb3bde7e9ef3740ce9624b461d300b12b89b13bd2521e8f377452cc",
+      "current_sha256": "878cf7eb8ce699ccb434debdf540608b5a2b0f2015e25422218aaccdf02f71f5"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_categories.php",
+      "baseline_sha256": "ddceefa77845fc69c23acc3cba0a630b921cac79b4f0a4b2f977139b1b94c83d",
+      "current_sha256": "768c697da0aa021557bff1eebd5e617f4a3836ebc85a84ebaf18ad93e0e811b6"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_devices.php",
+      "baseline_sha256": "d0923cf23e534cdfd3c936a102109d74b44cb7874593c5d5ccb6335cffebc307",
+      "current_sha256": "ea3f24ac2e36b2bb0d8d56d4132354cd2afb0e3376c1d198fc37a03e8b53a91d"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_diagnostics.php",
+      "baseline_sha256": "8d47d5efb2db00845e5e125fe457e7c45469f5af0d519a0ef1638a548a12863a",
+      "current_sha256": "58864d5981e6688b71cd03702670379945d4354d7be557d6ee9455e1be8dfefe"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_events.php",
+      "baseline_sha256": "0e146d603df8163d0b4bac21b5c8147cd50bbb034985560cb9e1c433fcdd7de7",
+      "current_sha256": "1fdd7f7079e436cbc46238728236796087f233c4861cc3562656045bc60ee906"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_exceptions.php",
+      "baseline_sha256": "31c84664ece955aeda39815d96d6de977a8d053b9100237439188d6201588b5a",
+      "current_sha256": "20d12d6ef05701c7164c7438f06ad1641fa28f08f4c1f9ee6b37a01939ce57f8"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_groups.php",
+      "baseline_sha256": "c3edca2077f549de0d6993c8392176a75711f4d24b50e622497ebd646ee3d1e9",
+      "current_sha256": "54b046788b9d4ca403d04afbcfa2d3019b145d2b5ad1e1aacaa25f88176616a0"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_identity.php",
+      "baseline_sha256": "60cd816218725d539dfd8215bf4f34db38088261ee0c882aeb73d9b95b7e84ea",
+      "current_sha256": "6f8962f2b9cd74c1534cd228ec7d5420c68fbb1c69ab2c93640f25a652ca49bc"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php",
+      "baseline_sha256": "ee85f080ec44004bec13b04793f2f2f778fa5ba40ad2614ce8bb168bb28fe5ed",
+      "current_sha256": "2c09df74e95811f334799b70d5e3338dbefbbf2738403897e16f31fa03682069"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php",
+      "baseline_sha256": "bf898f40e368aacc2b06e76a6c15dbc82db4d2562404eaf9f65cc838442164f3",
+      "current_sha256": "c38d510777ffd2391b8549a037c26d2488975020ddaac891050b1f19051dc75c"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_removal.php",
+      "baseline_sha256": "342d6eb6946fa2d8c870b222ee55e0e8e076c2fe7988af42bd768d8579c8bccb",
+      "current_sha256": "33584bf354b18e13636409b220344b583c8d42a1d8ad7802df68e9a554a45570"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_reports.php",
+      "baseline_sha256": "17137833c7b60189aa728306ac00caeac5055c7df7afb794989893e4af3259a6",
+      "current_sha256": "03e1cf0882853c4ed40b8e37a6ad925762990040e5558843f1a298bc1480b9be"
+    },
+    {
+      "path": "package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_test.php",
+      "baseline_sha256": "a25506028db1d53e2851e9e2ed5627e834fafab8d571ee0c35957090cbf34556",
+      "current_sha256": "d80601bd913f62589c7558178cb9bc952563f2eb069d8aed7c76886af751b0bb"
+    }
+  ],
+  "note": "Snapshot anterior à criação dos próprios arquivos deste relatório. Diff HEAD inclui alterações que já existiam no início; baseline de inspeção distingue arquivos originais alterados."
+}

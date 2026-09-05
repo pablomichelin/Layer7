@@ -4,6 +4,33 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.81] — 2026-09-05 (candidato preparado — **nao publicado**)
+
+### Changed
+
+- **BG-174 / redesign visual V1–V15:** quinze páginas GUI migradas para
+  view nativa pfSense (`panel panel-default`, forms POST preservados,
+  remoção de `layer7_render_styles()`/`layer7_render_footer()` e wrappers
+  proprietários). Handlers, daemon, PF, licença, Identity/MITM (fila 20.37)
+  e `layer7_settings_update.js` **congelados**. Gates funcionais locais PASS
+  (freeze/render/payload/jsdom por página). **Nao** declara correção do
+  defeito de bloqueio relatado; visual no appliance, CE, CSRF e homologação
+  operacional **pendentes**. Instalação no firewall em uso exige **GO**
+  explícito.
+
+- **V15 Settings (`layer7_settings.php`):** secções Relatórios/Sistema/Update
+  sem `style=` cosmético nem `layer7-summary`; retention com primitivo
+  `hidden`; confirmações `revoke_license`/`import_config` com
+  `onclick='return confirm(...)'` e `JSON_HEX_*` (sem `confirm` em
+  `do_update`).
+
+### Notas de release
+
+- **Publicado actual em GitHub:** `1.9.80` (`releases/latest`).
+- **SHA256 / artefacto / source commit:** `TBD-pos-build`.
+- **Rollback:** reinstalar artefacto assinado **`1.9.80`** preservado
+  (arquivo interno); **proibido** rebuild/republish da mesma versão.
+
 ## [1.9.80] — 2026-08-31
 
 ### Changed

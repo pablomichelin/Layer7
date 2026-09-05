@@ -44,3 +44,16 @@ src/layer7d/layer7d-smoke
 src/layer7-tlsproxy/layer7-tlsproxy
 src/layer7-tlsproxy/.poc-test*.sock
 src/layer7-tlsproxy/lab-certs/
+
+# HTML gerado pelo harness Devices (evidência local, não produto)
+tests/functional/harness-devices-view/generated/
+tests/functional/harness-groups-view/generated/
+tests/functional/harness-categories-view/generated/
+tests/functional/harness-policies-view/generated/
+tests/functional/harness-policies-library/generated/
+tests/functional/harness-policies-options/generated/
+tests/functional/harness-policies-edit/generated/
+tests/functional/harness-exceptions-view/generated/
+
+# Snapshot local de evidência gerencial (produção canónica em coordenação externa; fora de commit)
+/evidencia-gerente/

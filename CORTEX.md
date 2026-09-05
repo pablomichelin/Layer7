@@ -40,6 +40,10 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
 BG-174 / GUI1 Status nativo; cadeia F1.2). **PUBLICADO.** Appliance/visual
 **pendentes** (`.254` SSH timeout; nao instalado).
+**Candidato preparado (nao publicado):** `1.9.81` (`PORTVERSION` Makefile;
+redesign visual V1–V15; SHA/artefacto `TBD-pos-build`; `releases/latest`
+permanece `1.9.80` ate build/publish governado). Ver
+[`docs/06-releases/candidato-1.9.81-redesign-visual.md`](docs/06-releases/candidato-1.9.81-redesign-visual.md).
 herda `1.9.79`
 (`SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`;
 BG-173 Captive Portal + anti-bypass; cadeia F1.2; tag git preservada;
@@ -275,11 +279,146 @@ tag `7bd1fd012e6b8dcf00780f980d62f1a955de061a`; 7 assets F1.2.
 `v1.9.79` retirada do download (latest-only / BG-164; tag git preservada).
 `blacklists-ut1-current` preservada. Appliance/visual **pendentes**
 (`.254` SSH timeout; nao instalado). **Nao** homologado no appliance.
-GUI2–GUI7 bloqueados ate GO.
+GUI3 Policies V4-A **implementado, revisão local gerente PASS, pendente commit**
+(modos list/edit/view/new; lista `Form_Select` + `pon[]` acessível; handlers
+intactos; harness/handlers baseline/jsdom; i18n EN/ES). **V4-B1 biblioteca**
+**implementado, gates locais PASS, pendente commit** (`?library=1`; details
+nativos; bookmark `#l7-profiles`/`#l7-ra` com flag GET; mensagens separadas
+limite24 vs catálogo vazio; modais/JS rascunho byte-idênticos baseline V4-B;
+harness `harness-policies-library/` + `test_policies_library.js` (cobertura
+`revisao-v4b1-cobertura` + regressão cumulativa; ligados em `tests/run-local.sh`);
+sem
+`PORTVERSION`). **V4-B2a opções de perfil implementado, cobertura B2a completa
+nos gates locais, pendente revisão final/commit/visual/CE/CSRF/appliance**
+(modal Bootstrap `fn.modal`; form `Form_*` nativo com grupos0/2/16, VIP
+vazio/preenchido, GET `?profile_options=` incl. limite24/catálogo vazio/ID
+inválido/perfil oculto, POST erro integral + VIP limpo, escaping/labels,
+onclick real + hide/reabrir com draft/filtro, fallback progressivo
+`l7showProfileModal` → `return true` sem plugin; Avançado `Form_Section`
+expansível aberto; i18n EN/ES; **P1 a11y:** modal Opções sem `aria-hidden=true`
+estático (Bootstrap 3.4.1 pin não actualiza o atributo); harness
+`harness-policies-options/` **158 PASS** + `test_policies_profile_options.js`
+**226 PASS** (padrão; prova opcional pin Bootstrap +11 via
+`LAYER7_JQUERY_PIN_JS`/`LAYER7_BOOTSTRAP_PIN_JS` = **237** cumulativos)).
+**V4-B2b editor/criação de perfil revisão independente gerente PASS
+(`revisao-gerente-v4b2b.md`), implementado, pendente commit/visual/CE/CSRF/appliance** (modal Bootstrap `modal-lg`; form
+`Form_*` nativo; links progressivos `?profile_edit=` / `?profile_new=1`;
+GET dedicado + POST erro integral; filtro apps/cats com label/limpar;
+ocultar editor via atributo `hidden` + classe Bootstrap `.hidden` (`.btn`
+sobrescreve `[hidden]`); handlers/draft JS byte-idênticos; harness `harness-policies-edit/` **135 PASS**
++ `test_policies_profile_edit.js` **142 PASS**; prova CSS nativa
+`test_policies_profile_edit_hidden_css.js` **21 PASS** (env pin Bootstrap/pfSense;
+runner local SKIP sem `LAYER7_BOOTSTRAP_PIN_CSS`); auditoria independente gerente
+PASS (`/private/tmp/layer7-coordenacao-20260904/evidencia-gerente/b2b-auditoria-independente.json`;
+evidência CSS corrigida `b2b-css-corrigido.txt`; `b2b-hidden-css.json` = bug
+pré-correção); regressão cumulativa Options **158** / Library **194** / View **685**
+/Library jsdom **93** PASS; CSS `l7-modal-*` removido — `l7-modal-section-vip`
+Opções mantido).
+**V4-B2c wrapper/CSS Policies revisão independente gerente PASS
+(`revisao-gerente-v4b2c.md`), implementado, pendente commit/visual/CE/CSRF/appliance** (retirada `layer7_render_styles()` e wrappers
+`layer7-page`/`layer7-content`/`layer7-lead`/inline toolbar; crédito nativo como
+Groups; handlers/JS/forms intactos; `test_policies_native_view.php` **88 PASS**;
+regressão cumulativa Edit **135** / Options **158** / Library **194** / View **685**
+/ Edit jsdom **142** / Library jsdom **93** / Options jsdom **226** / CSS **21 PASS**;
+sem commit/homologação).
+**GUI2a subnav Políticas revisão independente gerente PASS
+(`revisao-gerente-gui2a.md`), implementado, pendente commit/visual/CE/CSRF/appliance**
+(excepção delimitada: só `layer7_render_policies_subnav()` em `layer7.inc`; gate
+funcional `test_policies_subnav_native.php` **ALL PASS**; auditoria byte-identica
+opcional via `LAYER7_GUI2A_BASELINE`; CSS global residual preservado; GUI2
+integral — 320px/teclado/back-forward e URLs/ACL reais — ainda pendente).
+**V5 Allowlist implementado, pendente revisão independente/commit/visual/CE/CSRF/appliance**
+(`layer7_allowlist.php` view nativa `Form_*`; prefixo até `$seed_entries` byte-idêntico;
+retry POST raw na view quando sem `$savemsg`; gates locais: handlers baseline,
+`test_allowlist_native_view.php` + prova DOM name/id, `harness-allowlist-view/run.php`,
+`test_allowlist_payload.js` FormData jsdom com render real baseline pinado +
+candidato (`render-parity.php`); fixture `form-original.html` manual auxiliar;
+**não** FECHADO / **não** homologado visual/CE/appliance)
+**V4-B2** modais/CSS global ainda pendente (helpers globais `layer7_render_styles`/
+`layer7_render_footer`). GUI4 Devices (V1, GO visual `2026-09-04`)
+**implementado, pendente de gates/commit** (list paginado + batch completo
+do filtro + edit individual; handlers intactos; sem `PORTVERSION`).
+GUI4 Groups V2 **implementado, pendente de gates/commit** (list/edit/new;
+handlers intactos; sem `PORTVERSION`). Catálogo nDPI V3
+**implementado, pendente de gates/commit** (consulta; leitura nDPI
+intacta; jsdom busca/click; Enter/Space browser pendentes; sem
+`PORTVERSION`). **V6a Exceptions (exceções gerais) revisão independente final gerente PASS local** (`2026-09-05`;
+`layer7_exceptions.php` modos list/new/edit; handlers VIP 15–114 e exceções 115–303 congelados;
+residual limites 16/64/32 em inventário+BG-072 — **não** corrigido; risco médio).
+**Pendente commit/visual/CE/CSRF/appliance** — **não** marcar FEITO no git.
+**V6b1 Lista VIP (consulta/?vip_add, modos exclusivos, ponte bookmark GET-only) revisão independente final gerente PASS local** (`2026-09-05`;
+**213** asserções VIP contando só linhas `PASS:` — pure **48**, freeze **8**, effects **19**, harness **53**, jsdom **37**, payload **48**;
++ contrato bootstrap **10**; baseline V6b1 SHA `b0efcd8…`; DHCP/lote/import/export literalmente congelados;
+handlers/core `layer7.inc` intactos; auditoria JSON independente 10 casos PASS em evidência gerencial).
+**Pendente commit/visual/CE/CSRF/appliance** — **não** marcar FEITO no git.
+**V6b2a DHCP exclusivo (`?vip_dhcp=1#l7-vip-list`) revisão independente final gerente PASS local** (`2026-09-05`;
+modo dedicado com `Form_Section` por interface; POST `add_vip_from_dhcp` + `vip_dhcp_ip[]`; consulta VIP sem tabela DHCP embutida;
+lote/import/export literalmente congelados V6b1; freeze actualizado (**13** `PASS:` — migração DHCP intencional);
+**162** `PASS:` DHCP novos — effects **19**, json audit **36**, harness **39**, jsdom **38** padrão (+**8** pin CSS opcional `LAYER7_BOOTSTRAP_PIN_CSS`), payload **30**;
+regressão VIP cumulativa **219** `PASS:` (harness VIP **54**); contrato bootstrap **14**; baseline V6b2a SHA `e3d2169…`;
+POST erro no limite 32 preserva formulário/seleção disponível (GET inicial continua bloqueado);
+evidência JSON independente do **gerente** (revisão externa): `/private/tmp/layer7-coordenacao-20260904/evidencia-gerente/v6b2a-json-independente.json` (12 cenários PASS; **não** produzida pelo gate portátil `test_exceptions_vip_dhcp_json_audit.php`; cópia eventual `evidencia-gerente/` na raiz = snapshot untracked desta sessão, fora de commit);
+limitação documentada: `layer7_vip_add_from_dhcp_ips` pode gravar adição parcial no limite 32).
+**V6b2b lote/import/export (`?vip_bulk=1` / `?vip_import=1` / export POST na consulta) implementado, revisão local Composer 2.5 PASS** (`2026-09-05`;
+modos dedicados com `Form`/`Form_Section`/`Form_Textarea`/`Form_StaticText`; consulta `?vip=1` com links nativos + export em secção nativa (sem toolbar/margens inline);
+avisos estáticos no lote: substituição directa + limpeza `source_groups` + lote vazio remove entradas (compreensível sem JS); confirmação JS `onsubmit` com `JSON_HEX_*` (bulk e import);
+handlers VIP 15–114 byte-idênticos; freeze actualizado (**21** `PASS:` — migração bulk/import intencional vs baseline V6b2b SHA `c72a5db5…`);
+bulk/import effects **34** `PASS:`; json audit portátil **56** (14×4; gate `test_exceptions_vip_bulk_json_audit.php`; evidência gerente externa **não** copiada); export Node **72** (`runPhp`→`export-subprocess.php` corpo + `export-probe.php` handler real com exit instrumentado; **sem** `proc_open` WASM; headers HTTP download **pendentes**); harness bulk **32**; jsdom payload **26** + confirm **20** (**46**); total gates V6b2b **240** `PASS:`;
+regressão cumulativa V6a/V6b1/V6b2a intacta (handlers **2**, VIP effects **19**, DHCP **162**, VIP harness **56**, payload VIP **41**, js VIP **37**, dhcp payload **30**, dhcp js **38** padrão).
+**Correção pós-revisão gerente** (export subprocess WASM): gates locais Composer 2.5 PASS após fix Node.
+**V6c fechamento visual Exceptions implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-form-card`; painéis `panel panel-default`; crédito nativo local + `foot.inc`; visibilidade JS `.hidden` Bootstrap (sem `is-hidden`); `require_once("classes/Form.class.php")` preservado na posição original (~linha 359, antes de `$l7_exc_add_retry`; prefixo congelado até `$pgtitle`);
+handlers byte-idênticos pre-view (**18324** bytes vs baseline V6c SHA `749b54d…`);
+gates V6c: `test_exceptions_native_view.php` **84** + `test_exceptions_vip_freeze.php` **32** (incl. V6c); regressão V6a–V6b2b intacta (handlers **2**, vip_js **37**, dhcp_js **38**, payload geral **58**, vip_payload **41**, bulk jsdom **46**, harness VIP **127**, bulk_effects **34**); `git diff --check` PASS).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v6c.md`; prefixo inteiro pre-`$pgtitle` byte-idêntico; diffcheck PASS; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/HTTP export/appliance** — apresentação Exceptions local concluída (**V6c**). Defeito funcional «bloqueio que libera depois» = etapa posterior (não corrigido).
+**V7 Eventos (view nativa) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_events.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers custom; painéis `panel panel-default` com IDs funcionais; monitor `#l7-live-view` com `list-group pre-scrollable` (rolagem limitada + `scrollTop`); linhas compactas `list-group-item`; filtro GET nativo (`method=get`, `action=layer7_events.php`, `maxlength=100`); raw em `<details>`/`<pre class="pre-scrollable">` (acessível sem JS); monitor ao vivo preservado (ajax/pause/refresh/clear/buffer **500**/merge); prefixo congelado byte-idêntico salvo `layer7_events_render_row` (**1971** bytes vs baseline V7 SHA `0e146d6…`);
+gates V7: native_view **61** + freeze **10** + render_row **13** + payload **12** + jsdom **18**; regressão humanize **31**; `git diff --check` + `php -l` PASS).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v7.md`; prefixo congelado; diffcheck PASS; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/appliance** — apresentação Eventos local concluída (**V7**).
+**V8 Diagnósticos (view nativa) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_diagnostics.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-form-card`/chips-steps report; painéis `panel panel-default` com IDs (`l7-diag-summary`, `l7-pf`, `l7-dns`, `l7-diag-pf-details`, `l7-actions`, `l7-report-error`, `l7-diag-logs`); dumps/logs `pre-scrollable` nativo; collapse Bootstrap; relato erro com `dl-horizontal`/listas nativas (mesmos 7 metadados + privacy); confirm `remove_anti_doh` via `onsubmit` + `JSON_HEX_*` (sem `onclick`); prefixo congelado byte-idêntico até `$pgtitle` (**11383** bytes vs baseline V8 SHA `8d47d5e…`);
+gates V8: native_view **74** + freeze **11** + payload_static **25** + payload_dom **57** + jsdom **28** (**195** cumulativos); harness `harness-diagnostics-view/render-parity.php` (view isolada, fixtures); `test_diagnostics_js.js`: handler `submit` instalado + `dispatchEvent` (não `outerHTML`/aspas serializadas jsdom); `php -l` PASS (WASM); **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v8.md`; prefixo literal + diffcheck PASS; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/appliance** — apresentação Diagnósticos local concluída (**V8**).
+**V9 Teste de políticas (view nativa) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_test.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-lead`; `Form(false)` + `Form_Section`/`Form_Input`/`Form_Select` + botão `run_test` em `Form_StaticText`; painéis `panel panel-default` (`l7-test`, `l7-test-results`, `l7-test-verdict`); alertas/tabela nativos sem `style=` inline; simulação preservada (notas enforce/monitor + aviso nDPI); prefixo congelado byte-idêntico até `$pgtitle` (**10225** bytes vs baseline V9 SHA `a255060…`);
+gates V9: native_view **51** + freeze **10** + payload_static **13** + payload_dom **31** + results **21** (**126** cumulativos); harness `harness-test-view/render-parity.php` + fixture nDPI V3 (`l7hc_fixture_catalog_472`: **472** protocolos / **20** categorias; não catálogo appliance); `php -l` PASS (WASM); **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v9.md`; catálogo **472**/**20** + payload **31** reexecutados PASS; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/appliance** — apresentação Teste de políticas local concluída (**V9**).
+**V10 Relatórios (view nativa) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_reports.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`l7-kpi-card`; painéis `panel panel-default` (`l7-reports-root`, `l7-reports-filters`, `l7-reports-summary`, `l7-reports-chart`, `l7-reports-tops`, `l7-reports-events`); filtro GET `form-horizontal` com labels `for`/`id` (`l7r-filter-*`); seis métricas em `well`/`lead`; Chart.js local preservado; fallback `#l7r-chart-empty` com `hidden` + `classList` (sem `style.display`); `clear_all_reports`: confirmação `onsubmit` aspas simples + `JSON_HEX_*` (sem `onclick`); prefixo SQLite/ingestão/handlers congelado byte-idêntico até `$pgtitle` (**5496** bytes vs baseline V10 SHA `17137833…`);
+gates V10: freeze **10** + native_view **33** + render **11** + payload_dom **8** + jsdom **10** (**72** cumulativos); harness `harness-reports-view/render-parity.php` (view isolada, fixtures sintéticas, stub `resolveIdentityByIp`; **sem** SQLite/ingestão/rede); `layer7_reports_export.php` intocado; `php -l` PASS (WASM); `git diff --check` PASS; **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v10.md`; freeze **10**/native **33**/payload **8**/JS **10** + prefixo/diffcheck; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/appliance** — apresentação Relatórios local concluída (**V10**).
+**V11 Remoção (view nativa) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_removal.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-lead`; painéis `panel panel-default` (`l7-removal-warning`, `l7-removal-state`, `l7-removal-after`); `Form(false)` + `Form_Checkbox`/`Form_Input` + botão `layer7_pkg_remove_do` vermelho; checkboxes `keep_license`/`keep_config` desmarcados; placeholder `REMOVER` + `autocomplete="off"`; form oculto quando `!pkg_installed` ou `job_running`; prefixo handler/job/flags congelado byte-idêntico até `$pgtitle` (**2801** bytes vs baseline V11 SHA `342d6eb6…`);
+gates V11: freeze **14** + native_view **35** + render **11** + payload_dom **26** (**86** cumulativos); harness `harness-removal-view/render-parity.php` (view isolada, fixtures `$pkg_installed`/`$job_running`; **sem** remoção real/rede/appliance); `php -l` PASS (WASM); `git diff --check` PASS; **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`2026-09-05`; evidência `/private/tmp/layer7-coordenacao-20260904/revisao-gerente-v11.md`; **não** marcar FEITO no git).
+**Pendente commit/visual real/CE/CSRF/appliance** — apresentação Remoção local concluída (**V11**); teste destrutivo **não** autorizado.
+**V12 Identity (view nativa, fila 20.37 fechada) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_identity.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-lead`; painéis `panel panel-default` (`l7-identity-header`, `l7-identity-status`, `l7-identity-module`, `l7-identity-ldap`, `l7-identity-radius`, `l7-identity-dc`, `l7-identity-limits`, `l7-identity-ldap-test`); formulário HTML `form-horizontal` `#l7-identity-form` preservado (sem `Form_*`); labels `for`/`id` (`l7i-*`); passwords vazios; token once sintético em `<code>` sem `user-select` inline; prefixo handlers save/testLDAP/token/secrets congelado byte-idêntico até `$pgtitle` (**6682** bytes vs baseline V12 SHA `60cd8162…`);
+gates V12: freeze **14** + native_view **32** + render **16** + payload_dom **16** (**78** cumulativos); harness `harness-identity-view/render-parity.php` (view isolada, fixtures entitlement/segredos sintéticos; **sem** LDAP/RADIUS/DC/rede); `php -l` PASS (WASM); `git diff --check` PASS; **não** reabrir trilha funcional Identity/MITM; **não** marcar FEITO no git).
+**Pendente revisão independente final/commit/visual/CE/CSRF/appliance** — **não** marcar FEITO no git.
+**V13 MITM (view nativa, fila 20.37 fechada — só visual; NO-GO funcional permanente) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_mitm.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-lead`; painéis `panel panel-default` (`l7-mitm-header`, `l7-mitm-status`, `l7-mitm-ca`, `l7-mitm-inspection`); formulários POST preservados (`mitm_break_glass`, `mitm_save_bypass`, `mitm_ca_*`); radios verticais `class="radio"`; PEM/key sempre vazios na view; confirmações `confirm()` com `json_encode`; prefixo handlers/gates/CA/download/import/salvar/breakglass congelado byte-idêntico até `$pgtitle` (**8391** bytes vs baseline V13 SHA `ee85f080…`);
+gates V13: freeze **16** + native_view **43** + render **19** + payload_dom **28** (**106** cumulativos); harness `harness-mitm-view/render-parity.php` (view isolada, fixtures entitlement/CA/effective/gates sintéticos; **sem** CA/rede/appliance/GET real); `php -l` PASS (WASM); **não** reabrir MITM funcional; **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`revisao-gerente-v13.md`); pendente commit/visual/CE/CSRF/appliance — **não** marcar FEITO no git.
+**V14 Blacklists (view nativa; backend/download/regras congelados) implementado, gates locais Composer 2.5 PASS** (`2026-09-05`;
+`layer7_blacklists.php`: removidos `layer7_render_styles()`/`layer7_render_footer()`/wrappers `layer7-page`/`layer7-admin-block`/`layer7-form-card`; painéis `panel panel-default` (`l7-bl-header`, `l7-download`, `l7-rules`, `l7-custom`, `l7-whitelist`, `l7-bl-settings`); forms POST/anchors GET preservados; submitters sem `value` (string vazia); JS polling/filtros literais; prefixo handlers/download/regras/whitelist/settings congelado byte-idêntico até `$pgtitle` (**10095** bytes vs baseline V14 SHA `926e9099…`);
+gates V14: freeze **18** + native_view **40** + render **15** + payload_dom **27** + js **13** (**113** cumulativos); harness `harness-blacklists-view/render-parity.php` (view isolada, fixtures sintéticas; **sem** download/rede/AJAX real); `php -l` PASS (WASM); **não** alterar `layer7.inc`/AJAX/backend; **não** marcar FEITO no git).
+**Revisão gerencial local PASS** (`revisao-gerente-v14.md`); pendente commit/visual/CE/CSRF/appliance — **não** marcar FEITO no git.
+**V15 Settings (view nativa; backend/licença/update/import congelados) FECHADO revisão gerencial** (`2026-09-05`;
+`layer7_settings.php`: view nativa completa (Relatórios/Sistema/Update sem `style=` cosmético nem `layer7-summary`; retention `hidden`+`classList`; confirmações `revoke_license`/`import_config` com `onclick='return confirm(...)'` + `JSON_HEX_*`; **sem** `confirm` em `do_update`); painéis `l7-servico`/`l7-relatorios`/`l7-sistema`/`l7_pkg_update`; contratos `save_scope`/reports `on`/script update intactos; prefixo **24306** bytes;
+gates V15: freeze **18** + native_view **52** + render **20** + payload_dom **23** + js **18** (**131** cumulativos); confirm DOM testado cancel/aceitar (jsdom); **não** marcar FEITO no git).
+**Candidato `1.9.81` preparado** (Makefile `PORTVERSION`; docs/changelog/manual; **sem** build/publish/commit). Pendente diff review → commit → build → publish → GO firewall.
 **BG-174 / GUI0 (`2026-08-31`):** análise integral do frontend,
 inventário técnico, matriz de paridade, arquitectura de informação,
 wireframes e plano GUI0–GUI7 **FEITOS no git** (`3563757`) após gates PASS.
-GUI1–GUI7 permanecem bloqueados até **GO humano**.
+GO visual integral local `2026-09-04` (não operacional) — checklist
+`BG-174 / GO visual integral local` **não** marcado done. GUI2 ainda não;
+GUI3/GUI4 em curso.
 Sem alteração de código, `PORTVERSION`, build, release ou estado do appliance.
 SSOT: [`docs/00-overview/frontend-redesign-analise.md`](docs/00-overview/frontend-redesign-analise.md),
 [`docs/01-architecture/frontend-redesign-inventario-paridade.md`](docs/01-architecture/frontend-redesign-inventario-paridade.md),
@@ -309,8 +448,14 @@ código/`PORTVERSION`/appliance.
 cálculos intactos. `layer7.inc` não tocado. **PUBLICADO** **`1.9.80`**
 (SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
 source/build `b84634c`; tag `7bd1fd0`). `releases/latest` = `v1.9.80`.
-Appliance/visual **pendentes** (`.254` inacessível). GUI2–GUI7 continuam
-bloqueados até GO.
+Appliance/visual **pendentes** (`.254` inacessível). GUI3 Policies
+**implementado, pendente de gates/commit** (mesma rota; modos
+list/edit/view/new; POST edit `#l7-edit`; sem `PORTVERSION`). GUI4 Devices (V1, GO visual `2026-09-04`)
+**implementado, pendente de gates/commit** (list/edit/batch; lote sem corte
+50; contexto URL; sem `PORTVERSION`). GUI4 Groups V2 **implementado,
+pendente de gates/commit**. Catálogo nDPI V3 **implementado,
+pendente de gates/commit**. GUI2, Exceptions e GUI5–GUI7 ainda nao
+neste bloco.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

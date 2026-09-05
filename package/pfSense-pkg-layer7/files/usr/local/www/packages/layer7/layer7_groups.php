@@ -8,6 +8,7 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
+require_once("classes/Form.class.php");
 
 if ($_POST["add_group"] ?? false) {
 	$data = layer7_load_or_default();
@@ -215,231 +216,284 @@ function layer7_group_policy_count($gid, $policies)
 	return $count;
 }
 
+$l7_add_retry = (!empty($input_errors) && ($_POST["add_group"] ?? false));
+$l7_group_mode = "list";
+if ($edit_idx !== null && $edit_group !== null) {
+	$l7_group_mode = "edit";
+} elseif ($l7_add_retry || (isset($_GET["new"]) && (string)$_GET["new"] === "1")) {
+	$l7_group_mode = "new";
+}
+
+$l7_new_id = isset($_POST["new_group_id"]) ? (string)$_POST["new_group_id"] : "";
+$l7_new_name = isset($_POST["new_group_name"]) ? (string)$_POST["new_group_name"] : "";
+$l7_new_cidrs = isset($_POST["new_group_cidrs"]) ? (string)$_POST["new_group_cidrs"] : "";
+$l7_new_hosts = isset($_POST["new_group_hosts"]) ? (string)$_POST["new_group_hosts"] : "";
+$l7_new_devices = isset($_POST["new_group_devices"]) ? (string)$_POST["new_group_devices"] : "";
+
+$eg_id = "";
+$eg_name = "";
+$eg_cidrs = "";
+$eg_hosts = "";
+$eg_devices = "";
+$eg_dips = array();
+if ($edit_group !== null) {
+	$eg_id = isset($edit_group["id"]) ? (string)$edit_group["id"] : "";
+	$eg_name = isset($edit_group["name"]) ? (string)$edit_group["name"] : "";
+	$eg_cidrs = isset($edit_group["cidrs"]) && is_array($edit_group["cidrs"])
+		? implode("\n", $edit_group["cidrs"]) : "";
+	$eg_hosts = isset($edit_group["hosts"]) && is_array($edit_group["hosts"])
+		? implode("\n", $edit_group["hosts"]) : "";
+	$eg_devices = isset($edit_group["device_macs"]) && is_array($edit_group["device_macs"])
+		? implode("\n", $edit_group["device_macs"]) : "";
+	$eg_dips = isset($edit_group["device_ips"]) && is_array($edit_group["device_ips"])
+		? $edit_group["device_ips"] : array();
+}
+if ($layer7_group_edit_retry !== null && ($_POST["save_group_edit"] ?? false)) {
+	if (isset($_POST["edit_group_name"])) {
+		$eg_name = (string)$_POST["edit_group_name"];
+	}
+	if (isset($_POST["edit_group_cidrs"])) {
+		$eg_cidrs = (string)$_POST["edit_group_cidrs"];
+	}
+	if (isset($_POST["edit_group_hosts"])) {
+		$eg_hosts = (string)$_POST["edit_group_hosts"];
+	}
+	if (isset($_POST["edit_group_devices"])) {
+		$eg_devices = (string)$_POST["edit_group_devices"];
+	}
+}
+
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Grupos"));
 include("head.inc");
-layer7_render_styles();
+layer7_render_tabs("policies");
+layer7_render_messages();
+layer7_render_policies_subnav("groups");
 ?>
-<div class="panel panel-default layer7-page">
+<div class="alert alert-info">
+	<?= htmlspecialchars(l7_t("Crie grupos nomeados (ex.: Funcionarios, Visitantes, Sala 3) por CIDR/sub-rede, por IPs individuais ou por dispositivos (MAC). Depois aplique politicas por grupo. Dispositivos por MAC sao resolvidos para o IP actual via DHCP/ARP.")); ?>
+</div>
+<?php if ($l7_group_mode === "edit") { ?>
+<div id="l7-edit-group">
+<?php
+	$edit_form = new Form(false);
+	$edit_form->setAction("layer7_groups.php#l7-edit-group");
+	$sec_edit = new Form_Section(l7_t("Editar grupo"));
+	$sec_edit->addInput(new Form_StaticText(
+		"id",
+		"<code>" . htmlspecialchars($eg_id) . "</code>"
+	));
+	$idx_hidden = new Form_Input("edit_group_index", "", "hidden", (string)(int)$edit_idx);
+	$idx_hidden->setAttribute("id", "l7-edit-group-index");
+	$sec_edit->addInput($idx_hidden);
+	$name_in = new Form_Input("edit_group_name", l7_t("Nome"), "text", $eg_name);
+	$name_in->setAttribute("maxlength", "160");
+	$name_in->setAttribute("id", "l7-edit-group-name");
+	$sec_edit->addInput($name_in);
+	$cidrs_in = new Form_Textarea("edit_group_cidrs", l7_t("CIDRs"), $eg_cidrs);
+	$cidrs_in->setRows(4);
+	$cidrs_in->setAttribute("id", "l7-edit-group-cidrs");
+	$cidrs_in->setAttribute("placeholder", "192.168.10.0/24");
+	$cidrs_in->setHelp(l7_t("Um CIDR por linha (max. 8)."));
+	$sec_edit->addInput($cidrs_in);
+	$hosts_in = new Form_Textarea("edit_group_hosts", l7_t("IPs individuais"), $eg_hosts);
+	$hosts_in->setRows(4);
+	$hosts_in->setAttribute("id", "l7-edit-group-hosts");
+	$hosts_in->setAttribute("placeholder", "10.0.85.100");
+	$hosts_in->setHelp(l7_t("Um IPv4 por linha (max. 16)."));
+	$sec_edit->addInput($hosts_in);
+	$mac_help = l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs.");
+	if (!empty($eg_dips)) {
+		$safe_dips = array();
+		foreach ($eg_dips as $dip) {
+			$safe_dips[] = htmlspecialchars((string)$dip, ENT_QUOTES, "UTF-8");
+		}
+		$mac_help .= " " . l7_t("IPs resolvidos agora") . ": " . implode(", ", $safe_dips);
+	} elseif ($eg_devices !== "") {
+		$mac_help .= " " . l7_t("Nenhum IP resolvido (dispositivos offline ou sem lease/ARP). Recomenda-se DHCP static mapping.");
+	}
+	$macs_in = new Form_Textarea("edit_group_devices", l7_t("Dispositivos (MAC)"), $eg_devices);
+	$macs_in->setRows(4);
+	$macs_in->setAttribute("id", "l7-edit-group-devices");
+	$macs_in->setAttribute("placeholder", "aa:bb:cc:dd:ee:ff");
+	$macs_in->setHelp($mac_help);
+	$sec_edit->addInput($macs_in);
+	$edit_form->add($sec_edit);
+	$save_btn = new Form_Button("save_group_edit", l7_t("Guardar alteracoes"), null, "fa fa-save");
+	$save_btn->addClass("btn-primary");
+	$edit_form->addGlobal($save_btn);
+	print($edit_form);
+?>
+<p>
+	<a class="btn btn-default" href="layer7_groups.php"><?= htmlspecialchars(l7_t("Cancelar edicao")); ?></a>
+</p>
+</div>
+<?php } ?>
+<?php if ($l7_group_mode === "new") { ?>
+<div id="l7-add-group">
+<?php if ($at_limit) { ?>
+<div class="alert alert-warning"><?= htmlspecialchars(l7_t("Limite de 16 grupos atingido.")); ?></div>
+<?php } else {
+	$add_form = new Form(false);
+	$add_form->setAction("layer7_groups.php");
+	$sec_add = new Form_Section(l7_t("Adicionar grupo"));
+	$id_in = new Form_Input("new_group_id", "id", "text", $l7_new_id);
+	$id_in->setAttribute("maxlength", "80");
+	$id_in->setAttribute("pattern", "[a-zA-Z0-9_-]+");
+	$id_in->setAttribute("required", "required");
+	$id_in->setAttribute("id", "l7-new-group-id");
+	$id_in->setAttribute("placeholder", "funcionarios");
+	$id_in->setHelp(l7_t("Identificador unico (letras, numeros, _ e -)."));
+	$sec_add->addInput($id_in);
+	$add_name = new Form_Input("new_group_name", l7_t("Nome"), "text", $l7_new_name);
+	$add_name->setAttribute("maxlength", "160");
+	$add_name->setAttribute("id", "l7-new-group-name");
+	$add_name->setAttribute("placeholder", l7_t("Ex.: Funcionarios"));
+	$sec_add->addInput($add_name);
+	$add_cidrs = new Form_Textarea("new_group_cidrs", l7_t("CIDRs"), $l7_new_cidrs);
+	$add_cidrs->setRows(4);
+	$add_cidrs->setAttribute("id", "l7-new-group-cidrs");
+	$add_cidrs->setAttribute("placeholder", "192.168.10.0/24");
+	$add_cidrs->setHelp(l7_t("Um CIDR por linha (max. 8). Ex.: 10.0.85.0/24."));
+	$sec_add->addInput($add_cidrs);
+	$add_hosts = new Form_Textarea("new_group_hosts", l7_t("IPs individuais"), $l7_new_hosts);
+	$add_hosts->setRows(4);
+	$add_hosts->setAttribute("id", "l7-new-group-hosts");
+	$add_hosts->setAttribute("placeholder", "10.0.85.100");
+	$add_hosts->setHelp(l7_t("Um IPv4 por linha (max. 16). Opcional se ja tiver CIDRs."));
+	$sec_add->addInput($add_hosts);
+	$add_macs = new Form_Textarea("new_group_devices", l7_t("Dispositivos (MAC)"), $l7_new_devices);
+	$add_macs->setRows(4);
+	$add_macs->setAttribute("id", "l7-new-group-devices");
+	$add_macs->setAttribute("placeholder", "aa:bb:cc:dd:ee:ff");
+	$add_macs->setHelp(l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs."));
+	$sec_add->addInput($add_macs);
+	$add_form->add($sec_add);
+	$add_btn = new Form_Button("add_group", l7_t("Adicionar grupo"), null, "fa fa-plus");
+	$add_btn->addClass("btn-success");
+	$add_form->addGlobal($add_btn);
+	print($add_form);
+} ?>
+<p>
+	<a class="btn btn-default" href="layer7_groups.php"><?= htmlspecialchars(l7_t("Voltar a lista")); ?></a>
+</p>
+<p class="help-block"><?= htmlspecialchars(l7_t("Defina um grupo de dispositivos com CIDRs e/ou IPs individuais. Depois associe o grupo a politicas na pagina de politicas.")); ?></p>
+</div>
+<?php } ?>
+<?php if ($l7_group_mode === "list") { ?>
+<div class="panel panel-default" id="l7-groups">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - Grupos de dispositivos"); ?></h2>
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Grupos actuais")); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("policies"); ?>
-		<div class="layer7-content">
-			<?php layer7_render_messages(); ?>
-			<?php layer7_render_policies_subnav("groups"); ?>
-
-			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados (ex.: Funcionarios, Visitantes, Sala 3) por CIDR/sub-rede, por IPs individuais ou por dispositivos (MAC). Depois aplique politicas por grupo. Dispositivos por MAC sao resolvidos para o IP actual via DHCP/ARP."); ?></p>
-
-			<div class="layer7-toolbar" style="margin-bottom:10px;">
-				<form method="post" action="layer7_groups.php#l7-groups" class="form-inline" style="display:inline;">
-					<button type="submit" name="resync_devices" value="1" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i> <?= l7_t("Resync IPs dos dispositivos"); ?></button>
-					<span class="text-muted" style="margin-left:8px;"><?= l7_t("Re-resolve MAC -> IP de todos os grupos (use apos mudancas de DHCP)."); ?></span>
-				</form>
-			</div>
-
-		<div class="layer7-admin-block" id="l7-groups">
-			<div class="layer7-admin-block__header"><?= l7_t("Grupos actuais"); ?></div>
-			<div class="layer7-admin-block__body">
-				<?php if (count($groups) === 0) { ?>
-				<div class="alert alert-info"><?= l7_t("Nenhum grupo criado. Adicione o primeiro grupo abaixo."); ?></div>
-				<?php } else { ?>
-				<div class="table-responsive">
-					<table class="table table-striped table-hover">
-						<thead>
-							<tr>
-								<th><code>id</code></th>
-								<th><?= l7_t("Nome"); ?></th>
-								<th><?= l7_t("CIDRs"); ?></th>
-								<th><?= l7_t("IPs"); ?></th>
-								<th><?= l7_t("Dispositivos (MAC -> IP)"); ?></th>
-								<th><?= l7_t("Politicas"); ?></th>
-								<th><?= l7_t("Acoes"); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-						<?php foreach ($groups as $i => $grp) {
-							$gid = isset($grp["id"]) ? (string)$grp["id"] : "";
-							$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
-							$gcidrs = isset($grp["cidrs"]) && is_array($grp["cidrs"]) ? $grp["cidrs"] : array();
-							$ghosts = isset($grp["hosts"]) && is_array($grp["hosts"]) ? $grp["hosts"] : array();
-							$gmacs = isset($grp["device_macs"]) && is_array($grp["device_macs"]) ? $grp["device_macs"] : array();
-							$gdips = isset($grp["device_ips"]) && is_array($grp["device_ips"]) ? $grp["device_ips"] : array();
-							$pcount = layer7_group_policy_count($gid, $policies);
-						?>
-							<tr>
-								<td><code><?= htmlspecialchars($gid); ?></code></td>
-								<td><?= htmlspecialchars($gname); ?></td>
-								<td class="small"><?= htmlspecialchars(implode(", ", $gcidrs)); ?></td>
-								<td class="small"><?= htmlspecialchars(implode(", ", $ghosts)); ?></td>
-								<td class="small"><?php if (empty($gmacs)) { echo "-"; } else { echo (int)count($gmacs) . " " . htmlspecialchars(l7_t("dispositivos")) . " &rarr; " . (int)count($gdips) . " IP"; } ?></td>
-								<td><?= (int)$pcount; ?></td>
-								<td class="layer7-table-actions">
-									<a href="layer7_groups.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
-								</td>
-							</tr>
-						<?php } ?>
-						</tbody>
-					</table>
-				</div>
-
-				<div class="layer7-callout layer7-danger-zone">
-					<form method="post" action="layer7_groups.php#l7-groups" class="form-inline layer7-inline-form"
-						onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
-						<div class="form-group">
-							<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
-							<select id="delete_group_index" name="delete_group_index" class="form-control">
-								<?php foreach ($groups as $i => $grp) {
-									$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
-									$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
-									$label = $gid . ($gname !== "" ? " - " . $gname : "");
-								?>
-								<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-								<?php } ?>
-							</select>
-							<button type="submit" name="delete_group" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-						</div>
-					</form>
-				</div>
-				<?php } ?>
-			</div>
+		<p class="help-block"><?= htmlspecialchars(l7_t("A consulta lista os grupos existentes. Criar e editar abrem uma pagina propria.")); ?></p>
+		<div id="l7-add-group">
+		<?php if ($at_limit) { ?>
+			<div class="alert alert-warning"><?= htmlspecialchars(l7_t("Limite de 16 grupos atingido.")); ?></div>
+		<?php } else { ?>
+			<p>
+				<a class="btn btn-primary" href="layer7_groups.php?new=1"><?= htmlspecialchars(l7_t("Adicionar grupo")); ?></a>
+			</p>
+		<?php } ?>
 		</div>
-
-		<?php if ($edit_group !== null && $edit_idx !== null) {
-			$eg_id = isset($edit_group["id"]) ? (string)$edit_group["id"] : "";
-			$eg_name = isset($edit_group["name"]) ? (string)$edit_group["name"] : "";
-			$eg_cidrs = isset($edit_group["cidrs"]) && is_array($edit_group["cidrs"])
-				? implode("\n", $edit_group["cidrs"]) : "";
-			$eg_hosts = isset($edit_group["hosts"]) && is_array($edit_group["hosts"])
-				? implode("\n", $edit_group["hosts"]) : "";
-			$eg_devices = isset($edit_group["device_macs"]) && is_array($edit_group["device_macs"])
-				? implode("\n", $edit_group["device_macs"]) : "";
-			$eg_dips = isset($edit_group["device_ips"]) && is_array($edit_group["device_ips"])
-				? $edit_group["device_ips"] : array();
-		?>
-		<div class="layer7-admin-block" id="l7-edit-group">
-			<div class="layer7-admin-block__header"><?= l7_t("Editar grupo"); ?></div>
-			<div class="layer7-admin-block__body">
-			<div class="layer7-toolbar">
-				<a href="layer7_groups.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
-			</div>
-			<form method="post" action="layer7_groups.php#l7-edit-group" class="form-horizontal">
-				<input type="hidden" name="edit_group_index" value="<?= (int)$edit_idx; ?>" />
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>id</code></label>
-					<div class="col-sm-9">
-						<p class="form-control-static"><code><?= htmlspecialchars($eg_id); ?></code></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
-					<div class="col-sm-6">
-						<input type="text" name="edit_group_name" class="form-control" maxlength="160" value="<?= htmlspecialchars($eg_name); ?>" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="edit_group_cidrs" class="form-control" rows="4" placeholder="192.168.10.0/24&#10;10.0.85.0/24"><?= htmlspecialchars($eg_cidrs); ?></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8)."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("IPs individuais"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="edit_group_hosts" class="form-control" rows="4" placeholder="10.0.85.100&#10;10.0.85.101"><?= htmlspecialchars($eg_hosts); ?></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16)."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Dispositivos (MAC)"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="edit_group_devices" class="form-control" rows="4" placeholder="aa:bb:cc:dd:ee:ff" style="font-family:monospace;"><?= htmlspecialchars($eg_devices); ?></textarea>
-						<p class="help-block"><?= l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs."); ?></p>
-						<?php if (!empty($eg_dips)) { ?>
-						<p class="help-block"><strong><?= l7_t("IPs resolvidos agora"); ?>:</strong> <span class="small"><?= htmlspecialchars(implode(", ", $eg_dips)); ?></span></p>
-						<?php } else if ($eg_devices !== "") { ?>
-						<p class="help-block text-warning"><?= l7_t("Nenhum IP resolvido (dispositivos offline ou sem lease/ARP). Recomenda-se DHCP static mapping."); ?></p>
-						<?php } ?>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="save_group_edit" value="1" class="btn btn-primary"><?= l7_t("Guardar alteracoes"); ?></button>
-					</div>
-				</div>
-			</form>
-			</div>
+		<?php if (count($groups) === 0) { ?>
+		<div class="alert alert-info"><?= htmlspecialchars(l7_t("Nenhum grupo criado.")); ?>
+			<a href="layer7_groups.php?new=1"><?= htmlspecialchars(l7_t("Adicionar o primeiro grupo.")); ?></a>
+		</div>
+		<?php } else { ?>
+		<div class="table-responsive">
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th><code>id</code></th>
+						<th><?= htmlspecialchars(l7_t("Nome")); ?></th>
+						<th><?= htmlspecialchars(l7_t("CIDRs")); ?></th>
+						<th><?= htmlspecialchars(l7_t("IPs")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Dispositivos (MAC -> IP)")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Politicas")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Acoes")); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ($groups as $i => $grp) {
+					$gid = isset($grp["id"]) ? (string)$grp["id"] : "";
+					$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
+					$gcidrs = isset($grp["cidrs"]) && is_array($grp["cidrs"]) ? $grp["cidrs"] : array();
+					$ghosts = isset($grp["hosts"]) && is_array($grp["hosts"]) ? $grp["hosts"] : array();
+					$gmacs = isset($grp["device_macs"]) && is_array($grp["device_macs"]) ? $grp["device_macs"] : array();
+					$gdips = isset($grp["device_ips"]) && is_array($grp["device_ips"]) ? $grp["device_ips"] : array();
+					$pcount = layer7_group_policy_count($gid, $policies);
+				?>
+					<tr>
+						<td><code><?= htmlspecialchars($gid); ?></code></td>
+						<td><?= htmlspecialchars($gname); ?></td>
+						<td><?= htmlspecialchars(implode(", ", $gcidrs)); ?></td>
+						<td><?= htmlspecialchars(implode(", ", $ghosts)); ?></td>
+						<td><?php if (empty($gmacs)) { echo "-"; } else { echo (int)count($gmacs) . " " . htmlspecialchars(l7_t("dispositivos")) . " &rarr; " . (int)count($gdips) . " IP"; } ?></td>
+						<td><?= (int)$pcount; ?></td>
+						<td>
+							<a href="layer7_groups.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= htmlspecialchars(l7_t("Editar")); ?></a>
+						</td>
+					</tr>
+				<?php } ?>
+				</tbody>
+			</table>
 		</div>
 		<?php } ?>
-
-		<div class="layer7-admin-block" id="l7-add-group">
-			<div class="layer7-admin-block__header"><?= l7_t("Adicionar grupo"); ?></div>
-			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Defina um grupo de dispositivos com CIDRs e/ou IPs individuais. Depois associe o grupo a politicas na pagina de politicas."); ?></p>
-			<?php if ($at_limit) { ?>
-			<div class="alert alert-warning"><?= l7_t("Limite de 16 grupos atingido."); ?></div>
-			<?php } else { ?>
-			<form method="post" action="layer7_groups.php#l7-add-group" class="form-horizontal">
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>id</code></label>
-					<div class="col-sm-6">
-						<input type="text" name="new_group_id" class="form-control" maxlength="80"
-							pattern="[a-zA-Z0-9_-]+" required="required" placeholder="funcionarios" />
-						<p class="help-block"><?= l7_t("Identificador unico (letras, numeros, _ e -)."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
-					<div class="col-sm-6">
-						<input type="text" name="new_group_name" class="form-control" maxlength="160"
-							placeholder="<?= l7_t("Ex.: Funcionarios"); ?>" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="new_group_cidrs" class="form-control" rows="4" placeholder="192.168.10.0/24&#10;10.0.85.0/24"></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Ex.: 10.0.85.0/24."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("IPs individuais"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="new_group_hosts" class="form-control" rows="4" placeholder="10.0.85.100&#10;10.0.85.101"></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Opcional se ja tiver CIDRs."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Dispositivos (MAC)"); ?></label>
-					<div class="col-sm-6">
-						<textarea name="new_group_devices" class="form-control" rows="4" placeholder="aa:bb:cc:dd:ee:ff" style="font-family:monospace;"></textarea>
-						<p class="help-block"><?= l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="add_group" value="1" class="btn btn-success"><?= l7_t("Adicionar grupo"); ?></button>
-					</div>
-				</div>
-			</form>
-			<?php } ?>
-			</div>
-		</div>
-		</div>
 	</div>
 </div>
-<?php layer7_render_footer(); ?>
-<?php require_once("foot.inc"); ?>
+<div class="panel panel-default" id="l7-groups-maintain">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Manutencao")); ?></h2>
+	</div>
+	<div class="panel-body">
+		<p class="help-block"><?= htmlspecialchars(l7_t("Re-resolver enderecos e remover um grupo sao accoes separadas da criacao e da edicao.")); ?></p>
+<?php
+	$rs_form = new Form(false);
+	$rs_form->setAction("layer7_groups.php#l7-groups");
+	$sec_rs = new Form_Section(l7_t("Resync IPs dos dispositivos"));
+	$sec_rs->addInput(new Form_StaticText(
+		"",
+		htmlspecialchars(l7_t("Re-resolve MAC -> IP de todos os grupos (use apos mudancas de DHCP)."))
+	));
+	$rs_form->add($sec_rs);
+	$rs_btn = new Form_Button("resync_devices", l7_t("Resync IPs dos dispositivos"), null, "fa fa-refresh");
+	$rs_btn->addClass("btn-default");
+	$rs_form->addGlobal($rs_btn);
+	print($rs_form);
+	if (count($groups) > 0) {
+		$del_opts = array();
+		foreach ($groups as $i => $grp) {
+			$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
+			$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
+			$del_opts[(string)(int)$i] = $gid . ($gname !== "" ? " - " . $gname : "");
+		}
+		$del_sel_value = "0";
+		if (!empty($input_errors) && ($_POST["delete_group"] ?? false) && isset($_POST["delete_group_index"])) {
+			$posted_del = (string)(int)$_POST["delete_group_index"];
+			if (array_key_exists($posted_del, $del_opts)) {
+				$del_sel_value = $posted_del;
+			}
+		}
+		$del_form = new Form(false);
+		$del_form->setAction("layer7_groups.php#l7-groups");
+		$del_form->setAttribute("onsubmit", "return confirm(" . json_encode(l7_t("Remover este grupo?")) . ");");
+		$sec_del = new Form_Section(l7_t("Remover grupo"));
+		$del_sel = new Form_Select("delete_group_index", l7_t("Remover grupo"), $del_sel_value, $del_opts);
+		$del_sel->setAttribute("id", "delete_group_index");
+		$sec_del->addInput($del_sel);
+		$del_form->add($sec_del);
+		$del_btn = new Form_Button("delete_group", l7_t("Remover"), null, "fa fa-trash");
+		$del_btn->addClass("btn-danger");
+		$del_form->addGlobal($del_btn);
+		print($del_form);
+	}
+?>
+	</div>
+</div>
+<?php } ?>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
+<?php include("foot.inc"); ?>

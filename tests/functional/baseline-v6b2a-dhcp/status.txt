@@ -1,0 +1,3 @@
+V6b2a baseline — estado pré-modo DHCP exclusivo (V6b1 visual com DHCP embutido na consulta VIP).
+SHA256=e3d216918399a3f2a54538f425e197d24b15ae2d4cd34758aa9801e7ccdfa7ea
+Fixture portátil pinada; distinta de baseline-v6b1-vip (SHA b0efcd8…).

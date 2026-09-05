@@ -662,26 +662,26 @@ foreach (layer7_get_pfsense_interfaces() as $ifc) {
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Settings"));
 include("head.inc");
-layer7_render_styles();
 ?>
-<div class="panel panel-default layer7-page">
+
+<?php layer7_render_tabs("settings"); ?>
+
+<div id="l7-settings-root">
+
+<?php layer7_render_messages(); ?>
+
+<form method="post" action="layer7_settings.php#l7-servico" class="form-horizontal" id="l7-settings-general-form">
+<input type="hidden" name="save_scope" value="general" />
+
+<div class="panel panel-default" id="l7-servico">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - definicoes"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Configuracao do servico"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("settings"); ?>
-		<div class="layer7-content">
-			<?php layer7_render_messages(); ?>
-			<form method="post" action="layer7_settings.php#l7-servico" class="form-horizontal">
-			<input type="hidden" name="save_scope" value="general" />
-
-			<div class="layer7-admin-block" id="l7-servico">
-				<div class="layer7-admin-block__header"><?= l7_t("Configuracao do servico"); ?></div>
-				<div class="layer7-admin-block__body">
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Idioma"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-language"><?= l7_t("Idioma"); ?></label>
 						<div class="col-sm-9">
-							<select name="language" class="form-control" style="max-width: 260px;">
+							<select name="language" id="l7s-language" class="form-control">
 								<option value="pt" <?= $cur_lang === "pt" ? 'selected="selected"' : ""; ?>>Portugues</option>
 								<option value="en" <?= $cur_lang === "en" ? 'selected="selected"' : ""; ?>>English</option>
 								<option value="es" <?= $cur_lang === "es" ? 'selected="selected"' : ""; ?>>Español</option>
@@ -690,19 +690,21 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Ativar pacote"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-enabled"><?= l7_t("Ativar pacote"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="enabled" value="1" <?= $en ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Executar o daemon Layer7"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="enabled" id="l7s-enabled" value="1" <?= $en ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Executar o daemon Layer7"); ?>
+								</label>
+							</div>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Modo global"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-mode"><?= l7_t("Modo global"); ?></label>
 						<div class="col-sm-9">
-							<select name="mode" class="form-control" style="max-width: 260px;">
+							<select name="mode" id="l7s-mode" class="form-control">
 								<option value="monitor" <?= $mode === "monitor" ? 'selected="selected"' : ""; ?>><?= l7_t("monitor"); ?></option>
 								<option value="enforce" <?= $mode === "enforce" ? 'selected="selected"' : ""; ?>><?= l7_t("enforce"); ?></option>
 							</select>
@@ -737,31 +739,35 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Bloquear DoT / DoQ (porta 853)"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-block-dot"><?= l7_t("Bloquear DoT / DoQ (porta 853)"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_dot_doq" value="1" <?= $block_dot_doq ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Bloquear DNS-over-TLS / DNS-over-QUIC (TCP/UDP 853) para destinos externos"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_dot_doq" id="l7s-block-dot" value="1" <?= $block_dot_doq ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Bloquear DNS-over-TLS / DNS-over-QUIC (TCP/UDP 853) para destinos externos"); ?>
+								</label>
+							</div>
 							<p class="help-block"><?= l7_t("Desligado por defeito. Activar reforca o anti-bypass DNS, mas pode quebrar 'DNS privado' em Android e algumas apps moveis (incluindo bancos) que dependem de DoT. So activar apos confirmar em laboratorio."); ?></p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Inspecao por SNI (TLS)"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-sni"><?= l7_t("Inspecao por SNI (TLS)"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="sni_inspection" value="1" <?= $sni_inspection ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Usar o SNI (nome do servidor no TLS) e o Host (HTTP) para casar politicas por site"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="sni_inspection" id="l7s-sni" value="1" <?= $sni_inspection ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Usar o SNI (nome do servidor no TLS) e o Host (HTTP) para casar politicas por site"); ?>
+								</label>
+							</div>
 							<p class="help-block"><?= l7_t("Desligado por defeito. Quando ligado, o motor usa o hostname pedido em cada ligacao (extraido pelo nDPI) em vez de depender so de DNS reverso. Melhora bloqueio em CDNs (ex.: googlevideo) e quando o DNS do cliente esta em cache ou cifrado. Nao usa MITM e nao decifra trafego; nao funciona se o SNI estiver cifrado (TLS 1.3 ECH)."); ?></p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Modelo de enforcement PF"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-enforcement"><?= l7_t("Modelo de enforcement PF"); ?></label>
 						<div class="col-sm-9">
-							<select name="enforcement_model" class="form-control" style="max-width: 420px;">
+							<select name="enforcement_model" id="l7s-enforcement" class="form-control">
 								<option value="legacy_global" <?= $enforcement_model === "legacy_global" ? 'selected="selected"' : ""; ?>><?= l7_t("Legacy global (actual — tabela layer7_block_dst partilhada)"); ?></option>
 								<option value="scoped_hybrid" <?= $enforcement_model === "scoped_hybrid" ? 'selected="selected"' : ""; ?>><?= l7_t("Escopado hibrido (experimental — Caminho B; requer blocos E2+)"); ?></option>
 							</select>
@@ -770,13 +776,15 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Pagina de bloqueio"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-block-page"><?= l7_t("Pagina de bloqueio"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_page_enabled" value="1"
-									<?= !empty($bp_cfg["enabled"]) ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Mostrar pagina informativa ao utilizador (requer mode=enforce)"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_page_enabled" id="l7s-block-page" value="1"
+										<?= !empty($bp_cfg["enabled"]) ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Mostrar pagina informativa ao utilizador (requer mode=enforce)"); ?>
+								</label>
+							</div>
 							<p class="help-block"><?= l7_t("DNS sinkhole via Unbound + pagina HTTP no IP portal. Funciona em HTTP; HTTPS mostra erro de certificado (sem MITM). CDN/QUIC/DoH podem contornar. Desligado por defeito. Se o Captive Portal nativo estiver activo no mesmo IP/interface, o Layer7 nao instala rdr em 80/443 — o portal pfSense continua dono do fluxo."); ?></p>
 							<?php if (!empty($bp_cfg["enabled"]) && $mode !== "enforce") { ?>
 							<p class="text-warning"><i class="fa fa-warning"></i> <?= l7_t("A pagina so e activa com Servico ligado e modo enforce."); ?></p>
@@ -802,9 +810,9 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("IP portal"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-portal-ip"><?= l7_t("IP portal"); ?></label>
 						<div class="col-sm-9">
-							<input type="text" name="block_page_portal_ip" class="form-control" style="max-width: 220px;"
+							<input type="text" name="block_page_portal_ip" id="l7s-portal-ip" class="form-control"
 								value="<?= htmlspecialchars($bp_cfg["portal_ip"]); ?>"
 								placeholder="<?= $bp_portal_detected ? htmlspecialchars($bp_portal_detected) : '192.168.1.1'; ?>" />
 							<p class="help-block"><?= l7_t("Vazio = auto (primeira interface de captura). Detectado agora:"); ?>
@@ -814,25 +822,25 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Titulo da pagina"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-block-title"><?= l7_t("Titulo da pagina"); ?></label>
 						<div class="col-sm-9">
-							<input type="text" name="block_page_title" class="form-control" style="max-width: 420px;"
+							<input type="text" name="block_page_title" id="l7s-block-title" class="form-control"
 								maxlength="120" value="<?= htmlspecialchars($bp_cfg["title"]); ?>" />
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Mensagem"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-block-message"><?= l7_t("Mensagem"); ?></label>
 						<div class="col-sm-9">
-							<textarea name="block_page_message" class="form-control" rows="3" style="max-width: 520px;"
+							<textarea name="block_page_message" id="l7s-block-message" class="form-control" rows="3"
 								maxlength="2000"><?= htmlspecialchars($bp_cfg["message"]); ?></textarea>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Contacto admin"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-block-contact"><?= l7_t("Contacto admin"); ?></label>
 						<div class="col-sm-9">
-							<input type="text" name="block_page_contact" class="form-control" style="max-width: 420px;"
+							<input type="text" name="block_page_contact" id="l7s-block-contact" class="form-control"
 								maxlength="500" value="<?= htmlspecialchars($bp_cfg["contact"]); ?>"
 								placeholder="suporte@empresa.pt" />
 						</div>
@@ -841,43 +849,51 @@ layer7_render_styles();
 					<div class="form-group">
 						<label class="col-sm-3 control-label"><?= l7_t("Detalhes na pagina"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_page_show_host" value="1"
-									<?= !empty($bp_cfg["show_host"]) ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Mostrar dominio bloqueado"); ?>
-							</label>
-							<label class="checkbox-inline" style="margin-left:12px;">
-								<input type="checkbox" name="block_page_show_policy" value="1"
-									<?= !empty($bp_cfg["show_policy"]) ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Mostrar nome da politica"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_page_show_host" value="1"
+										<?= !empty($bp_cfg["show_host"]) ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Mostrar dominio bloqueado"); ?>
+								</label>
+							</div>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_page_show_policy" value="1"
+										<?= !empty($bp_cfg["show_policy"]) ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Mostrar nome da politica"); ?>
+								</label>
+							</div>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("DNS forcado (anti-bypass)"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-force-dns"><?= l7_t("DNS forcado (anti-bypass)"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_page_force_dns" value="1"
-									<?= !empty($bp_cfg["force_dns"]) ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Redireccionar todo o DNS (porta 53) dos clientes para o resolver local"); ?>
-							</label>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_page_force_dns" id="l7s-force-dns" value="1"
+										<?= !empty($bp_cfg["force_dns"]) ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Redireccionar todo o DNS (porta 53) dos clientes para o resolver local"); ?>
+								</label>
+							</div>
 							<p class="help-block"><?= l7_t("Impede que clientes contornem o sinkhole usando DNS externo (8.8.8.8, 1.1.1.1). Activa tambem anti-DoH no Unbound (NXDOMAIN para resolvers DoH conhecidos + canario Firefox). Recomendado combinar com bloqueio DoT/DoQ (porta 853) e anti-QUIC nas interfaces LAN."); ?></p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Blacklists UT1"); ?></label>
+						<label class="col-sm-3 control-label" for="l7s-sinkhole-bl"><?= l7_t("Blacklists UT1"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_page_sinkhole_blacklists" value="1"
-									<?= !empty($bp_cfg["sinkhole_blacklists"]) ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Incluir dominios de categorias activas no sinkhole"); ?>
-							</label>
-							<div style="margin-top:8px;">
-								<label><?= l7_t("Limite de dominios blacklist"); ?></label>
-								<input type="number" name="block_page_blacklist_limit" class="form-control"
-									style="max-width:120px; display:inline-block;" min="1" max="4096"
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_page_sinkhole_blacklists" id="l7s-sinkhole-bl" value="1"
+										<?= !empty($bp_cfg["sinkhole_blacklists"]) ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Incluir dominios de categorias activas no sinkhole"); ?>
+								</label>
+							</div>
+							<div class="form-group">
+								<label for="l7s-bl-limit"><?= l7_t("Limite de dominios blacklist"); ?></label>
+								<input type="number" name="block_page_blacklist_limit" id="l7s-bl-limit" class="form-control"
+									min="1" max="4096"
 									value="<?= (int)$bp_cfg["blacklist_domain_limit"]; ?>" />
 							</div>
 							<p class="help-block"><?= l7_t("Politicas activas:"); ?>
@@ -908,16 +924,16 @@ layer7_render_styles();
 						</div>
 					</div>
 
-					<div style="margin-top:12px;">
-						<a data-toggle="collapse" href="#l7-logging-advanced" style="cursor:pointer;">
+					<p>
+						<a data-toggle="collapse" href="#l7-logging-advanced">
 							<i class="fa fa-cog"></i> <?= l7_t("Logging avancado"); ?> <i class="fa fa-chevron-down"></i>
 						</a>
-					</div>
-					<div id="l7-logging-advanced" class="collapse" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+					</p>
+					<div id="l7-logging-advanced" class="collapse">
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Nivel de log"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-log-level"><?= l7_t("Nivel de log"); ?></label>
 							<div class="col-sm-9">
-								<select name="log_level" class="form-control" style="max-width: 260px;">
+								<select name="log_level" id="l7s-log-level" class="form-control">
 									<?php foreach (array("error", "warn", "info", "debug") as $v) { ?>
 									<option value="<?= htmlspecialchars($v); ?>" <?= $ll === $v ? 'selected="selected"' : ""; ?>><?= htmlspecialchars($v); ?></option>
 									<?php } ?>
@@ -926,66 +942,70 @@ layer7_render_styles();
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Syslog remoto"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-syslog-remote"><?= l7_t("Syslog remoto"); ?></label>
 							<div class="col-sm-9">
-								<label class="checkbox-inline">
-									<input type="checkbox" name="syslog_remote" value="1" <?= $sr ? 'checked="checked"' : ""; ?> />
-									<?= l7_t("Duplicar eventos por UDP (RFC 3164)"); ?>
-								</label>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="syslog_remote" id="l7s-syslog-remote" value="1" <?= $sr ? 'checked="checked"' : ""; ?> />
+										<?= l7_t("Duplicar eventos por UDP (RFC 3164)"); ?>
+									</label>
+								</div>
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Host syslog"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-syslog-host"><?= l7_t("Host syslog"); ?></label>
 							<div class="col-sm-9">
-								<input type="text" name="syslog_remote_host" class="form-control" style="max-width: 360px;" maxlength="255"
+								<input type="text" name="syslog_remote_host" id="l7s-syslog-host" class="form-control" maxlength="255"
 									value="<?= htmlspecialchars($sr_host); ?>" placeholder="192.168.1.50" />
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Porta UDP"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-syslog-port"><?= l7_t("Porta UDP"); ?></label>
 							<div class="col-sm-9">
-								<input type="number" name="syslog_remote_port" class="form-control" style="max-width: 140px;" value="<?= (int)$sr_port; ?>" min="1" max="65535" />
+								<input type="number" name="syslog_remote_port" id="l7s-syslog-port" class="form-control" value="<?= (int)$sr_port; ?>" min="1" max="65535" />
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Janela debug (min)"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-debug-min"><?= l7_t("Janela debug (min)"); ?></label>
 							<div class="col-sm-9">
-								<input type="number" name="debug_minutes" class="form-control" style="max-width: 140px;" value="<?= (int)$dbgm; ?>" min="0" max="720" />
+								<input type="number" name="debug_minutes" id="l7s-debug-min" class="form-control" value="<?= (int)$dbgm; ?>" min="0" max="720" />
 								<p class="help-block"><?= l7_t("0 = normal. 1-720 para LOG_DEBUG temporario."); ?></p>
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Limite por arquivo de log"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-log-max"><?= l7_t("Limite por arquivo de log"); ?></label>
 							<div class="col-sm-9">
-								<div style="display:flex; gap:8px; align-items:center;">
-									<input type="number" name="log_file_max_mb" class="form-control"
-										style="max-width:140px;" value="<?= (int)$log_file_max_mb; ?>" min="1" max="100" />
-									<span class="text-muted">MiB</span>
+								<div class="input-group">
+									<input type="number" name="log_file_max_mb" id="l7s-log-max" class="form-control"
+										value="<?= (int)$log_file_max_mb; ?>" min="1" max="100" />
+									<span class="input-group-addon">MiB</span>
 								</div>
 								<p class="help-block"><?= l7_t("Aplica-se separadamente ao log operacional e ao arquivo temporario de eventos."); ?></p>
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Copias rotacionadas"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-log-keep"><?= l7_t("Copias rotacionadas"); ?></label>
 							<div class="col-sm-9">
-								<input type="number" name="log_file_keep" class="form-control"
-									style="max-width:140px;" value="<?= (int)$log_file_keep; ?>" min="1" max="10" />
+								<input type="number" name="log_file_keep" id="l7s-log-keep" class="form-control"
+									value="<?= (int)$log_file_keep; ?>" min="1" max="10" />
 								<p class="help-block"><?= l7_t("Quantidade maxima de arquivos antigos mantidos por log."); ?></p>
 							</div>
 						</div>
 					</div>
 
-					<div style="margin-top:16px;">
-						<button type="submit" name="save" value="1" class="btn btn-primary"><?= l7_t("Guardar definicoes"); ?></button>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="submit" name="save" value="1" class="btn btn-primary"><?= l7_t("Guardar definicoes"); ?></button>
+						</div>
 					</div>
-				</div>
-			</div>
-			</form>
+	</div>
+</div>
+</form>
 
 			<?php
 			$lic_status = layer7_read_license_status();
@@ -1039,86 +1059,104 @@ layer7_render_styles();
 			$rpt_selected_preset = in_array($rpt_ret, $rpt_presets, true) ? (string)$rpt_ret : "custom";
 			$rpt_evt_selected_preset = in_array($rpt_evt_ret, $rpt_presets, true) ? (string)$rpt_evt_ret : "custom";
 			?>
-			<div class="layer7-admin-block" id="l7-relatorios">
-				<div class="layer7-admin-block__header"><?= l7_t("Relatorios"); ?></div>
-				<div class="layer7-admin-block__body">
-					<form method="post" action="layer7_settings.php#l7-relatorios" class="form-horizontal">
+			<div class="panel panel-default" id="l7-relatorios">
+				<div class="panel-heading">
+					<h2 class="panel-title"><?= l7_t("Relatorios"); ?></h2>
+				</div>
+				<div class="panel-body">
+					<form method="post" action="layer7_settings.php#l7-relatorios" class="form-horizontal" id="l7-settings-reports-form">
 						<input type="hidden" name="save_scope" value="reports">
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Historico executivo"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-reports-enabled"><?= l7_t("Historico executivo"); ?></label>
 							<div class="col-sm-9">
-								<label class="checkbox-inline">
-									<input type="checkbox" name="reports_enabled" <?= $rpt_en ? 'checked' : ''; ?>>
-									<?= l7_t("Activar"); ?>
-								</label>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="reports_enabled" id="l7s-reports-enabled" <?= $rpt_en ? 'checked' : ''; ?>>
+										<?= l7_t("Activar"); ?>
+									</label>
+								</div>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Retencao executivo"); ?></label>
+							<label class="col-sm-3 control-label" for="l7_rpt_preset"><?= l7_t("Retencao executivo"); ?></label>
 							<div class="col-sm-9">
-								<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-									<select class="form-control" name="reports_retention_preset" id="l7_rpt_preset" style="width:180px;" onchange="document.getElementById('l7_rpt_custom').style.display=this.value==='custom'?'inline-block':'none';">
-										<?php foreach ($rpt_presets as $rp) { ?>
-										<option value="<?= $rp; ?>" <?= $rpt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
-										<?php } ?>
-										<option value="custom" <?= $rpt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
-									</select>
-									<input type="number" class="form-control" name="reports_retention" id="l7_rpt_custom" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:110px;<?= $rpt_selected_preset !== "custom" ? 'display:none;' : ''; ?>">
+								<div class="row">
+									<div class="col-sm-4">
+										<select class="form-control" name="reports_retention_preset" id="l7_rpt_preset" onchange="var c=document.getElementById('l7_rpt_custom');if(this.value==='custom'){c.classList.remove('hidden');}else{c.classList.add('hidden');}">
+											<?php foreach ($rpt_presets as $rp) { ?>
+											<option value="<?= $rp; ?>" <?= $rpt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
+											<?php } ?>
+											<option value="custom" <?= $rpt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
+										</select>
+									</div>
+									<div class="col-sm-3">
+										<input type="number" class="form-control<?= $rpt_selected_preset !== "custom" ? ' hidden' : ''; ?>" name="reports_retention" id="l7_rpt_custom" value="<?= $rpt_ret; ?>" min="1" max="365">
+									</div>
 								</div>
 							</div>
 						</div>
 
-						<hr style="margin:12px 0;">
+						<hr>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Log detalhado"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-event-log"><?= l7_t("Log detalhado"); ?></label>
 							<div class="col-sm-9">
-								<label class="checkbox-inline">
-									<input type="checkbox" name="reports_event_log_enabled" <?= $rpt_evt_en ? 'checked' : ''; ?>>
-									<?= l7_t("Activar"); ?>
-								</label>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="reports_event_log_enabled" id="l7s-event-log" <?= $rpt_evt_en ? 'checked' : ''; ?>>
+										<?= l7_t("Activar"); ?>
+									</label>
+								</div>
 								<p class="help-block"><?= l7_t("Desligado por defeito. Bloqueios e erros continuam preservados como auditoria essencial."); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Retencao detalhado"); ?></label>
+							<label class="col-sm-3 control-label" for="l7_evt_preset"><?= l7_t("Retencao detalhado"); ?></label>
 							<div class="col-sm-9">
-								<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-									<select class="form-control" name="reports_event_retention_preset" id="l7_evt_preset" style="width:180px;" onchange="document.getElementById('l7_evt_custom').style.display=this.value==='custom'?'inline-block':'none';">
-										<?php foreach ($rpt_presets as $rp) { ?>
-										<option value="<?= $rp; ?>" <?= $rpt_evt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
-										<?php } ?>
-										<option value="custom" <?= $rpt_evt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
-									</select>
-									<input type="number" class="form-control" name="reports_event_retention" id="l7_evt_custom" value="<?= $rpt_evt_ret; ?>" min="1" max="365" style="width:110px;<?= $rpt_evt_selected_preset !== "custom" ? 'display:none;' : ''; ?>">
+								<div class="row">
+									<div class="col-sm-4">
+										<select class="form-control" name="reports_event_retention_preset" id="l7_evt_preset" onchange="var c=document.getElementById('l7_evt_custom');if(this.value==='custom'){c.classList.remove('hidden');}else{c.classList.add('hidden');}">
+											<?php foreach ($rpt_presets as $rp) { ?>
+											<option value="<?= $rp; ?>" <?= $rpt_evt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
+											<?php } ?>
+											<option value="custom" <?= $rpt_evt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
+										</select>
+									</div>
+									<div class="col-sm-3">
+										<input type="number" class="form-control<?= $rpt_evt_selected_preset !== "custom" ? ' hidden' : ''; ?>" name="reports_event_retention" id="l7_evt_custom" value="<?= $rpt_evt_ret; ?>" min="1" max="365">
+									</div>
 								</div>
 								<p class="help-block"><?= l7_t("Recomendado: 7 a 15 dias. Bloco que mais cresce em disco."); ?></p>
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Limite do banco detalhado"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-rpt-max-mb"><?= l7_t("Limite do banco detalhado"); ?></label>
 							<div class="col-sm-9">
-								<div style="display:flex; gap:8px; align-items:center;">
-									<input type="number" class="form-control" name="reports_event_max_mb"
-										value="<?= $rpt_evt_max_mb; ?>" min="25" max="1000" style="width:110px;">
-									<span class="text-muted">MiB</span>
+								<div class="input-group col-sm-4">
+									<input type="number" class="form-control" name="reports_event_max_mb" id="l7s-rpt-max-mb"
+										value="<?= $rpt_evt_max_mb; ?>" min="25" max="1000">
+									<span class="input-group-addon">MiB</span>
 								</div>
 								<p class="help-block"><?= l7_t("O primeiro limite atingido, dias ou tamanho, dispara o expurgo dos eventos mais antigos."); ?></p>
 							</div>
 						</div>
 
-						<hr style="margin:12px 0;">
+						<hr>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= l7_t("Intervalo de recolha"); ?></label>
+							<label class="col-sm-3 control-label" for="l7s-rpt-interval"><?= l7_t("Intervalo de recolha"); ?></label>
 							<div class="col-sm-9">
-								<select class="form-control" name="reports_interval" style="width:150px;">
-									<?php foreach (array(5, 10, 15, 30, 60) as $iv) { ?>
-									<option value="<?= $iv; ?>" <?= ($rpt_int === $iv) ? 'selected' : ''; ?>><?= $iv; ?> <?= l7_t("minutos"); ?></option>
-									<?php } ?>
-								</select>
+								<div class="row">
+									<div class="col-sm-3">
+										<select class="form-control" name="reports_interval" id="l7s-rpt-interval">
+											<?php foreach (array(5, 10, 15, 30, 60) as $iv) { ?>
+											<option value="<?= $iv; ?>" <?= ($rpt_int === $iv) ? 'selected' : ''; ?>><?= $iv; ?> <?= l7_t("minutos"); ?></option>
+											<?php } ?>
+										</select>
+									</div>
+								</div>
 							</div>
 						</div>
 
@@ -1142,23 +1180,27 @@ layer7_render_styles();
 						<?php } ?>
 
 						<input type="hidden" name="save" value="1">
-						<div style="margin-top:12px;">
-							<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Guardar relatorios"); ?></button>
+						<div class="form-group">
+							<div class="col-sm-offset-3 col-sm-9">
+								<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Guardar relatorios"); ?></button>
+							</div>
 						</div>
 					</form>
 				</div>
 			</div>
 
-			<div class="layer7-admin-block" id="l7-sistema">
-				<div class="layer7-admin-block__header"><?= l7_t("Sistema"); ?></div>
-				<div class="layer7-admin-block__body">
+			<div class="panel panel-default" id="l7-sistema">
+				<div class="panel-heading">
+					<h2 class="panel-title"><?= l7_t("Sistema"); ?></h2>
+				</div>
+				<div class="panel-body">
 
-				<h4 style="margin-top:0;"><?= l7_t("Licenca"); ?></h4>
-				<dl class="dl-horizontal layer7-summary">
+				<h4><?= l7_t("Licenca"); ?></h4>
+				<dl class="dl-horizontal">
 					<dt><?= l7_t("Estado"); ?></dt>
 					<dd><?= $lic_badge; ?></dd>
 					<dt><?= l7_t("Hardware ID"); ?></dt>
-					<dd><code style="font-size: 11px; word-break: break-all;"><?= htmlspecialchars($lic_hw); ?></code></dd>
+					<dd><code class="small"><?= htmlspecialchars($lic_hw); ?></code></dd>
 					<?php if ($lic_customer !== "") { ?>
 					<dt><?= l7_t("Cliente"); ?></dt>
 					<dd><?= htmlspecialchars($lic_customer); ?></dd>
@@ -1174,7 +1216,7 @@ layer7_render_styles();
 					<?php if ($lic_clock_suspect && $lic_err !== "") { ?>
 					<dt><?= l7_t("Detalhe"); ?></dt>
 					<dd><span class="text-danger"><?= htmlspecialchars($lic_err); ?></span>
-						<p class="help-block" style="margin-top:6px;">
+						<p class="help-block">
 							<?= l7_t("Relogio do sistema atrasado face a marca observada. Sincronize a hora (NTP) e reinicie o servico layer7d. Ver runbook anti-rollback."); ?>
 						</p>
 					</dd>
@@ -1184,26 +1226,26 @@ layer7_render_styles();
 					<?php } ?>
 					<dt><?= l7_t("Subscricao de conteudo"); ?></dt>
 					<dd><?= $cs_badge; ?>
-						<small class="text-muted" style="margin-left:8px;"><?= htmlspecialchars((string)($cs_st["message"] ?? "")); ?></small>
+						<small class="text-muted"><?= htmlspecialchars((string)($cs_st["message"] ?? "")); ?></small>
 					</dd>
 					<dt><?= l7_t("Check-in online"); ?></dt>
 					<dd>
 						<span class="label label-success"><?= l7_t("Obrigatorio"); ?></span>
-						<p class="help-block" style="margin:8px 0 0;">
+						<p class="help-block">
 							<?= l7_t("O appliance contacta o servidor de licencas. Uma falha de rede nao desliga o bloqueio enquanto a licenca estiver valida."); ?>
 						</p>
 					</dd>
 				</dl>
 				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
-					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7-sistema" class="form-inline">
 						<button type="submit" name="revoke_license" value="1" class="btn btn-sm btn-danger"
-							onclick="return confirm(<?= json_encode(l7_t('Deseja revogar a licenca activa?')) ?>);">
+							onclick='return confirm(<?= json_encode(l7_t("Deseja revogar a licenca activa?"), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>);'>
 							<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
 						</button>
 					</form>
 				<?php else: ?>
-					<form method="post" action="layer7_settings.php#l7-sistema" style="margin-top:8px;">
-						<div class="input-group" style="max-width:400px;">
+					<form method="post" action="layer7_settings.php#l7-sistema" class="form-inline">
+						<div class="input-group">
 							<input type="text" name="license_code" class="form-control" maxlength="128" placeholder="ABCD1234EFGH5678">
 							<span class="input-group-btn">
 								<button type="submit" name="register_license" value="1" class="btn btn-success">
@@ -1223,16 +1265,18 @@ layer7_render_styles();
 				<?php if ($backup_err !== "") { ?>
 				<div class="alert alert-danger"><?= htmlspecialchars($backup_err); ?></div>
 				<?php } ?>
-				<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:12px;">
-					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
+				<div class="form-group">
+					<form method="post" action="layer7_settings.php#l7-sistema" class="form-inline">
 						<button type="submit" name="export_config" value="1" class="btn btn-sm btn-info">
 							<i class="fa fa-download"></i> <?= l7_t("Exportar"); ?>
 						</button>
 					</form>
-					<form method="post" action="layer7_settings.php#l7-sistema" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center;">
-						<input type="file" name="import_file" accept=".json" style="display:inline-block; width:auto;" />
+					<form method="post" action="layer7_settings.php#l7-sistema" enctype="multipart/form-data" class="form-inline">
+						<div class="form-group">
+							<input type="file" name="import_file" accept=".json" class="form-control">
+						</div>
 						<button type="submit" name="import_config" value="1" class="btn btn-sm btn-warning"
-							onclick="return confirm(<?= json_encode(l7_t('Substituir a configuracao actual? Esta accao nao pode ser desfeita.')) ?>);">
+							onclick='return confirm(<?= json_encode(l7_t("Substituir a configuracao actual? Esta accao nao pode ser desfeita."), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>);'>
 							<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
 						</button>
 					</form>
@@ -1297,7 +1341,7 @@ layer7_render_styles();
 				<div id="l7_update_actions">
 				<?php if ($update_info !== null) { ?>
 					<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
-					<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7_pkg_update" class="form-inline">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
 						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success">
 							<i class="fa fa-download"></i>
@@ -1310,18 +1354,18 @@ layer7_render_styles();
 					<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?></span>
 					<?php } ?>
 				<?php } ?>
-				<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;">
+				<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info">
 					<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
 				</button>
 				<noscript>
-				<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">
-					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-default" style="margin-left:4px;">
+				<form method="post" action="layer7_settings.php#l7_pkg_update" class="form-inline">
+					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-default">
 						<?= l7_t("Verificar (POST)"); ?>
 					</button>
 				</form>
 				</noscript>
-				<form method="post" action="layer7_settings.php#l7_pkg_update" id="l7_check_update_post" style="display:inline;">
-					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-link" style="margin-left:4px; padding:0 4px;">
+				<form method="post" action="layer7_settings.php#l7_pkg_update" id="l7_check_update_post" class="form-inline">
+					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-link">
 						<?= l7_t("Modo compatibilidade"); ?>
 					</button>
 				</form>
@@ -1330,9 +1374,14 @@ layer7_render_styles();
 
 				</div>
 			</div>
-		</div>
-	</div>
+
 </div>
-<?php layer7_render_footer(); ?>
+
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
+
 <script src="/packages/layer7/layer7_settings_update.js?v=<?= htmlspecialchars(layer7_pkg_version() !== "" ? layer7_pkg_version() : "1", ENT_QUOTES, 'UTF-8') ?>"></script>
 <?php require_once("foot.inc"); ?>

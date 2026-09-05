@@ -1,0 +1,66 @@
+pfSense Form_* pin — harness Devices (BG-174 / V1-B)
+
+Não é o Form do appliance. Não prova integração no pfSense CE / FreeBSD.
+
+Fonte: https://github.com/pfsense/pfsense
+Ref master no fetch (2026-09-04): 9363ac5b8651a1c7a333180425ce7719070f95f9
+Paths:
+  src/usr/local/www/classes/Form.class.php
+  src/usr/local/www/classes/autoload.inc.php
+  src/usr/local/www/classes/Form/{Element,Input,Button,Section,StaticText,Group}.class.php
+Licença: Apache-2.0 (cabeçalhos originais preservados)
+
+SHA-256 dos ficheiros pinados:
+
+0b6ea2af2d09318e14f06771a1044c8ebd75e74d22ccf3f83b38817e06437576  Form.class.php
+99c8bea9ad5d3e8260ee70dea18d6cbdbbcfda3ec79cee07aaeef9e2bde9e0f4  autoload.inc.php
+f504ede52f550298fa4ef4469cc94898da9fa50467cad872a862807190562d99  Form/Button.class.php
+42ef0a5d04f3e52838cde63bc52c09cfad80e36ead901240a53dda9e85d71fe0  Form/Element.class.php
+50378d56de76d2f3f887f708607eb71597d65be522317d752a5d5505492783a7  Form/Group.class.php
+604f177822a02a15c030c681b139157faf2c7588f800867157c7534d0bab278a  Form/Input.class.php
+93d5795c7e2ba02f5575e735a550b4abc3d9dc35edad02990ba1d7d23c7d5678  Form/Section.class.php
+2cb0d9863637794456f7a7ebf62f32039763e468185d13a83952d63131df0213  Form/StaticText.class.php
+
+Construtores oficiais (não adivinhados):
+  Form::__construct($submit = null, $enabled = true)
+    — new Form() / new Form(null) acrescenta Form_Button('save', gettext('Save'), ...)
+    — new Form(false) não acrescenta botão Save
+  Form_Input::__construct($name, $title, $type = 'text', $value = null, array $attributes = array())
+  Form_Button::__construct($name, $title, $link = null, $icon = null)
+  Form_Section::__construct($title, $id = "", $collapsible = 0)
+  Form_StaticText::__construct($title, $text)
+  Form_Group::__construct($title)
+  Form_Element::__construct($tagName = 'div', $selfClose = false, $attributes = array('class' => array()))
+
+CSRF: estas classes não emitem token. No appliance o csrf-magic entra via
+head.inc/guiconfig, não pela view. O harness não inventa CSRF no HTML;
+os testes de payload somam +1 simulado na conta, separado dos inputs
+renderizados.
+
+autoload.inc.php oficial resolve /usr/local/www/classes/ — não é usado aqui.
+O bootstrap carrega os .class.php pinados por caminho local.
+
+Dependências de guiconfig/globals (não são Form; definidas no stub):
+  COLLAPSIBLE=0x08, SEC_CLOSED=0x04, SEC_OPEN=0x00
+  (src/etc/inc/globals.inc, mesmos valores)
+
+PHP 8.3: as classes oficiais emitem Warning em $hidden/$help não
+inicializados e em $_attributes['id'] ausente. O harness não altera
+esses ficheiros; o ruído 8.3 do vendor é filtrado no error handler.
+Isso não aprova integração Form no appliance.
+
+Acrescentos V2 Grupos (mesmo commit 9363ac5b8651a1c7a333180425ce7719070f95f9):
+  src/usr/local/www/classes/Form/Textarea.class.php
+  src/usr/local/www/classes/Form/Select.class.php
+5ed4d093d0cf90525fd03a4a200783128ae0df1fe1ed86306562dcfcc3487cf0  Form/Textarea.class.php
+4e434142144b7ae8d2b7cdf9820b3e4bac21057f2b80d169bc36280d1f59cbf9  Form/Select.class.php
+  Form_Textarea::__construct($name, $title, $value)
+  Form_Select::__construct($name, $title, $value, array $values, $allowMultiple = false)
+Ficheiros Form/Element/Input/Button/Section/StaticText/Group/Form.class.php nao foram alterados.
+
+Acrescentos V4-A Policies (mesmo commit 9363ac5b8651a1c7a333180425ce7719070f95f9):
+  src/usr/local/www/classes/Form/Checkbox.class.php
+68c09ac5193bb33883e794f9633a0a243f3f6e1ef783350a663fbf4d8461f82b  Form/Checkbox.class.php
+  Form_Checkbox::__construct($name, $title, $description, $checked, $value = 'yes')
+  Copyright (c) 2015 Sjon Hortensius; 2015-2016 Electric Sheep Fencing;
+  2015-2026 Rubicon Communications, LLC (Netgate). Licença Apache-2.0.

@@ -521,9 +521,25 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
   `layer7_status.php` nativo; handler intacto; `layer7.inc` intocado;
   SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
   `v1.9.79` retirada do download (latest-only / BG-164; tag git
-  preservada). Gate estático + lint extraído 27/27 PASS. Residual:
+  preservada). Gate estático + lint extraído 27/27 PASS.   Residual:
   appliance/visual **pendentes** (`.254` SSH timeout; **não** homologado
-  no appliance). GUI2–GUI7 bloqueados até GO.
+  no appliance). GO visual integral local `2026-09-04` (não operacional)
+  — ver item abaixo; GUI2 ainda não; **GUI3 Policies V4-A revisão local gerente
+  PASS (pendente commit; V4-B1 biblioteca gates locais PASS, pendente commit;
+  V4-B2a opções cobertura B2a completa gates locais (harness **158** + jsdom **226**
+  PASS padrão; pin opcional +11 = **237** cumulativos), pendente revisão final/commit/visual/CE/CSRF/appliance; **V4-B2b
+  editor/criação revisão independente gerente PASS (harness **135** + jsdom **142** PASS;
+  CSS **21 PASS** com pin env; auditoria independente gerente PASS),
+  pendente commit/visual/CE/CSRF/appliance; **V4-B2c wrapper/CSS Policies revisão independente gerente PASS**
+  (`test_policies_native_view.php` **88 PASS**; regressão cumulativa Edit/Options/Library/View/jsdom/CSS PASS),
+  pendente commit/visual/CE/CSRF/appliance; **GUI2a subnav Políticas gate funcional PASS**
+  (`test_policies_subnav_native.php` ALL PASS; auditoria byte-identica opcional via `LAYER7_GUI2A_BASELINE`),
+  pendente revisão gerente/commit/visual/CE/CSRF/appliance; **V5 Allowlist implementado, gates locais WASM PASS,
+  pendente revisão independente/commit/visual/CE/CSRF/appliance** (`test_allowlist_native_view.php` + DOM name/id;
+  `harness-allowlist-view/run.php`; `test_allowlist_payload.js` FormData jsdom com baseline PHP real via
+  `render-parity.php`; prefixo byte-idêntico até `$seed_entries`; **não** FECHADO); **V6a Exceptions revisão independente final gerente PASS local** (`2026-09-05`; handlers/effects/harness/jsdom/payload/i18n; residual 16/64/32; pendente commit/visual/CE/CSRF/appliance; **não** FECHADO); **V6b1 Lista VIP revisão independente final gerente PASS local** (`2026-09-05`; **213** `PASS:` VIP + contrato **10**; DHCP/lote/import/export congelados; pendente commit/visual/CE/CSRF/appliance; **não** FECHADO); **V6b2a DHCP exclusivo revisão independente final gerente PASS local** (`2026-09-05`; **162** `PASS:` DHCP + json audit **36**; POST limite 32 preserva retry; pendente commit/visual/CE/CSRF/appliance; **não** FECHADO); **V6b2b lote/import/export implementado, revisão local Composer 2.5 PASS** (`2026-09-05`; baseline V6b2b SHA `c72a5db5…`; modos `?vip_bulk=1` / `?vip_import=1`; export Form nativo; avisos estáticos lote; effects **34** + json audit **56** + export **72** + harness **32** + jsdom **46** = **240** `PASS:`; headers HTTP export pendentes; pendente revisão independente final/commit/visual/CE/CSRF/appliance; **não** FECHADO); **V6c fechamento visual revisão gerencial local PASS** (`2026-09-05`; baseline V6c SHA `749b54d…`; native_view **84** + freeze **32**; evidência `revisao-gerente-v6c.md`; pendente commit/visual real/CE/CSRF/HTTP export/appliance; **não** FECHADO); **V7 Eventos implementado, gates locais Composer 2.5 PASS** (`2026-09-05`; baseline V7 SHA `0e146d6…`; native_view **61** + freeze **10** + render_row **13** + payload **12** + jsdom **18** + humanize **31**; pendente revisão independente final/commit/visual/CE/CSRF/appliance; **não** FECHADO); V4-B2 modais/CSS global
+  pendente)**; GUI4 Devices V1 GUI4 Groups V2
+  e Catálogo nDPI V3 em curso (não done).
 - [x] **BG-174 / ADR-0037** — **FEITO no git** (`f44a14b`) após gates PASS —
   decisão humana de frontend nativo pfSense. Cinco áreas =
   taxonomia; sem shell, design system ou reorganização ampla paralela.
@@ -535,4 +551,10 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
   (`3b18f82`) após gates PASS; produto/handlers/efeitos
   congelados; `head.inc`/`foot.inc` + `Form_*` + assets pfSense são a base;
   alvo zero CSS visual próprio; orçamento de assets e paridade antes/depois.
+- [ ] **BG-174 / GO visual integral local (`2026-09-04`)** — GO humano
+  de redesenho visual (não operacional; não é GO de appliance/build).
+  GUI4 Devices V1: revisão local do harness de render (não done).
+  GUI4 Groups V2 **implementado, pendente de gates/commit** (não done).
+  Catálogo nDPI V3 **implementado, pendente de gates/commit** (não done).
+  Exceptions e GUI5–GUI7 ainda não. Appliance/visual pendentes.
 - [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo = P0-1 rebuild api + smoke (sem P2-9; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7; sem P0-2 residual; sem `.244` neste bloco)

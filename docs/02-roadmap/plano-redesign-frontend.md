@@ -8,8 +8,17 @@
 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
 tag `7bd1fd0`; source/build `b84634c`). `v1.9.79` retirada do download
 (latest-only / BG-164; tag git preservada). Appliance/visual **pendentes**
-(`.254` SSH timeout; **não** homologado no appliance). GUI2–GUI7
-bloqueados até GO humano.
+(`.254` SSH timeout; **não** homologado no appliance). GUI3 Policies V4-A
+**implementado, revisão local gerente PASS, pendente commit** (modos
+list/edit/view/new; handlers intactos; harness/handlers baseline/jsdom;
+biblioteca/modais = V4-B; sem `PORTVERSION`). GUI4 Devices (bloco V1, GO visual `2026-09-04`)
+**implementado, pendente de gates/commit** (consulta paginada + modo
+batch com conjunto completo do filtro + editor individual; sem
+`PORTVERSION`). GUI4 Groups (bloco V2, GO visual integral local
+`2026-09-04`) **implementado, pendente de gates/commit**. Catálogo
+nDPI (bloco V3, GO visual integral local `2026-09-04`)
+**implementado, pendente de gates/commit**. **V6a Exceptions revisão independente final gerente PASS local** (`2026-09-05`; pendente commit/visual/CE/CSRF/appliance). **V6b1 Lista VIP revisão independente final gerente PASS local** (`2026-09-05`; **213** `PASS:` VIP + contrato **10**; pendente commit/visual/CE/CSRF/appliance). **V6b2a DHCP exclusivo revisão independente final gerente PASS local** (`2026-09-05`; **162** `PASS:` DHCP + json audit **36**; POST limite 32 preserva retry; pendente commit/visual/CE/CSRF/appliance); **V6b2b lote/import/export implementado, revisão local Composer 2.5 PASS** (`2026-09-05`; modos exclusivos bulk/import; export Form nativo; avisos estáticos grupos/vazio; effects **34** + json **56** + export **72** + harness **32** + jsdom **46** = **240** `PASS:`; headers HTTP export pendentes; handlers intactos; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **V6c fechamento visual revisão gerencial local PASS** (`2026-09-05`; evidência `revisao-gerente-v6c.md`; pendente commit/visual real/CE/CSRF/HTTP export/appliance); **V7 Eventos implementado, gates locais Composer 2.5 PASS** (`2026-09-05`; native_view **61** + freeze **10** + render_row **13** + payload **12** + jsdom **18** + humanize **31**; pendente revisão independente final/commit/visual/CE/CSRF/appliance)). GUI2 e
+GUI5–GUI7 ainda não. Sem homologação appliance.
 **Canal `latest`:** `1.9.80`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as
 fases canónicas F0…F7. A execução técnica cruza F4/F5/F7 e obedece aos seus
@@ -217,21 +226,47 @@ A melhoria deve vir da ordem e do fluxo, não de decoração:
 ### GUI3 — Policies e Biblioteca de perfis
 
 - **Objectivo:** separar aplicadas/biblioteca/criar/editar; edição dedicada.
+- **Estado do bloco:** **V4-A implementado, revisão local gerente PASS, pendente
+  commit.** Mesma rota `layer7_policies.php`. Modos: `list` (aplicadas;
+  remoção visível `Form_Select`; `pon[]` acessível), `edit` (`?edit=N` /
+  retry), `view` (`?view=N`), `new` (`?new=1` / erro `add_policy`). POST de
+  edição mantém `action="layer7_policies.php#l7-edit"`. Biblioteca/modais =
+  **V4-B1 biblioteca implementado, gates locais PASS, pendente commit**;
+  **V4-B2a opções de perfil implementado, cobertura B2a completa nos gates
+  locais, pendente revisão final/commit/visual/CE/CSRF/appliance** (modal
+  Bootstrap; Form nativo; fallback GET; limite24/catálogo vazio/oculto/POST
+  integral/escaping/onclick real; harness `harness-policies-options/` **158 PASS** + `test_policies_profile_options.js` **226
+  PASS** (padrão; prova opcional pin Bootstrap +11 via env do briefing =
+  **237** cumulativos); **V4-B2b editor/criação revisão independente gerente PASS** (harness
+  **135** + jsdom **142** PASS; CSS **21 PASS** (pin env); regressão cumulativa
+  Options **158** / Library **194** / View **685** / Library jsdom **93** PASS;
+  pendente commit/visual/CE/CSRF/appliance; **V4-B2c revisão independente gerente PASS**,
+  pendente commit/visual/CE/CSRF/appliance; **GUI2a subnav Políticas gate funcional PASS**
+  (`test_policies_subnav_native.php` ALL PASS; auditoria byte-identica opcional via `LAYER7_GUI2A_BASELINE`), pendente revisão gerente/commit/visual/CE/CSRF/appliance; V4-B2 modais/CSS
+  global pendente). Sem `PORTVERSION`, build ou release neste bloco.
 - **Limite funcional:** os handlers não mudam; payloads, defaults, perfis,
   seletores, ordem de avaliação e resync permanecem semanticamente equivalentes;
   a separação é de vista e contexto, não de motor.
-- **Ficheiros:** `layer7_policies.php` e possivelmente novas rotas de modo,
-  includes/JS/i18n, profiles UI tests/docs.
+- **Ficheiros:** `layer7_policies.php`, i18n EN/ES,
+  `tests/functional/test_policies_native_view.php`,
+  `tests/functional/test_policies_handlers_baseline.php`,
+  `tests/functional/harness-policies-view/`, `tests/functional/test_policies_filters.js`,
+  `tests/functional/harness-policies-library/`, `tests/functional/test_policies_library.js`,
+  `tests/functional/harness-policies-options/`, `tests/functional/test_policies_profile_options.js`.
 - **Preserva:** todas as linhas Policies/Profiles da matriz, inclusive
   hidden/override, batch, opções, selectors, schedule, AD e VIP.
 - **Risco:** maior superfície de regressão; PF resync indevido; perda de
-  contexto; 105 perfis.
-- **Testes:** CRUD completo, PRG, dirty state, filtros/scroll, perfil
-  Pornografia ≤3 interações, monitor/enforce, licença/Identity, no-JS.
+  contexto; 105 perfis (V4-B).
+- **Testes:** gates locais PASS (harness 685+, handlers baseline pinado,
+  jsdom `onkeyup`/`onclick` edit/new); V4-B1 biblioteca + V4-B2a opções
+  (harness **158** + jsdom **226** PASS padrão; pin opcional +11 = **237**
+  cumulativos); **não** homologado
+  visual/CE/CSRF/appliance;
+  V4-B2 modais/CSS global ainda pendente.
 - **Gate:** G-UX0…G-UX9 + appliance monitor; comparação JSON antes/depois.
-- **Rollback:** rotas antigas permanecem; feature switch de apresentação se
-  formalmente aprovado; pacote anterior/config export.
-- **Versão/build:** sim, isolada de Devices/Settings.
+- **Rollback:** rotas antigas permanecem; reverter o diff de apresentação;
+  pacote anterior/config export.
+- **Versão/build:** sim, isolada de Devices/Settings — **não** neste bloco.
 
 ### GUI4 — Clientes e Atividade
 
@@ -248,8 +283,66 @@ A melhoria deve vir da ordem e do fluxo, não de decoração:
   primeiro smoke read-only.
 - **Rollback:** modo lista antigo por rota; pacote anterior.
 - **Versão/build:** sim; dividir Clientes e Atividade se diff crescer.
+- **Devices (bloco V1, GO visual `2026-09-04`):** **implementado, pendente
+  de gates/commit**. Consulta `list` paginada (50); modo `batch` com o
+  conjunto completo do filtro (sem corte de 50). Editor individual
+  `?edit=MAC` com `Form_Input`/`for`/`id`. POST/voltar preservam
+  `q`/`online`/`page`/`mode`. Erro reapresenta valores digitados (view).
+  Duas acções independentes no lote (aliases vs grupo); o copy do
+  operador não expõe nomes de campo nem `max_input_vars` (conta e
+  limite ficam em docs/testes: forms `l7-form-aliases` /
+  `l7-form-assign`; 674 combinado excederia 1000). V1: revisão local
+  do harness de render (não fixtures manuais). `Form_Button`
+  `save_aliases` (editor) usa a API oficial: `value` = legenda
+  traduzida (dispatch truthy; **não** `value="1"`, que apagava o
+  nome da acção). Ícone `fa fa-save`. Lote manual já enviava `1`
+  com legenda própria — intocado. Sem `PORTVERSION`. Não
+  homologado / sem PASS visual.
+- **Groups (bloco V2, GO visual integral local `2026-09-04`):**
+  **implementado, pendente de gates/commit**. Consulta `list` com
+  tabela nativa; `?edit=N` e `?new=1` exclusivos; resync/remoção no
+  fim da consulta; âncoras `#l7-groups` / `#l7-edit-group` /
+  `#l7-add-group`. Handlers intactos. `layer7_render_footer()`
+  substituído localmente pelo mesmo crédito em classes nativas
+  (o helper emite `style=` inline; excepção de render, sem editar
+  `layer7.inc`). `setHelp` de IPs resolvidos escapa com
+  `htmlspecialchars`. Exceptions **ainda não**. Sem `PORTVERSION`.
+  `Form_Button` de submit (`save_group_edit` / `add_group` /
+  `resync_devices` / `delete_group`) usam `value` = legenda
+  traduzida (equivalente booleano nos handlers) e ícones
+  `fa fa-save` / `fa fa-plus` / `fa fa-refresh` / `fa fa-trash`.
+  Após erro de remoção, a view restaura `delete_group_index` se for
+  opção válida (GET continua default `0`); handler intacto.
+  Não homologado / sem PASS visual. Risco da view que monta POST:
+  médio (não «baixo absoluto»).
+- **Catálogo nDPI (bloco V3, GO visual integral local `2026-09-04`):**
+  **implementado, pendente de gates/commit**. Consulta de referência
+  em `layer7_categories.php`; leitura `layer7_ndpi_list` / `ksort` /
+  contagens / privilégios intactos. Busca com `label`/`for`/`id`;
+  grupos `details`/`summary` e tabelas nativas (sem chips). Init via
+  `events[]` ou `DOMContentLoaded` (sem jQuery antes de `foot.inc`).
+  `layer7_render_footer()` substituído localmente pelo crédito em
+  classes nativas (emite `style=`). Harness PHP 0/1/472+; jsdom
+  26.1.0 isolado para busca/click (Enter/Space no browser
+  **pendentes**; sem prova visual). Sem `PORTVERSION`. Não homologado.
 
 ### GUI5 — Settings e Diagnostics
+
+- **V8 Diagnósticos (bloco visual, `2026-09-05`):** **revisão gerencial local PASS**; gates `test_diagnostics_*.php|js` (**195** cumulativos); pendente commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V9 Teste de políticas (bloco visual, `2026-09-05`):** **revisão gerencial local PASS**; gates `test_test_*.php|js` (**126** cumulativos; fixture nDPI V3 **472**/**20**); pendente commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V10 Relatórios (bloco visual, `2026-09-05`):** **revisão gerencial local PASS**; gates `test_reports_*.php|js` (**72** cumulativos; harness sem SQLite/rede); pendente commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V11 Remoção (bloco visual, `2026-09-05`):** **revisão gerencial local PASS**; gates `test_removal_*.php|js` (**86** cumulativos; harness sem remoção real); pendente commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V12 Identity (bloco visual, `2026-09-05`):** **implementado, gates locais Composer 2.5 PASS**; view nativa em `layer7_identity.php` (painéis Bootstrap, form HTML preservado, labels `l7i-*`; prefixo handlers congelado até `$pgtitle` **6682** bytes; fila **20.37 fechada** — só visual); gates `test_identity_freeze.php` **14** + `test_identity_native_view.php` **32** + `test_identity_render.php` **16** + `test_identity_payload.js` **16** (**78** cumulativos; harness sem LDAP/rede); pendente revisão independente/commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V13 MITM (bloco visual, `2026-09-05`):** **revisão gerencial local PASS**; gates `test_mitm_*.php|js` (**106** cumulativos); pendente commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
+
+- **V15 Settings (bloco visual, `2026-09-05`):** **FECHADO** revisão gerencial; gates **131** cumulativos; confirmações `revoke`/`import` com `JSON_HEX_*`; **sem** `confirm` em `do_update`; candidato **`1.9.81`** preparado (nao publicado); sem `PORTVERSION` commitado.
+
+- **V15 Settings (bloco visual, `2026-09-05`):** **implementado, gates locais Composer 2.5 PASS**; view nativa em `layer7_settings.php` (painéis Bootstrap, forms POST/anchors preservados; `save_scope` general/reports; reports checkboxes sem `value`; retention `style.display`; prefixo handlers congelado até `$pgtitle` **24306** bytes; backend/licença/update/import **congelados**); gates `test_settings_freeze.php` **18** + `test_settings_native_view.php` **48** + `test_settings_render.php` **16** + `test_settings_payload.js` **23** + `test_settings_js.js` **16** (**121** cumulativos; harness sem rede/licença/update real); pendente revisão gerencial/commit/visual/CE/CSRF/appliance; sem `PORTVERSION`.
 
 - **Objectivo:** separar secções, impacto antes de salvar e resultado por etapa.
 - **Limite funcional:** `save_scope`, campos, valores, validações e efeitos são
@@ -360,5 +453,15 @@ a view de `layer7_status.php` (apresentação). Sem `layer7.inc`, sem
 piloto pelo manager):** autorizado bump de `PORTVERSION`/`PKGVERSION` e
 documentação. **PUBLICADO** `v1.9.80` (`releases/latest`; SHA256
 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-tag `7bd1fd0`). Residual: appliance/visual **pendentes**. GUI2–GUI7
-continuam sem implementação.
+tag `7bd1fd0`). Residual: appliance/visual **pendentes**.
+
+**GO visual integral local (`2026-09-04`):** autoriza o redesenho
+visual das views restantes (não operacional; não é GO de
+appliance/build/`PORTVERSION`). GUI1 publicado; GUI3 Policies V4-A
+**implementados, revisão local gerente PASS, pendente commit** (V4-B1
+biblioteca + V4-B2a opções cobertura B2a completa gates locais (harness **158** +
+jsdom **226** PASS padrão; pin opcional +11 = **237** cumulativos), pendente revisão final/commit/visual/CE/CSRF/appliance; **V4-B2b revisão independente gerente PASS** (harness **135** + jsdom **142** + CSS **21** PASS), pendente commit/visual/CE/CSRF/appliance; **V4-B2c revisão independente gerente PASS** (`test_policies_native_view.php` **88 PASS**), pendente commit/visual/CE/CSRF/appliance; **GUI2a subnav Políticas gate funcional PASS** (`test_policies_subnav_native.php` ALL PASS; auditoria byte-identica opcional via `LAYER7_GUI2A_BASELINE`), pendente revisão gerente/commit/visual/CE/CSRF/appliance; **V5 Allowlist revisão independente gerente PASS**, pendente commit/visual/CE/CSRF/appliance; **V6a Exceptions revisão independente final gerente PASS local** (`2026-09-05`; pendente commit/visual/CE/CSRF/appliance); **V6b1 Lista VIP revisão independente final gerente PASS local** (`2026-09-05`; **213** `PASS:` VIP + contrato **10**; pendente commit/visual/CE/CSRF/appliance); **V6b2a DHCP exclusivo revisão independente final gerente PASS local** (`2026-09-05`; pendente commit/visual/CE/CSRF/appliance); **V6b2b lote/import/export implementado, revisão local Composer 2.5 PASS** (`2026-09-05`; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **V6c fechamento visual revisão gerencial local PASS** (`2026-09-05`; native_view **84** + freeze **32**; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **V7 Eventos implementado, gates locais Composer 2.5 PASS** (`2026-09-05`; native_view **60** + freeze **10** + render_row **13** + payload **12** + jsdom **18**; pendente revisão independente final/commit/visual/CE/CSRF/appliance); **não** FECHADO)). GUI4 Devices V1 **implementado, pendente de
+gates/commit** (revisão local harness). GUI4 Groups V2 **implementado, pendente
+de gates/commit**. Catálogo nDPI V3 **implementado, pendente de
+gates/commit**. GUI2 e GUI5–GUI7 ainda sem
+implementação. O plano **não** está FEITO no conjunto.

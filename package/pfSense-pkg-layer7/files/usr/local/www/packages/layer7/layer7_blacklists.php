@@ -304,58 +304,53 @@ if (!layer7_bl_category_id_valid($cat_edit) || !isset($custom_map[$cat_edit])) {
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Blacklists"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
 include("head.inc");
-
-layer7_render_styles();
 ?>
-
-<div class="layer7-page">
-<div class="panel panel-default">
-<div class="panel-heading"><h2 class="panel-title"><?=l7_t("Categorias Web (Blacklists)")?></h2></div>
-<div class="panel-body">
 
 <?php layer7_render_tabs("blacklists"); ?>
 
-<div class="layer7-content">
+<div id="l7-blacklists-root">
 
 <?php layer7_render_messages(); ?>
 
-<!-- SECTION 1: Official Origin & Download -->
-<div class="layer7-admin-block" id="l7-download">
-<div class="layer7-admin-block__header"><?=l7_t("Origem oficial e download")?></div>
-<div class="layer7-admin-block__body">
-<div class="layer7-form-card">
-<form method="post" action="layer7_blacklists.php#l7-download">
-<div class="form-group">
-	<label><?=l7_t("Origem oficial primaria")?></label>
-	<input type="text" class="form-control" readonly
-		value="<?=htmlspecialchars(layer7_bl_official_manifest_url())?>">
-	<p class="help-block"><?=l7_t("O auto-update confiavel consome apenas manifesto assinado em HTTPS publicado pelo canal oficial Layer7/Systemup.")?></p>
-</div>
-<div class="form-group">
-	<label><?=l7_t("Mirrors oficiais")?></label>
-	<textarea class="form-control" rows="2" readonly style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=
-htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
-	<p class="help-block"><?=l7_t("Mirror e apenas disponibilidade. A confianca continua ancorada na assinatura do manifesto e na chave publica embutida no pacote.")?></p>
-</div>
-<div class="layer7-form-card__actions">
-<button type="submit" name="do_download" class="btn btn-primary">
-	<i class="fa fa-download"></i> <?=l7_t("Download snapshot assinada")?>
-</button>
-</div>
-</form>
+<div class="panel panel-default" id="l7-bl-header">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Categorias Web (Blacklists)"); ?></h2>
+	</div>
 </div>
 
-<div class="layer7-readonly-block" id="download_progress_wrap" style="margin-top:14px;">
-	<label><?=l7_t("Log de download")?></label>
-	<p id="download_progress_status" class="help-block" style="margin:6px 0 8px;"></p>
-	<textarea id="download_log" class="form-control" rows="8" readonly
-		placeholder="<?=htmlspecialchars(l7_t("Aguardando inicio do script..."))?>"
-		style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=htmlspecialchars(layer7_bl_download_status())?></textarea>
-	<button type="button" class="btn btn-default btn-xs" style="margin-top:6px;"
-		onclick="pollDownloadLog();">
-		<i class="fa fa-refresh"></i> <?=l7_t("Actualizar log")?>
-	</button>
-</div>
+<div class="panel panel-default" id="l7-download">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Origem oficial e download"); ?></h2>
+	</div>
+	<div class="panel-body">
+		<form method="post" action="layer7_blacklists.php#l7-download">
+			<div class="form-group">
+				<label for="l7bl-source-url"><?= l7_t("Origem oficial primaria"); ?></label>
+				<input type="text" class="form-control" id="l7bl-source-url" readonly
+					value="<?= htmlspecialchars(layer7_bl_official_manifest_url()); ?>">
+				<p class="help-block"><?= l7_t("O auto-update confiavel consome apenas manifesto assinado em HTTPS publicado pelo canal oficial Layer7/Systemup."); ?></p>
+			</div>
+			<div class="form-group">
+				<label for="l7bl-mirrors"><?= l7_t("Mirrors oficiais"); ?></label>
+				<textarea class="form-control" id="l7bl-mirrors" rows="2" readonly><?=
+htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls())); ?></textarea>
+				<p class="help-block"><?= l7_t("Mirror e apenas disponibilidade. A confianca continua ancorada na assinatura do manifesto e na chave publica embutida no pacote."); ?></p>
+			</div>
+			<button type="submit" name="do_download" class="btn btn-primary">
+				<i class="fa fa-download"></i> <?= l7_t("Download snapshot assinada"); ?>
+			</button>
+		</form>
+
+		<div class="form-group" id="download_progress_wrap">
+			<label for="download_log"><?= l7_t("Log de download"); ?></label>
+			<p id="download_progress_status" class="help-block"></p>
+			<textarea id="download_log" class="form-control" rows="8" readonly
+				placeholder="<?= htmlspecialchars(l7_t("Aguardando inicio do script...")); ?>"><?= htmlspecialchars(layer7_bl_download_status()); ?></textarea>
+			<button type="button" class="btn btn-default btn-xs"
+				onclick="pollDownloadLog();">
+				<i class="fa fa-refresh"></i> <?= l7_t("Actualizar log"); ?>
+			</button>
+		</div>
 
 <?php
 $cs_status = (string)($content_sub["status"] ?? "missing");
@@ -373,57 +368,57 @@ if (!empty($content_sub["exp"])) {
 	$cs_exp_txt = gmdate("Y-m-d H:i:s", (int)$content_sub["exp"]) . " UTC";
 }
 ?>
-<div class="layer7-readonly-block" style="margin-top:14px;">
-	<label><?=l7_t("Subscricao de conteudo")?></label>
-	<dl class="dl-horizontal" style="margin-bottom:0;">
-		<dt><?=l7_t("Estado")?></dt>
-		<dd><?=$cs_badge?>
-			<small class="text-muted" style="margin-left:8px;"><?=htmlspecialchars((string)($content_sub["message"] ?? ""))?></small>
-		</dd>
-		<dt><?=l7_t("Valido ate")?></dt>
-		<dd><?=htmlspecialchars($cs_exp_txt)?></dd>
-		<dt><?=l7_t("Ficheiro")?></dt>
-		<dd><code>/var/db/layer7/content-subscription.json</code></dd>
-	</dl>
-	<p class="help-block" style="margin-top:10px;"><?=l7_t("Sem token valido o update de blacklists correntes nao corre; o conteudo local e o enforce mantem-se. Force check-in com licenca activa para renovar. Ver runbook de subscricao de conteudo.")?></p>
+		<div class="form-group">
+			<label><?= l7_t("Subscricao de conteudo"); ?></label>
+			<dl class="dl-horizontal">
+				<dt><?= l7_t("Estado"); ?></dt>
+				<dd><?= $cs_badge; ?>
+					<small class="text-muted"><?= htmlspecialchars((string)($content_sub["message"] ?? "")); ?></small>
+				</dd>
+				<dt><?= l7_t("Valido ate"); ?></dt>
+				<dd><?= htmlspecialchars($cs_exp_txt); ?></dd>
+				<dt><?= l7_t("Ficheiro"); ?></dt>
+				<dd><code>/var/db/layer7/content-subscription.json</code></dd>
+			</dl>
+			<p class="help-block"><?= l7_t("Sem token valido o update de blacklists correntes nao corre; o conteudo local e o enforce mantem-se. Force check-in com licenca activa para renovar. Ver runbook de subscricao de conteudo."); ?></p>
+		</div>
+
+		<div class="form-group">
+			<label><?= l7_t("Estado da trust chain"); ?></label>
+			<dl class="dl-horizontal">
+				<dt><?= l7_t("Snapshot activa"); ?></dt>
+				<dd><?= htmlspecialchars($runtime_state["snapshot_id"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Origem aplicada"); ?></dt>
+				<dd><?= htmlspecialchars($runtime_state["manifest_url"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Fonte activa"); ?></dt>
+				<dd><?= htmlspecialchars($runtime_state["source_role"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Ultima versao valida"); ?></dt>
+				<dd><?= htmlspecialchars($lkg_state["snapshot_id"] ?? "-"); ?></dd>
+				<dt><?= l7_t("LKG guardada em"); ?></dt>
+				<dd><code>/usr/local/etc/layer7/blacklists/.last-known-good</code></dd>
+				<dt><?= l7_t("Cache local"); ?></dt>
+				<dd><code>/usr/local/etc/layer7/blacklists/.cache</code></dd>
+				<dt><?= l7_t("Estado de degradacao"); ?></dt>
+				<dd><?= htmlspecialchars($fallback_state["status"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Modo de fallback"); ?></dt>
+				<dd><?= htmlspecialchars($fallback_state["mode"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Estado seguro mantido"); ?></dt>
+				<dd><?= htmlspecialchars($fallback_state["safe_state"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Motivo da degradacao"); ?></dt>
+				<dd><?= htmlspecialchars($fallback_state["reason"] ?? "-"); ?></dd>
+				<dt><?= l7_t("Acao do operador"); ?></dt>
+				<dd><?= htmlspecialchars($fallback_state["operator_action"] ?? "-"); ?></dd>
+			</dl>
+			<p class="help-block"><?= l7_t("Falha nova nao vira sucesso silencioso: a pagina mostra explicitamente se a trilha ficou healthy, degraded ou fail-closed e qual estado seguro foi preservado."); ?></p>
+		</div>
+	</div>
 </div>
 
-<div class="layer7-readonly-block" style="margin-top:14px;">
-	<label><?=l7_t("Estado da trust chain")?></label>
-	<dl class="dl-horizontal" style="margin-bottom:0;">
-		<dt><?=l7_t("Snapshot activa")?></dt>
-		<dd><?=htmlspecialchars($runtime_state["snapshot_id"] ?? "-")?></dd>
-		<dt><?=l7_t("Origem aplicada")?></dt>
-		<dd><?=htmlspecialchars($runtime_state["manifest_url"] ?? "-")?></dd>
-		<dt><?=l7_t("Fonte activa")?></dt>
-		<dd><?=htmlspecialchars($runtime_state["source_role"] ?? "-")?></dd>
-		<dt><?=l7_t("Ultima versao valida")?></dt>
-		<dd><?=htmlspecialchars($lkg_state["snapshot_id"] ?? "-")?></dd>
-		<dt><?=l7_t("LKG guardada em")?></dt>
-		<dd><code>/usr/local/etc/layer7/blacklists/.last-known-good</code></dd>
-		<dt><?=l7_t("Cache local")?></dt>
-		<dd><code>/usr/local/etc/layer7/blacklists/.cache</code></dd>
-		<dt><?=l7_t("Estado de degradacao")?></dt>
-		<dd><?=htmlspecialchars($fallback_state["status"] ?? "-")?></dd>
-		<dt><?=l7_t("Modo de fallback")?></dt>
-		<dd><?=htmlspecialchars($fallback_state["mode"] ?? "-")?></dd>
-		<dt><?=l7_t("Estado seguro mantido")?></dt>
-		<dd><?=htmlspecialchars($fallback_state["safe_state"] ?? "-")?></dd>
-		<dt><?=l7_t("Motivo da degradacao")?></dt>
-		<dd><?=htmlspecialchars($fallback_state["reason"] ?? "-")?></dd>
-		<dt><?=l7_t("Acao do operador")?></dt>
-		<dd><?=htmlspecialchars($fallback_state["operator_action"] ?? "-")?></dd>
-	</dl>
-	<p class="help-block" style="margin-top:10px;"><?=l7_t("Falha nova nao vira sucesso silencioso: a pagina mostra explicitamente se a trilha ficou healthy, degraded ou fail-closed e qual estado seguro foi preservado.")?></p>
-</div>
-</div>
-</div>
-
-<!-- SECTION 2: Blacklist Rules -->
-<div class="layer7-admin-block" id="l7-rules">
-<div class="layer7-admin-block__header"><?=l7_t("Regras de Blacklist")?></div>
-<div class="layer7-admin-block__body">
-
+<div class="panel panel-default" id="l7-rules">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Regras de Blacklist"); ?></h2>
+	</div>
+	<div class="panel-body">
 <?php if (empty($rules)): ?>
 <div class="alert alert-info">
 	<i class="fa fa-info-circle"></i>
@@ -482,11 +477,11 @@ if (!empty($content_sub["exp"])) {
 		<?php endif; ?>
 	</td>
 	<td><code>layer7_bld_<?=$idx?></code></td>
-	<td class="layer7-table-actions">
-		<a href="?edit=<?=$idx?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-		<form method="post" action="layer7_blacklists.php#l7-rules" style="display:inline;"
-			onsubmit="return confirm(<?=json_encode(l7_t('Remover esta regra'))?>);">
-			<input type="hidden" name="rule_index" value="<?=$idx?>">
+	<td class="text-nowrap">
+		<a href="?edit=<?= $idx; ?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+		<form method="post" action="layer7_blacklists.php#l7-rules" class="form-inline"
+			onsubmit="return confirm(<?= json_encode(l7_t("Remover esta regra")); ?>);">
+			<input type="hidden" name="rule_index" value="<?= $idx; ?>">
 			<button type="submit" name="delete_rule" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>
 	</td>
@@ -502,11 +497,11 @@ if (!empty($content_sub["exp"])) {
 <?php endif; ?>
 
 <?php if (count($rules) < 8): ?>
-<div class="layer7-toolbar">
+<p>
 	<a href="?add=1" class="btn btn-success">
-		<i class="fa fa-plus"></i> <?=l7_t("Adicionar regra")?>
+		<i class="fa fa-plus"></i> <?= l7_t("Adicionar regra"); ?>
 	</a>
-</div>
+</p>
 <?php endif; ?>
 
 <?php
@@ -522,55 +517,58 @@ if ($show_form):
 	);
 	$form_title = ($edit_idx >= 0) ? l7_t("Editar regra") : l7_t("Nova regra");
 ?>
-<div class="layer7-form-card">
-<h4 class="layer7-form-card__title"><?=$form_title?></h4>
+<h4><?= htmlspecialchars($form_title); ?></h4>
 <form method="post" action="layer7_blacklists.php#l7-rules">
 <?php if ($edit_idx >= 0): ?>
-<input type="hidden" name="rule_index" value="<?=$edit_idx?>">
+<input type="hidden" name="rule_index" value="<?= $edit_idx; ?>">
 <?php endif; ?>
 
 <div class="form-group">
-	<label><?=l7_t("Nome da regra")?></label>
-	<input type="text" class="form-control" name="rule_name"
-		value="<?=htmlspecialchars($erule["name"])?>"
-		placeholder="<?=l7_t("Ex: Funcionarios, Convidados, Alunos...")?>"
-		style="max-width:400px;" required>
+	<label for="l7bl-rule-name"><?= l7_t("Nome da regra"); ?></label>
+	<input type="text" class="form-control" name="rule_name" id="l7bl-rule-name"
+		value="<?= htmlspecialchars($erule["name"]); ?>"
+		placeholder="<?= l7_t("Ex: Funcionarios, Convidados, Alunos..."); ?>"
+		required>
 </div>
 
 <div class="form-group">
-	<label class="checkbox-inline">
-		<input type="checkbox" name="rule_enabled" value="1"
-			<?=(!empty($erule["enabled"])) ? "checked" : ""?>>
-		<?=l7_t("Regra activa")?>
-	</label>
+	<div class="checkbox">
+		<label>
+			<input type="checkbox" name="rule_enabled" value="1"
+				<?= (!empty($erule["enabled"])) ? "checked" : ""; ?>>
+			<?= l7_t("Regra activa"); ?>
+		</label>
+	</div>
 </div>
 
 <div class="form-group">
-	<label class="checkbox-inline">
-		<input type="checkbox" name="rule_force_dns" value="1"
-			<?=(!empty($erule["force_dns"])) ? "checked" : ""?>>
-		<?=l7_t("Forcar DNS local para estes CIDRs")?>
-	</label>
+	<div class="checkbox">
+		<label>
+			<input type="checkbox" name="rule_force_dns" value="1"
+				<?= (!empty($erule["force_dns"])) ? "checked" : ""; ?>>
+			<?= l7_t("Forcar DNS local para estes CIDRs"); ?>
+		</label>
+	</div>
 	<p class="help-block">
-		<?=l7_t("Redireciona todo o DNS (porta 53) dos CIDRs de origem para o Unbound local, mesmo que o dispositivo tenha DNS externo (ex: 8.8.8.8) configurado. Requer CIDRs de origem definidos.")?>
+		<?= l7_t("Redireciona todo o DNS (porta 53) dos CIDRs de origem para o Unbound local, mesmo que o dispositivo tenha DNS externo (ex: 8.8.8.8) configurado. Requer CIDRs de origem definidos."); ?>
 	</p>
 </div>
 
 <div class="form-group">
-	<label><?=l7_t("Categorias a bloquear")?></label>
+	<label><?= l7_t("Categorias a bloquear"); ?></label>
 	<?php if (empty($merged_categories)): ?>
-	<div class="alert alert-warning" style="margin:0;">
+	<div class="alert alert-warning">
 		<i class="fa fa-exclamation-triangle"></i>
-		<?=l7_t("Sem categorias disponiveis. Faca o download da UT1 ou adicione uma categoria personalizada abaixo.")?>
+		<?= l7_t("Sem categorias disponiveis. Faca o download da UT1 ou adicione uma categoria personalizada abaixo."); ?>
 	</div>
 	<?php else: ?>
-	<input type="text" id="rule_cat_filter" class="form-control l7-filter" style="max-width:300px;"
-		placeholder="<?=l7_t("Pesquisar categorias...")?>" onkeyup="filterRuleCats();">
-	<div class="l7-bulk-tools">
-		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(true);"><?=l7_t("Seleccionar todas")?></button>
-		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(false);"><?=l7_t("Limpar todas")?></button>
-	</div>
-	<div class="l7-multiselect-wrap" id="rule_cats_wrap">
+	<input type="text" id="rule_cat_filter" class="form-control"
+		placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="filterRuleCats();">
+	<p>
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(true);"><?= l7_t("Seleccionar todas"); ?></button>
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(false);"><?= l7_t("Limpar todas"); ?></button>
+	</p>
+	<div id="rule_cats_wrap">
 	<?php
 	$ecats = is_array($erule["categories"]) ? $erule["categories"] : array();
 	foreach ($merged_categories as $cat):
@@ -578,51 +576,50 @@ if ($show_form):
 		$cnt = isset($cat["domains_count"]) ? (int)$cat["domains_count"] : 0;
 		$custom_cnt = isset($cat["custom_domains_count"]) ? (int)$cat["custom_domains_count"] : 0;
 		$checked = in_array($cid, $ecats) ? "checked" : "";
-		$warn = ($cnt > 1000000) ? ' &#9888;' : '';
+		$warn = ($cnt > 1000000) ? " &#9888;" : "";
 	?>
-	<label class="rule-cat-item" data-cat="<?=htmlspecialchars($cid)?>">
-		<input type="checkbox" name="rule_cats[]" value="<?=htmlspecialchars($cid)?>" <?=$checked?>>
-		<?=htmlspecialchars($cid)?> <small class="text-muted">(<?=number_format($cnt, 0, ',', '.')?><?php if ($custom_cnt > 0): ?> +<?=number_format($custom_cnt, 0, ',', '.')?> <?=l7_t("custom")?><?php endif; ?>)</small><?=$warn?>
-	</label>
+	<div class="checkbox rule-cat-item" data-cat="<?= htmlspecialchars($cid); ?>">
+		<label>
+			<input type="checkbox" name="rule_cats[]" value="<?= htmlspecialchars($cid); ?>" <?= $checked; ?>>
+			<?= htmlspecialchars($cid); ?> <small class="text-muted">(<?= number_format($cnt, 0, ",", "."); ?><?php if ($custom_cnt > 0): ?> +<?= number_format($custom_cnt, 0, ",", "."); ?> <?= l7_t("custom"); ?><?php endif; ?>)</small><?= $warn; ?>
+		</label>
+	</div>
 	<?php endforeach; ?>
 	</div>
-	<p class="help-block"><?=l7_t("Seleccione as categorias que esta regra deve bloquear.")?></p>
+	<p class="help-block"><?= l7_t("Seleccione as categorias que esta regra deve bloquear."); ?></p>
 	<?php endif; ?>
 </div>
 
 <div class="form-group">
-	<label><?=l7_t("Origem — IPs ou CIDRs (um por linha)")?></label>
-	<textarea class="form-control" name="rule_cidrs" rows="4"
-		placeholder="<?=l7_t("Ex: 192.168.10.0/24\nDeixe vazio para bloquear TODOS os clientes (global).")?>"
-		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["src_cidrs"] ?? array()))?></textarea>
-	<p class="help-block"><?=l7_t("IPs/CIDRs de origem sujeitos a esta regra. Se vazio, aplica-se a TODOS os clientes.")?></p>
+	<label for="l7bl-rule-cidrs"><?= l7_t("Origem — IPs ou CIDRs (um por linha)"); ?></label>
+	<textarea class="form-control" name="rule_cidrs" id="l7bl-rule-cidrs" rows="4"
+		placeholder="<?= l7_t("Ex: 192.168.10.0/24\nDeixe vazio para bloquear TODOS os clientes (global)."); ?>"><?= htmlspecialchars(implode("\n", $erule["src_cidrs"] ?? array())); ?></textarea>
+	<p class="help-block"><?= l7_t("IPs/CIDRs de origem sujeitos a esta regra. Se vazio, aplica-se a TODOS os clientes."); ?></p>
 </div>
 
 <div class="form-group">
-	<label><?=l7_t("Excepcoes — IPs excluidos desta regra (um por linha)")?></label>
-	<textarea class="form-control" name="rule_except" rows="3"
-		placeholder="<?=l7_t("Ex: 192.168.10.1 (director)")?>"
-		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["except_ips"] ?? array()))?></textarea>
-	<p class="help-block"><?=l7_t("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem.")?></p>
+	<label for="l7bl-rule-except"><?= l7_t("Excepcoes — IPs excluidos desta regra (um por linha)"); ?></label>
+	<textarea class="form-control" name="rule_except" id="l7bl-rule-except" rows="3"
+		placeholder="<?= l7_t("Ex: 192.168.10.1 (director)"); ?>"><?= htmlspecialchars(implode("\n", $erule["except_ips"] ?? array())); ?></textarea>
+	<p class="help-block"><?= l7_t("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem."); ?></p>
 </div>
 
-<div class="layer7-form-card__actions">
+<p>
 	<button type="submit" name="save_rule" class="btn btn-primary">
-		<i class="fa fa-save"></i> <?=l7_t("Guardar regra")?>
+		<i class="fa fa-save"></i> <?= l7_t("Guardar regra"); ?>
 	</button>
-	<a href="layer7_blacklists.php" class="btn btn-default"><?=l7_t("Cancelar")?></a>
-</div>
+	<a href="layer7_blacklists.php" class="btn btn-default"><?= l7_t("Cancelar"); ?></a>
+</p>
 </form>
-</div>
 <?php endif; ?>
-</div>
+	</div>
 </div>
 
-<!-- SECTION 3: Custom categories/extensions -->
-<div class="layer7-admin-block" id="l7-custom">
-<div class="layer7-admin-block__header"><?=l7_t("Categorias personalizadas e extensoes")?></div>
-<div class="layer7-admin-block__body">
-
+<div class="panel panel-default" id="l7-custom">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Categorias personalizadas e extensoes"); ?></h2>
+	</div>
+	<div class="panel-body">
 <?php if (empty($custom_map)): ?>
 <div class="alert alert-info">
 	<i class="fa fa-info-circle"></i>
@@ -656,10 +653,11 @@ if ($show_form):
 		<?= $is_ut1 ? l7_t("Extensao UT1") : l7_t("Categoria local") ?>
 	</td>
 	<td><?=number_format(count($domains), 0, ',', '.')?></td>
-	<td class="layer7-table-actions">
-		<a href="?cat_edit=<?=urlencode($cid)?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-		<form method="post" action="layer7_blacklists.php#l7-custom" style="display:inline;" onsubmit="return confirm(<?=json_encode(l7_t('Remover categoria personalizada?'))?>);">
-			<input type="hidden" name="cat_id" value="<?=htmlspecialchars($cid)?>">
+	<td class="text-nowrap">
+		<a href="?cat_edit=<?= urlencode($cid); ?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+		<form method="post" action="layer7_blacklists.php#l7-custom" class="form-inline"
+			onsubmit="return confirm(<?= json_encode(l7_t("Remover categoria personalizada?")); ?>);">
+			<input type="hidden" name="cat_id" value="<?= htmlspecialchars($cid); ?>">
 			<button type="submit" name="delete_cat_sites" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>
 	</td>
@@ -676,81 +674,79 @@ $cat_form_id = $_cat_editing ? $cat_edit : "";
 $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n", $custom_map[$cat_edit]) : "";
 ?>
 <?php if (!$_cat_editing) { ?>
-<div style="margin-top:12px; margin-bottom:8px;">
+<p>
 	<a data-toggle="collapse" href="#l7-new-cat-form" class="btn btn-sm btn-success">
-		<i class="fa fa-plus"></i> <?= l7_t("Nova categoria personalizada") ?>
+		<i class="fa fa-plus"></i> <?= l7_t("Nova categoria personalizada"); ?>
 	</a>
-</div>
+</p>
 <?php } ?>
-<div id="l7-new-cat-form" class="<?= $_cat_editing ? '' : 'collapse' ?>">
-<div class="layer7-form-card">
-<h4 class="layer7-form-card__title"><?= $_cat_editing ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
+<div id="l7-new-cat-form" class="<?= $_cat_editing ? "" : "collapse"; ?>">
+<h4><?= $_cat_editing ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada"); ?></h4>
 <form method="post" action="layer7_blacklists.php#l7-custom">
 <div class="form-group">
-	<label><?=l7_t("ID da categoria")?></label>
-	<input type="text" class="form-control" name="cat_id" value="<?=htmlspecialchars($cat_form_id)?>" placeholder="<?=l7_t("Ex: bloqueios_internos, erp, cloud_apps")?>" style="max-width:360px;" <?= $_cat_editing ? 'readonly' : '' ?> required>
-	<p class="help-block"><?=l7_t("Use letras minusculas, numeros, underscore (_) e hifen (-).")?></p>
+	<label for="l7bl-cat-id"><?= l7_t("ID da categoria"); ?></label>
+	<input type="text" class="form-control" name="cat_id" id="l7bl-cat-id" value="<?= htmlspecialchars($cat_form_id); ?>" placeholder="<?= l7_t("Ex: bloqueios_internos, erp, cloud_apps"); ?>" <?= $_cat_editing ? "readonly" : ""; ?> required>
+	<p class="help-block"><?= l7_t("Use letras minusculas, numeros, underscore (_) e hifen (-)."); ?></p>
 </div>
 <div class="form-group">
-	<label><?=l7_t("Dominios da categoria (um por linha)")?></label>
-	<textarea class="form-control" name="cat_sites" rows="6" style="font-family:monospace; max-width:520px;" placeholder="<?=l7_t("Ex: site1.com\nsub.site2.com")?>" required><?=htmlspecialchars($cat_form_sites)?></textarea>
+	<label for="l7bl-cat-sites"><?= l7_t("Dominios da categoria (um por linha)"); ?></label>
+	<textarea class="form-control" name="cat_sites" id="l7bl-cat-sites" rows="6" placeholder="<?= l7_t("Ex: site1.com\nsub.site2.com"); ?>" required><?= htmlspecialchars($cat_form_sites); ?></textarea>
 </div>
-<div class="layer7-form-card__actions">
-	<button type="submit" name="save_cat_sites" class="btn btn-primary"><i class="fa fa-save"></i> <?=l7_t("Guardar categoria")?></button>
+<p>
+	<button type="submit" name="save_cat_sites" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Guardar categoria"); ?></button>
 	<?php if ($_cat_editing): ?>
-	<a href="layer7_blacklists.php" class="btn btn-default"><?=l7_t("Cancelar")?></a>
+	<a href="layer7_blacklists.php" class="btn btn-default"><?= l7_t("Cancelar"); ?></a>
 	<?php endif; ?>
-</div>
+</p>
 </form>
 </div>
-</div>
-</div>
+	</div>
 </div>
 
-<!-- SECTION 3: Global Whitelist -->
-<div class="layer7-admin-block" id="l7-whitelist">
-<div class="layer7-admin-block__header"><?=l7_t("Whitelist Global")?></div>
-<div class="layer7-admin-block__body">
-<div class="layer7-form-card">
+<div class="panel panel-default" id="l7-whitelist">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Whitelist Global"); ?></h2>
+	</div>
+	<div class="panel-body">
 <form method="post" action="layer7_blacklists.php#l7-whitelist">
 <div class="form-group">
-	<label><?=l7_t("Dominios nunca bloqueados (um por linha)")?></label>
-	<textarea class="form-control" name="whitelist" rows="5"
-		placeholder="<?=l7_t("Ex: google.com\nyoutube.com")?>"
-		style="font-family:monospace; max-width:500px;"><?=htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array()))?></textarea>
-	<p class="help-block"><?=l7_t("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias.")?></p>
+	<label for="l7bl-whitelist"><?= l7_t("Dominios nunca bloqueados (um por linha)"); ?></label>
+	<textarea class="form-control" name="whitelist" id="l7bl-whitelist" rows="5"
+		placeholder="<?= l7_t("Ex: google.com\nyoutube.com"); ?>"><?= htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array())); ?></textarea>
+	<p class="help-block"><?= l7_t("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias."); ?></p>
 </div>
-<div class="layer7-form-card__actions">
+<p>
 	<button type="submit" name="save_whitelist" class="btn btn-primary">
-		<i class="fa fa-save"></i> <?=l7_t("Guardar whitelist")?>
+		<i class="fa fa-save"></i> <?= l7_t("Guardar whitelist"); ?>
 	</button>
-</div>
+</p>
 </form>
-</div>
-</div>
+	</div>
 </div>
 
-<!-- SECTION 4: Settings & State -->
-<div class="layer7-admin-block" id="l7-bl-settings">
-<div class="layer7-admin-block__header"><?=l7_t("Definicoes e Estado")?></div>
-<div class="layer7-admin-block__body">
-<div class="layer7-form-card">
+<div class="panel panel-default" id="l7-bl-settings">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= l7_t("Definicoes e Estado"); ?></h2>
+	</div>
+	<div class="panel-body">
 <form method="post" action="layer7_blacklists.php#l7-bl-settings">
 <div class="form-group">
-	<label class="checkbox-inline">
-		<input type="checkbox" name="auto_update" value="1"
-			<?=(!empty($bl_config["auto_update"])) ? "checked" : ""?>>
-		<?=l7_t("Actualizacao automatica")?>
-	</label>
+	<div class="checkbox">
+		<label>
+			<input type="checkbox" name="auto_update" value="1"
+				<?= (!empty($bl_config["auto_update"])) ? "checked" : ""; ?>>
+			<?= l7_t("Actualizacao automatica"); ?>
+		</label>
+	</div>
 </div>
 <div class="form-group">
-	<label><?=l7_t("Intervalo (horas)")?></label>
-	<input type="number" class="form-control" name="update_interval_hours"
-		value="<?=(int)($bl_config["update_interval_hours"] ?? 24)?>"
-		min="1" max="168" style="width:100px;">
+	<label for="l7bl-update-hours"><?= l7_t("Intervalo (horas)"); ?></label>
+	<input type="number" class="form-control" name="update_interval_hours" id="l7bl-update-hours"
+		value="<?= (int)($bl_config["update_interval_hours"] ?? 24); ?>"
+		min="1" max="168">
 </div>
 <hr>
-<h4><?=l7_t("Recursos (memoria / teto de dominios)")?></h4>
+<h4><?= l7_t("Recursos (memoria / teto de dominios)"); ?></h4>
 <?php if ($bl_union_domains > $bl_max_entries): ?>
 <div class="alert alert-warning">
 	<i class="fa fa-exclamation-triangle"></i>
@@ -769,86 +765,83 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 </div>
 <?php endif; ?>
 <div class="form-group">
-	<label><?=l7_t("Teto maximo de dominios em memoria")?></label>
-	<input type="number" class="form-control" name="max_entries"
-		value="<?=(int)$bl_max_entries?>"
-		min="1000000" max="5000000" step="100000" style="width:160px;">
+	<label for="l7bl-max-entries"><?= l7_t("Teto maximo de dominios em memoria"); ?></label>
+	<input type="number" class="form-control" name="max_entries" id="l7bl-max-entries"
+		value="<?= (int)$bl_max_entries; ?>"
+		min="1000000" max="5000000" step="100000">
 	<p class="help-block">
-		<?=l7_t("Hard-cap do produto: 5 000 000. Default 5 000 000 (cabe UT1 adult ~4,6M). O daemon trunca com WARN ao atingir o teto.")?>
+		<?= l7_t("Hard-cap do produto: 5 000 000. Default 5 000 000 (cabe UT1 adult ~4,6M). O daemon trunca com WARN ao atingir o teto."); ?>
 	</p>
 </div>
 <div class="form-group">
-	<label><?=l7_t("Limite de memoria da blacklist (% da RAM do appliance)")?></label>
-	<input type="number" class="form-control" name="mem_percent"
-		value="<?=(int)($bl_config["mem_percent"] ?? 25)?>"
-		min="5" max="50" style="width:100px;">
+	<label for="l7bl-mem-percent"><?= l7_t("Limite de memoria da blacklist (% da RAM do appliance)"); ?></label>
+	<input type="number" class="form-control" name="mem_percent" id="l7bl-mem-percent"
+		value="<?= (int)($bl_config["mem_percent"] ?? 25); ?>"
+		min="5" max="50">
 	<p class="help-block">
-		<?=l7_t("Percentagem de hw.physmem reservavel ao load (5–50%, default 25%). Clamp interno: minimo 128 MB, maximo 1536 MB. O load para no primeiro limite (contagem ou bytes).")?>
+		<?= l7_t("Percentagem de hw.physmem reservavel ao load (5–50%, default 25%). Clamp interno: minimo 128 MB, maximo 1536 MB. O load para no primeiro limite (contagem ou bytes)."); ?>
 		<?php if ($bl_phys > 0): ?>
-		<br><?=l7_t("RAM detectada")?>:
-		<strong><?=number_format($bl_phys / (1024*1024), 0, ',', '.')?> MB</strong>
-		— <?=l7_t("orcamento estimado")?>:
-		<strong><?=number_format($bl_budget / (1024*1024), 0, ',', '.')?> MB</strong>
+		<br><?= l7_t("RAM detectada"); ?>:
+		<strong><?= number_format($bl_phys / (1024 * 1024), 0, ",", "."); ?> MB</strong>
+		— <?= l7_t("orcamento estimado"); ?>:
+		<strong><?= number_format($bl_budget / (1024 * 1024), 0, ",", "."); ?> MB</strong>
 		<?php endif; ?>
 	</p>
 </div>
-<div class="layer7-form-card__actions">
+<p>
 	<button type="submit" name="save_settings" class="btn btn-primary">
-		<i class="fa fa-save"></i> <?=l7_t("Guardar definicoes")?>
+		<i class="fa fa-save"></i> <?= l7_t("Guardar definicoes"); ?>
 	</button>
-</div>
+</p>
 </form>
-</div>
 
-<div style="margin-top:18px;">
-<dl class="dl-horizontal layer7-summary">
-	<dt><?=l7_t("Ultima actualizacao")?></dt>
-	<dd><?=$last_update ? htmlspecialchars($last_update) : '<em>' . l7_t("Nunca") . '</em>'?></dd>
+<dl class="dl-horizontal">
+	<dt><?= l7_t("Ultima actualizacao"); ?></dt>
+	<dd><?= $last_update ? htmlspecialchars($last_update) : "<em>" . l7_t("Nunca") . "</em>"; ?></dd>
 <?php if ($bl_stats): ?>
-	<dt><?=l7_t("Regras activas")?></dt>
-	<dd><?=(int)$bl_stats["rules_active"]?></dd>
-	<dt><?=l7_t("Categorias carregadas")?></dt>
-	<dd><?=(int)$bl_stats["categories_active"]?><?php if (!empty($merged_categories)): ?> / <?=count($merged_categories)?> <?=l7_t("disponiveis")?><?php endif; ?></dd>
-	<dt><?=l7_t("Dominios carregados")?></dt>
-	<dd><?=number_format((int)$bl_stats["domains_loaded"], 0, ',', '.')?></dd>
-	<dt><?=l7_t("Lookups totais")?></dt>
-	<dd><?=number_format((int)$bl_stats["lookups"], 0, ',', '.')?></dd>
-	<dt><?=l7_t("Hits de blacklist")?></dt>
-	<dd><?=number_format((int)$bl_stats["hits"], 0, ',', '.')?></dd>
+	<dt><?= l7_t("Regras activas"); ?></dt>
+	<dd><?= (int)$bl_stats["rules_active"]; ?></dd>
+	<dt><?= l7_t("Categorias carregadas"); ?></dt>
+	<dd><?= (int)$bl_stats["categories_active"]; ?><?php if (!empty($merged_categories)): ?> / <?= count($merged_categories); ?> <?= l7_t("disponiveis"); ?><?php endif; ?></dd>
+	<dt><?= l7_t("Dominios carregados"); ?></dt>
+	<dd><?= number_format((int)$bl_stats["domains_loaded"], 0, ",", "."); ?></dd>
+	<dt><?= l7_t("Lookups totais"); ?></dt>
+	<dd><?= number_format((int)$bl_stats["lookups"], 0, ",", "."); ?></dd>
+	<dt><?= l7_t("Hits de blacklist"); ?></dt>
+	<dd><?= number_format((int)$bl_stats["hits"], 0, ",", "."); ?></dd>
 <?php endif; ?>
 </dl>
 
 <?php if ($bl_stats && is_array($bl_stats["top_categories"]) && count($bl_stats["top_categories"]) > 0): ?>
-<h4><?=l7_t("Top categorias bloqueadas")?></h4>
-<table class="table table-condensed" style="max-width:400px;">
-<thead><tr><th><?=l7_t("Categoria")?></th><th style="text-align:right;"><?=l7_t("Hits")?></th></tr></thead>
+<h4><?= l7_t("Top categorias bloqueadas"); ?></h4>
+<table class="table table-condensed">
+<thead><tr><th><?= l7_t("Categoria"); ?></th><th class="text-right"><?= l7_t("Hits"); ?></th></tr></thead>
 <tbody>
 <?php foreach ($bl_stats["top_categories"] as $tc): ?>
 <tr>
-	<td><?=htmlspecialchars($tc["cat"] ?? "")?></td>
-	<td style="text-align:right;"><?=number_format((int)($tc["hits"] ?? 0), 0, ',', '.')?></td>
+	<td><?= htmlspecialchars($tc["cat"] ?? ""); ?></td>
+	<td class="text-right"><?= number_format((int)($tc["hits"] ?? 0), 0, ",", "."); ?></td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
 <?php endif; ?>
+
+<p class="text-muted small">
+	<?= l7_t("Listas mantidas pela"); ?> <a href="https://dsi.ut-capitole.fr/blacklists/index_en.php" target="_blank">Universit&eacute; Toulouse Capitole</a>.
+	<?= l7_t("Licenca"); ?> <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA 4.0</a>.
+</p>
+
+	</div>
 </div>
 
-<div class="layer7-muted-note" style="margin-top:24px; font-size:11px;">
-	<?=l7_t("Listas mantidas pela")?> <a href="https://dsi.ut-capitole.fr/blacklists/index_en.php" target="_blank">Universit&eacute; Toulouse Capitole</a>.
-	<?=l7_t("Licenca")?> <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA 4.0</a>.
 </div>
 
-</div>
-</div>
-
-</div><!-- layer7-content -->
-</div><!-- panel-body -->
-</div><!-- panel -->
-
-<?php layer7_render_footer(); ?>
-
-</div><!-- layer7-page -->
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 
 <script>
 var _pollTimer = null;
@@ -934,4 +927,4 @@ startDownloadPolling();
 <?php endif; ?>
 </script>
 
-<?php include("foot.inc"); ?>
+<?php require_once("foot.inc"); ?>

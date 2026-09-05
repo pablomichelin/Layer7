@@ -505,6 +505,186 @@ else
 	else
 		fail "test_status_native_view"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_policies_native_view.php; then
+		pass "test_policies_native_view"
+	else
+		fail "test_policies_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_policies_subnav_native.php; then
+		pass "test_policies_subnav_native"
+	else
+		fail "test_policies_subnav_native"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_policies_handlers_baseline.php; then
+		pass "test_policies_handlers_baseline"
+	else
+		fail "test_policies_handlers_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-policies-view/run.php; then
+		pass "harness-policies-view"
+	else
+		fail "harness-policies-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-policies-library/run.php; then
+		pass "harness-policies-library"
+	else
+		fail "harness-policies-library"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-policies-options/run.php; then
+		pass "harness-policies-options"
+	else
+		fail "harness-policies-options"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-policies-edit/run.php; then
+		pass "harness-policies-edit"
+	else
+		fail "harness-policies-edit"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_devices_native_view.php; then
+		pass "test_devices_native_view"
+	else
+		fail "test_devices_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_devices_handlers_baseline.php; then
+		pass "test_devices_handlers_baseline"
+	else
+		fail "test_devices_handlers_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_devices_batch_payload.php; then
+		pass "test_devices_batch_payload"
+	else
+		fail "test_devices_batch_payload"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-devices-view/run.php; then
+		pass "harness-devices-view"
+	else
+		fail "harness-devices-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_groups_native_view.php; then
+		pass "test_groups_native_view"
+	else
+		fail "test_groups_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_groups_handlers_baseline.php; then
+		pass "test_groups_handlers_baseline"
+	else
+		fail "test_groups_handlers_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-groups-view/run.php; then
+		pass "harness-groups-view"
+	else
+		fail "harness-groups-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_categories_native_view.php; then
+		pass "test_categories_native_view"
+	else
+		fail "test_categories_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_categories_data_baseline.php; then
+		pass "test_categories_data_baseline"
+	else
+		fail "test_categories_data_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-categories-view/run.php; then
+		pass "harness-categories-view"
+	else
+		fail "harness-categories-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_allowlist_native_view.php; then
+		pass "test_allowlist_native_view"
+	else
+		fail "test_allowlist_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_allowlist_handlers_baseline.php; then
+		pass "test_allowlist_handlers_baseline"
+	else
+		fail "test_allowlist_handlers_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-allowlist-view/run.php; then
+		pass "harness-allowlist-view"
+	else
+		fail "harness-allowlist-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_handlers_baseline.php; then
+		pass "test_exceptions_handlers_baseline"
+	else
+		fail "test_exceptions_handlers_baseline"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_harness_bootstrap.php; then
+		pass "test_exceptions_harness_bootstrap"
+	else
+		fail "test_exceptions_harness_bootstrap"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_native_view.php; then
+		pass "test_exceptions_native_view"
+	else
+		fail "test_exceptions_native_view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-exceptions-view/run.php; then
+		pass "harness-exceptions-view"
+	else
+		fail "harness-exceptions-view"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_effects.php; then
+		pass "test_exceptions_effects"
+	else
+		fail "test_exceptions_effects"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_target_summary.php; then
+		pass "test_exceptions_target_summary"
+	else
+		fail "test_exceptions_target_summary"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_pure.php; then
+		pass "test_exceptions_vip_pure"
+	else
+		fail "test_exceptions_vip_pure"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_freeze.php; then
+		pass "test_exceptions_vip_freeze"
+	else
+		fail "test_exceptions_vip_freeze"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_effects.php; then
+		pass "test_exceptions_vip_effects"
+	else
+		fail "test_exceptions_vip_effects"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-exceptions-view/run-vip.php; then
+		pass "harness-exceptions-view-vip"
+	else
+		fail "harness-exceptions-view-vip"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_dhcp_effects.php; then
+		pass "test_exceptions_vip_dhcp_effects"
+	else
+		fail "test_exceptions_vip_dhcp_effects"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_dhcp_json_audit.php; then
+		pass "test_exceptions_vip_dhcp_json_audit"
+	else
+		fail "test_exceptions_vip_dhcp_json_audit"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-exceptions-view/run-vip-dhcp.php; then
+		pass "run-vip-dhcp"
+	else
+		fail "run-vip-dhcp"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_bulk_effects.php; then
+		pass "test_exceptions_vip_bulk_effects"
+	else
+		fail "test_exceptions_vip_bulk_effects"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_exceptions_vip_bulk_json_audit.php; then
+		pass "test_exceptions_vip_bulk_json_audit"
+	else
+		fail "test_exceptions_vip_bulk_json_audit"
+	fi
+	if "$PHP_BIN_E2" tests/functional/harness-exceptions-view/run-vip-bulk.php; then
+		pass "run-vip-bulk"
+	else
+		fail "run-vip-bulk"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"
@@ -592,6 +772,107 @@ elif "$NODE_BIN" tests/functional/test_i18n_coverage.js; then
 	pass "test_i18n_coverage"
 else
 	fail "test_i18n_coverage"
+fi
+if [ -n "$NODE_BIN" ]; then
+	if "$NODE_BIN" tests/functional/test_categories_search.js; then
+		pass "test_categories_search"
+	else
+		fail "test_categories_search"
+	fi
+	if "$NODE_BIN" tests/functional/test_policies_filters.js; then
+		pass "test_policies_filters"
+	else
+		fail "test_policies_filters"
+	fi
+	if "$NODE_BIN" tests/functional/test_policies_library.js; then
+		pass "test_policies_library"
+	else
+		fail "test_policies_library"
+	fi
+	if "$NODE_BIN" tests/functional/test_policies_profile_options.js; then
+		pass "test_policies_profile_options"
+	else
+		fail "test_policies_profile_options"
+	fi
+	if "$NODE_BIN" tests/functional/test_policies_profile_edit.js; then
+		pass "test_policies_profile_edit"
+	else
+		fail "test_policies_profile_edit"
+	fi
+	if [ -n "${LAYER7_BOOTSTRAP_PIN_CSS:-}" ]; then
+		if "$NODE_BIN" tests/functional/test_policies_profile_edit_hidden_css.js; then
+			pass "test_policies_profile_edit_hidden_css"
+		else
+			fail "test_policies_profile_edit_hidden_css"
+		fi
+	else
+		echo "SKIP: test_policies_profile_edit_hidden_css (defina LAYER7_BOOTSTRAP_PIN_CSS)"
+	fi
+	if "$NODE_BIN" tests/functional/test_form_buttons_payload.js; then
+		pass "test_form_buttons_payload"
+	else
+		fail "test_form_buttons_payload"
+	fi
+	L7_PAYLOAD_PHP="${LAYER7_PHP:-$PHP_BIN_E2}"
+	if [ -n "$L7_PAYLOAD_PHP" ] && "$L7_PAYLOAD_PHP" -r "echo 1;" >/dev/null 2>&1; then
+		if LAYER7_PHP="$L7_PAYLOAD_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_allowlist_payload.js; then
+			pass "test_allowlist_payload"
+		else
+			fail "test_allowlist_payload"
+		fi
+	else
+		printf "SKIP: test_allowlist_payload (LAYER7_PHP/php indisponivel)\n"
+	fi
+	L7_EXC_PHP="${LAYER7_PHP:-$PHP_BIN_E2}"
+	if [ -n "$L7_EXC_PHP" ] && "$L7_EXC_PHP" -r "echo 1;" >/dev/null 2>&1; then
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_payload.js; then
+			pass "test_exceptions_payload"
+		else
+			fail "test_exceptions_payload"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_js.js; then
+			pass "test_exceptions_js"
+		else
+			fail "test_exceptions_js"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_js.js; then
+			pass "test_exceptions_vip_js"
+		else
+			fail "test_exceptions_vip_js"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_payload.js; then
+			pass "test_exceptions_vip_payload"
+		else
+			fail "test_exceptions_vip_payload"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_dhcp_js.js; then
+			pass "test_exceptions_vip_dhcp_js"
+		else
+			fail "test_exceptions_vip_dhcp_js"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_dhcp_payload.js; then
+			pass "test_exceptions_vip_dhcp_payload"
+		else
+			fail "test_exceptions_vip_dhcp_payload"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_bulk_payload.js; then
+			pass "test_exceptions_vip_bulk_payload"
+		else
+			fail "test_exceptions_vip_bulk_payload"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" LAYER7_JSDOM="${LAYER7_JSDOM:-}" "$NODE_BIN" tests/functional/test_exceptions_vip_bulk_js.js; then
+			pass "test_exceptions_vip_bulk_js"
+		else
+			fail "test_exceptions_vip_bulk_js"
+		fi
+		if LAYER7_PHP="$L7_EXC_PHP" "$NODE_BIN" tests/functional/test_exceptions_vip_bulk_export.js; then
+			pass "test_exceptions_vip_bulk_export"
+		else
+			fail "test_exceptions_vip_bulk_export"
+		fi
+	else
+		printf "SKIP: test_exceptions_payload/js (LAYER7_PHP/php indisponivel)\n"
+	fi
 fi
 
 step "Resumo"

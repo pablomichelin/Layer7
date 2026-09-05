@@ -893,6 +893,14 @@ $data = layer7_load_or_default();
 $policies = isset($data["layer7"]["policies"]) && is_array($data["layer7"]["policies"])
 	? $data["layer7"]["policies"] : array();
 $at_limit = count($policies) >= 24;
+$l7_profiles_catalog = layer7_load_profiles();
+$l7_library_unavail_reason = null;
+if ($at_limit) {
+	$l7_library_unavail_reason = "limit24";
+} elseif (empty($l7_profiles_catalog)) {
+	$l7_library_unavail_reason = "empty_catalog";
+}
+$l7_library_available = ($l7_library_unavail_reason === null);
 
 $edit_idx = null;
 $edit_policy = null;
@@ -917,6 +925,49 @@ if (isset($_GET["view"]) && ctype_digit((string)$_GET["view"])) {
 	}
 }
 
+$layer7_policy_add_retry = !empty($_POST["add_policy"]) && !empty($input_errors);
+$l7_profile_post = !empty($_POST["add_profile_policy"]) ||
+	!empty($_POST["toggle_profile_on"]) ||
+	!empty($_POST["toggle_profile_off"]) ||
+	!empty($_POST["unhide_profile"]) ||
+	!empty($_POST["save_profile_edit"]) ||
+	!empty($_POST["delete_custom_profile"]) ||
+	!empty($_POST["apply_profiles_batch"]);
+$l7_profile_post_retry = $l7_profile_post && !empty($input_errors);
+$l7_policy_mode = "list";
+if ($edit_policy !== null && $edit_idx !== null) {
+	$l7_policy_mode = "edit";
+} elseif ($view_policy !== null && $view_idx !== null) {
+	$l7_policy_mode = "view";
+} elseif ($layer7_policy_add_retry ||
+    (isset($_GET["new"]) && (string)$_GET["new"] !== "" && (string)$_GET["new"] !== "0")) {
+	$l7_policy_mode = "new";
+} elseif ($l7_profile_post_retry && !empty($_POST["add_profile_policy"])) {
+	$l7_policy_mode = "profile_options";
+} elseif (isset($_GET["profile_options"]) && trim((string)$_GET["profile_options"]) !== "") {
+	$l7_policy_mode = "profile_options";
+} elseif ($l7_profile_post_retry &&
+    (!empty($_POST["save_profile_edit"]) || !empty($_POST["delete_custom_profile"]))) {
+	$l7_policy_mode = "profile_edit";
+} elseif (isset($_GET["profile_edit"]) && trim((string)$_GET["profile_edit"]) !== "") {
+	$l7_policy_mode = "profile_edit";
+} elseif (isset($_GET["profile_new"]) && (string)$_GET["profile_new"] !== "" &&
+    (string)$_GET["profile_new"] !== "0") {
+	$l7_policy_mode = "profile_edit";
+} elseif (isset($_GET["library"]) && (string)$_GET["library"] !== "" && (string)$_GET["library"] !== "0") {
+	$l7_policy_mode = "library";
+} elseif ($l7_profile_post_retry) {
+	$l7_policy_mode = "library";
+}
+
+$l7_legacy_library_redirect_ok = (
+	$l7_policy_mode === "list" &&
+	$l7_library_available &&
+	(($_SERVER["REQUEST_METHOD"] ?? "GET") === "GET") &&
+	empty($_POST) &&
+	empty($input_errors)
+);
+
 $l7_groups = layer7_load_groups();
 
 $l7_vip_exc = layer7_find_vip_exception($data);
@@ -935,15 +986,916 @@ if (is_array($l7_vip_exc)) {
 	}
 }
 
+$l7_profile_options_id = null;
+$l7_profile_options_profile = null;
+$l7_po_req_id = "";
+if (!empty($_POST["add_profile_policy"]) && $l7_profile_post_retry) {
+	$l7_po_req_id = trim((string)($_POST["profile_id"] ?? ""));
+} elseif (isset($_GET["profile_options"])) {
+	$l7_po_req_id = trim((string)$_GET["profile_options"]);
+}
+if ($l7_po_req_id !== "") {
+	$l7_profile_options_id = $l7_po_req_id;
+	$l7_profile_options_profile = layer7_policies_find_profile($l7_po_req_id);
+}
+$l7_po_from_post = !empty($_POST["add_profile_policy"]) && $l7_profile_post_retry;
+$l7_profile_options_state = layer7_profile_options_state($l7_po_from_post, array(
+	"profile_id" => $l7_profile_options_id ?? "",
+	"vip_groups" => $l7_vip_groups_sel,
+	"vip_hosts" => $l7_vip_hosts_val,
+	"vip_cidrs" => $l7_vip_cidrs_val,
+));
+
+$l7_profile_edit_id = null;
+$l7_profile_edit_profile = null;
+$l7_pe_from_post = false;
+$l7_pe_is_new = false;
+$l7_pe_req_id = "";
+if (!empty($_POST["save_profile_edit"]) && $l7_profile_post_retry) {
+	$l7_pe_from_post = true;
+	$l7_pe_is_new = !empty($_POST["edit_profile_is_new"]);
+	$l7_pe_req_id = trim((string)($_POST["edit_profile_id"] ?? ""));
+} elseif (!empty($_POST["delete_custom_profile"]) && $l7_profile_post_retry) {
+	$l7_pe_from_post = true;
+	$l7_pe_is_new = false;
+	$l7_pe_req_id = trim((string)($_POST["edit_profile_id"] ?? ""));
+} elseif (isset($_GET["profile_new"]) && (string)$_GET["profile_new"] !== "" &&
+    (string)$_GET["profile_new"] !== "0") {
+	$l7_pe_is_new = true;
+} elseif (isset($_GET["profile_edit"])) {
+	$l7_pe_req_id = trim((string)$_GET["profile_edit"]);
+}
+if ($l7_pe_req_id !== "" && !$l7_pe_is_new) {
+	$l7_profile_edit_id = $l7_pe_req_id;
+	$l7_profile_edit_profile = layer7_policies_find_profile($l7_pe_req_id);
+}
+$l7_profiles_custom_for_edit = layer7_profiles_custom_load();
+$l7_profile_edit_state = layer7_profile_edit_state($l7_pe_from_post, array(
+	"profile" => $l7_profile_edit_profile,
+	"is_new" => $l7_pe_is_new,
+	"policies" => $policies,
+	"custom_raw" => $l7_profiles_custom_for_edit,
+));
+
 $ndpi_list = layer7_ndpi_list();
 $ndpi_protos = isset($ndpi_list["protocols"]) ? $ndpi_list["protocols"] : array();
 $ndpi_cats = isset($ndpi_list["categories"]) ? $ndpi_list["categories"] : array();
 sort($ndpi_protos);
 sort($ndpi_cats);
 
+$l7_edit_retry = (!empty($input_errors) && ($_POST["save_policy_edit"] ?? false));
+$l7_add_retry = $layer7_policy_add_retry;
+$l7_pf_ifaces = layer7_get_pfsense_interfaces();
+$l7_action_opts = array(
+	"monitor" => l7_t("monitor"),
+	"allow" => l7_t("allow"),
+	"block" => l7_t("block"),
+	"tag" => l7_t("tag"),
+);
+$l7_sched_days = array(
+	"mon" => "Seg",
+	"tue" => "Ter",
+	"wed" => "Qua",
+	"thu" => "Qui",
+	"fri" => "Sex",
+	"sat" => "Sab",
+	"sun" => "Dom",
+);
+
+function layer7_policies_posted_text($key)
+{
+	return array_key_exists($key, $_POST) ? (string)$_POST[$key] : "";
+}
+function layer7_policies_posted_list($key)
+{
+	if (!isset($_POST[$key]) || !is_array($_POST[$key])) {
+		return array();
+	}
+	$out = array();
+	foreach ($_POST[$key] as $v) {
+		$out[] = (string)$v;
+	}
+	return $out;
+}
+function layer7_policies_posted_checked($key)
+{
+	return isset($_POST[$key]) && (string)$_POST[$key] !== "" && (string)$_POST[$key] !== "0";
+}
+function layer7_policies_lines($arr)
+{
+	return (is_array($arr) && count($arr) > 0) ? implode("\n", $arr) : "";
+}
+function layer7_policies_iface_selected($ifc, $selected, $from_post)
+{
+	if (!is_array($selected)) {
+		return false;
+	}
+	if ($from_post) {
+		return in_array($ifc["ifid"], $selected, true);
+	}
+	return in_array($ifc["real"], $selected, true) ||
+		in_array($ifc["ifid"], $selected, true);
+}
+function layer7_policies_ifaces_html($list_id, $input_name, $ifaces, $selected, $from_post, $help)
+{
+	$html = '<div class="l7-bulk-tools">';
+	$html .= '<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks(\'' .
+		htmlspecialchars($list_id, ENT_QUOTES, "UTF-8") . '\', true);">' .
+		htmlspecialchars(l7_t("Selecionar tudo")) . '</button> ';
+	$html .= '<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks(\'' .
+		htmlspecialchars($list_id, ENT_QUOTES, "UTF-8") . '\', false);">' .
+		htmlspecialchars(l7_t("Limpar")) . '</button>';
+	$html .= '</div><div id="' . htmlspecialchars($list_id) . '">';
+	foreach ($ifaces as $ifc) {
+		$chk = layer7_policies_iface_selected($ifc, $selected, $from_post)
+			? ' checked="checked"' : '';
+		$html .= '<label class="checkbox-inline">';
+		$html .= '<input type="checkbox" name="' . htmlspecialchars($input_name) .
+			'" value="' . htmlspecialchars($ifc["ifid"]) . '"' . $chk . ' /> ';
+		$html .= htmlspecialchars($ifc["descr"]) .
+			' <span class="text-muted">(' . htmlspecialchars($ifc["real"]) . ')</span>';
+		$html .= '</label>';
+	}
+	$html .= '</div><p class="help-block">' . htmlspecialchars($help) . '</p>';
+	return $html;
+}
+function layer7_policies_group_boxes_html($list_id, $input_name, $groups, $selected, $show_id)
+{
+	$html = '<div class="l7-multiselect-wrap" id="' . htmlspecialchars($list_id) . '">';
+	foreach ($groups as $grp) {
+		$gid_raw = isset($grp["id"]) ? (string)$grp["id"] : "";
+		$gid = htmlspecialchars($gid_raw);
+		$gname = htmlspecialchars(isset($grp["name"]) ? (string)$grp["name"] : $gid_raw);
+		$gchk = in_array($gid_raw, (array)$selected, true) ? ' checked="checked"' : '';
+		$html .= '<label><input type="checkbox" name="' . htmlspecialchars($input_name) .
+			'" value="' . $gid . '"' . $gchk . ' /> ' . $gname;
+		if ($show_id) {
+			$html .= ' <span class="text-muted">(' . $gid . ')</span>';
+		}
+		$html .= '</label>';
+	}
+	$html .= '</div>';
+	return $html;
+}
+function layer7_policies_ndpi_list_html($list_id, $input_name, $items, $selected, $filter_ph)
+{
+	$filter_id = $list_id . "_filter";
+	$html = '<label class="sr-only" for="' . htmlspecialchars($filter_id) . '">' .
+		htmlspecialchars($filter_ph) . '</label>';
+	$html .= '<input type="text" id="' . htmlspecialchars($filter_id) .
+		'" class="form-control l7-filter" placeholder="' .
+		htmlspecialchars($filter_ph) . '" aria-label="' . htmlspecialchars($filter_ph) .
+		'" onkeyup="l7filter(this,\'' .
+		htmlspecialchars($list_id, ENT_QUOTES, "UTF-8") .
+		'\')" />';
+	$html .= '<div class="l7-bulk-tools">';
+	$html .= '<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks(\'' .
+		htmlspecialchars($list_id, ENT_QUOTES, "UTF-8") . '\', true, true);">' .
+		htmlspecialchars(l7_t("Selecionar visiveis")) . '</button> ';
+	$html .= '<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks(\'' .
+		htmlspecialchars($list_id, ENT_QUOTES, "UTF-8") . '\', false, false);">' .
+		htmlspecialchars(l7_t("Limpar tudo")) . '</button>';
+	$html .= '</div><div class="l7-multiselect-wrap" id="' . htmlspecialchars($list_id) . '">';
+	foreach ($items as $item) {
+		$chk = in_array($item, (array)$selected, true) ? ' checked="checked"' : '';
+		$html .= '<label><input type="checkbox" name="' . htmlspecialchars($input_name) .
+			'" value="' . htmlspecialchars($item) . '"' . $chk . ' /> ' .
+			htmlspecialchars($item) . '</label>';
+	}
+	$html .= '</div>';
+	return $html;
+}
+function layer7_policies_schedule_html($prefix, $days_map, $selected, $start, $end)
+{
+	$html = "";
+	foreach ($days_map as $dk => $dl) {
+		$chk = in_array($dk, (array)$selected, true) ? ' checked="checked"' : '';
+		$html .= '<label class="checkbox-inline">';
+		$html .= '<input type="checkbox" name="' . htmlspecialchars($prefix . "_sched_" . $dk) .
+			'" value="1"' . $chk . ' /> ' . htmlspecialchars($dl);
+		$html .= '</label>';
+	}
+	$start_name = $prefix . "_sched_start";
+	$end_name = $prefix . "_sched_end";
+	$html .= '<div class="l7-schedule-times form-inline">';
+	$html .= '<label class="control-label" for="' . htmlspecialchars($start_name) . '">' .
+		htmlspecialchars(l7_t("De")) . '</label> ';
+	$html .= '<input type="time" class="form-control input-sm" name="' .
+		htmlspecialchars($start_name) . '" id="' . htmlspecialchars($start_name) .
+		'" value="' . htmlspecialchars($start) . '" /> ';
+	$html .= '<label class="control-label" for="' . htmlspecialchars($end_name) . '">' .
+		htmlspecialchars(l7_t("ate")) . '</label> ';
+	$html .= '<input type="time" class="form-control input-sm" name="' .
+		htmlspecialchars($end_name) . '" id="' . htmlspecialchars($end_name) .
+		'" value="' . htmlspecialchars($end) . '" />';
+	$html .= '</div>';
+	$html .= '<p class="help-block">' .
+		htmlspecialchars(l7_t("Vazio = sempre activa. Preencha dias + horas para restringir.")) .
+		'</p>';
+	return $html;
+}
+function layer7_policies_find_profile($profile_id)
+{
+	$profile_id = trim((string)$profile_id);
+	if ($profile_id === "") {
+		return null;
+	}
+	foreach (layer7_load_profiles(true) as $p) {
+		if (isset($p["id"]) && (string)$p["id"] === $profile_id) {
+			return $p;
+		}
+	}
+	return null;
+}
+function layer7_profile_options_state($from_post, $defaults)
+{
+	if ($from_post) {
+		$act = trim((string)($_POST["profile_action"] ?? "block"));
+		if (!in_array($act, array("monitor", "allow", "block"), true)) {
+			$act = "block";
+		}
+		return array(
+			"profile_id" => trim((string)($_POST["profile_id"] ?? "")),
+			"action" => $act,
+			"ifaces" => layer7_policies_posted_list("profile_ifaces"),
+			"groups" => layer7_policies_posted_list("profile_groups"),
+			"vip_groups" => layer7_policies_posted_list("profile_vip_groups"),
+			"vip_hosts" => layer7_policies_posted_text("profile_vip_hosts"),
+			"vip_cidrs" => layer7_policies_posted_text("profile_vip_cidrs"),
+			"src_cidrs" => layer7_policies_posted_text("profile_src_cidrs"),
+			"exc_groups" => layer7_policies_posted_list("profile_src_exclude_groups"),
+			"exc_cidrs" => layer7_policies_posted_text("profile_src_exclude_cidrs"),
+		);
+	}
+	return array(
+		"profile_id" => (string)($defaults["profile_id"] ?? ""),
+		"action" => "block",
+		"ifaces" => array(),
+		"groups" => array(),
+		"vip_groups" => (array)($defaults["vip_groups"] ?? array()),
+		"vip_hosts" => (string)($defaults["vip_hosts"] ?? ""),
+		"vip_cidrs" => (string)($defaults["vip_cidrs"] ?? ""),
+		"src_cidrs" => "",
+		"exc_groups" => array(),
+		"exc_cidrs" => "",
+	);
+}
+function layer7_profile_options_ifaces_html($ifaces, $selected)
+{
+	$html = '<p class="text-muted small"><strong>' . htmlspecialchars(l7_t("Interfaces")) . '</strong></p>';
+	foreach ($ifaces as $ifc) {
+		$chk = in_array($ifc["ifid"], (array)$selected, true) ? ' checked="checked"' : '';
+		$html .= '<label class="checkbox-inline">';
+		$html .= '<input type="checkbox" name="profile_ifaces[]" value="' .
+			htmlspecialchars($ifc["ifid"]) . '"' . $chk . ' /> ';
+		$html .= htmlspecialchars($ifc["descr"]);
+		$html .= '</label>';
+	}
+	$html .= '<p class="help-block">' . htmlspecialchars(l7_t("Nenhuma = todas.")) . '</p>';
+	return $html;
+}
+function layer7_profile_options_groups_html($groups, $input_name, $selected, $heading)
+{
+	if (empty($groups)) {
+		return "";
+	}
+	$html = '<p class="text-muted small"><strong>' .
+		htmlspecialchars($heading) . '</strong></p>';
+	foreach ($groups as $grp) {
+		$gid_raw = isset($grp["id"]) ? (string)$grp["id"] : "";
+		$gid = htmlspecialchars($gid_raw);
+		$gname = htmlspecialchars(isset($grp["name"]) ? (string)$grp["name"] : $gid_raw);
+		$gchk = in_array($gid_raw, (array)$selected, true) ? ' checked="checked"' : '';
+		$html .= '<label class="checkbox-inline">';
+		$html .= '<input type="checkbox" name="' . htmlspecialchars($input_name) .
+			'" value="' . $gid . '"' . $gchk . ' /> ' . $gname;
+		$html .= '</label>';
+	}
+	return $html;
+}
+function layer7_render_profile_options_form($state, $ifaces, $groups, $ctx)
+{
+	$form = new Form(false);
+	$form->setAction("layer7_policies.php#l7-policies");
+
+	$sec_main = new Form_Section("NOTITLE", "", 0);
+	$pid_in = new Form_Input("profile_id", "", "hidden", $state["profile_id"]);
+	if ($ctx === "modal") {
+		$pid_in->setAttribute("id", "l7ProfileId");
+	}
+	$sec_main->addInput($pid_in);
+	$sec_main->addInput(new Form_Input("add_profile_policy", "", "hidden", "1"));
+	$action_opts = array(
+		"block" => l7_t("block"),
+		"monitor" => l7_t("monitor"),
+		"allow" => l7_t("allow"),
+	);
+	$sec_main->addInput(new Form_Select(
+		"profile_action",
+		l7_t("Accao"),
+		$state["action"],
+		$action_opts
+	));
+	$apply_html = layer7_profile_options_ifaces_html($ifaces, $state["ifaces"]);
+	if (empty($groups)) {
+		$apply_html .= '<p class="text-muted small"><strong>' .
+			htmlspecialchars(l7_t("Grupos")) . '</strong></p>';
+		$apply_html .= '<p class="help-block"><a href="layer7_groups.php" class="btn btn-xs btn-default">' .
+			htmlspecialchars(l7_t("Criar grupo (ex.: Gestores)")) . '</a></p>';
+	} else {
+		$apply_html .= layer7_profile_options_groups_html(
+			$groups,
+			"profile_groups[]",
+			$state["groups"],
+			l7_t("Grupos")
+		);
+		$apply_html .= '<p class="help-block">' .
+			htmlspecialchars(l7_t("Preferivel a CIDRs manuais.")) . '</p>';
+	}
+	$sec_main->addInput(new Form_StaticText(l7_t("Aplicar a"), $apply_html));
+	$form->add($sec_main);
+
+	$sec_vip = new Form_Section(l7_t("Isentos (nunca bloqueados)"), "l7ProfileOptionsVip", 0);
+	$sec_vip->addClass("l7-modal-section-vip");
+	$vip_intro = '<p class="help-block">' .
+		htmlspecialchars(l7_t("Isencao global: estes IPs/dispositivos nunca sao bloqueados por nenhum perfil Layer7. Gere a excepcao partilhada vip-isentos.")) .
+		'</p>';
+	$vip_intro .= '<p class="help-block"><a href="layer7_exceptions.php#l7-vip-list" class="btn btn-xs btn-default">' .
+		'<i class="fa fa-list"></i> ' . htmlspecialchars(l7_t("Gerir Lista VIP")) . '</a></p>';
+	$vip_intro .= '<p class="help-block text-warning small">' .
+		htmlspecialchars(l7_t("Isencao total de bloqueios Layer7; sinkhole DNS so coberto apos Bloco D.")) .
+		'</p>';
+	if (!empty($groups)) {
+		$vip_intro .= layer7_profile_options_groups_html(
+			$groups,
+			"profile_vip_groups[]",
+			$state["vip_groups"],
+			l7_t("Grupos isentos")
+		);
+	}
+	$sec_vip->addInput(new Form_StaticText("", $vip_intro));
+	$vip_hosts = new Form_Textarea("profile_vip_hosts", l7_t("IPs isentos"), $state["vip_hosts"]);
+	$vip_hosts->setRows(2);
+	$vip_hosts->setAttribute("placeholder", "192.168.1.50");
+	$sec_vip->addInput($vip_hosts);
+	$vip_cidrs = new Form_Textarea("profile_vip_cidrs", l7_t("CIDRs isentos"), $state["vip_cidrs"]);
+	$vip_cidrs->setRows(2);
+	$vip_cidrs->setAttribute("placeholder", "192.168.1.0/24");
+	$vip_cidrs->setHelp(l7_t("Desligar um perfil nao remove a excepcao VIP — continua editavel em Excepcoes."));
+	$sec_vip->addInput($vip_cidrs);
+	$form->add($sec_vip);
+
+	$sec_adv = new Form_Section(l7_t("Avancado"), "l7ProfileModalAdvanced", COLLAPSIBLE);
+	$src_cidrs = new Form_Textarea("profile_src_cidrs", l7_t("CIDRs de origem"), $state["src_cidrs"]);
+	$src_cidrs->setRows(2);
+	$src_cidrs->setAttribute("placeholder", "192.168.10.0/24");
+	$src_cidrs->setHelp(l7_t("Vazio = qualquer sub-rede. Use apenas se grupos nao forem suficientes."));
+	$sec_adv->addInput($src_cidrs);
+	$exc_html = '<p class="help-block">' .
+		htmlspecialchars(l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis.")) .
+		'</p>';
+	if (!empty($groups)) {
+		$exc_html .= layer7_profile_options_groups_html(
+			$groups,
+			"profile_src_exclude_groups[]",
+			$state["exc_groups"],
+			l7_t("Grupos excluidos")
+		);
+	}
+	$sec_adv->addInput(new Form_StaticText(l7_t("Excluir origens (so este perfil)"), $exc_html));
+	$exc_cidrs = new Form_Textarea("profile_src_exclude_cidrs", l7_t("CIDRs excluidos"), $state["exc_cidrs"]);
+	$exc_cidrs->setRows(2);
+	$exc_cidrs->setAttribute("placeholder", "192.168.1.50");
+	$sec_adv->addInput($exc_cidrs);
+	$form->add($sec_adv);
+
+	$sec_actions = new Form_Section("NOTITLE", "", 0);
+	$ver_html = '<a href="layer7_test.php" class="btn btn-link btn-sm">' .
+		'<i class="fa fa-search"></i> ' . htmlspecialchars(l7_t("Verificador de politica efectiva")) . '</a>';
+	$sec_actions->addInput(new Form_StaticText("", $ver_html));
+	$btns = '<button type="submit" class="btn btn-success">' .
+		htmlspecialchars(l7_t("Criar politica")) . '</button> ';
+	if ($ctx === "modal") {
+		$btns .= '<button type="button" class="btn btn-default" onclick="l7hideProfileModal();">' .
+			htmlspecialchars(l7_t("Cancelar")) . '</button>';
+	} else {
+		$btns .= '<a href="layer7_policies.php?library=1#l7-profiles" class="btn btn-default">' .
+			htmlspecialchars(l7_t("Cancelar")) . '</a>';
+	}
+	$sec_actions->addInput(new Form_StaticText("", $btns));
+	$form->add($sec_actions);
+
+	ob_start();
+	print($form);
+	return ob_get_clean();
+}
+function layer7_profile_edit_connected($profile_id, $policies)
+{
+	if ($profile_id === "") {
+		return false;
+	}
+	$pid = "profile-" . $profile_id;
+	foreach ($policies as $existing) {
+		if (isset($existing["id"]) && (string)$existing["id"] === $pid) {
+			return true;
+		}
+	}
+	return false;
+}
+function layer7_profile_edit_hidden_flag($profile_id, $prof, $custom_raw)
+{
+	if (layer7_profile_custom_id_valid($profile_id)) {
+		return !empty($prof["hidden"]);
+	}
+	if (isset($custom_raw["overrides"][$profile_id]["hidden"])) {
+		return !empty($custom_raw["overrides"][$profile_id]["hidden"]);
+	}
+	return false;
+}
+function layer7_profile_edit_state($from_post, $defaults)
+{
+	$policies = (array)($defaults["policies"] ?? array());
+	$custom_raw = (array)($defaults["custom_raw"] ?? array());
+	if ($from_post) {
+		$profile_id = trim((string)($_POST["edit_profile_id"] ?? ""));
+		$is_new = !empty($_POST["edit_profile_is_new"]);
+		$is_custom = $is_new || layer7_profile_custom_id_valid($profile_id);
+		return array(
+			"profile_id" => $profile_id,
+			"is_new" => $is_new,
+			"name" => layer7_policies_posted_text("edit_profile_name"),
+			"description" => layer7_policies_posted_text("edit_profile_description"),
+			"icon" => layer7_policies_posted_text("edit_profile_icon"),
+			"apps" => layer7_policies_posted_list("edit_profile_apps"),
+			"cats" => layer7_policies_posted_list("edit_profile_cats"),
+			"hosts" => layer7_policies_posted_text("edit_profile_hosts"),
+			"hidden" => layer7_policies_posted_checked("edit_profile_hidden"),
+			"is_custom" => $is_custom,
+			"connected" => layer7_profile_edit_connected($profile_id, $policies),
+			"show_delete" => !$is_new && $is_custom,
+		);
+	}
+	if (!empty($defaults["is_new"])) {
+		return array(
+			"profile_id" => "",
+			"is_new" => true,
+			"name" => "",
+			"description" => "",
+			"icon" => "fa-cube",
+			"apps" => array(),
+			"cats" => array(),
+			"hosts" => "",
+			"hidden" => false,
+			"is_custom" => true,
+			"connected" => false,
+			"show_delete" => false,
+		);
+	}
+	$prof = $defaults["profile"] ?? null;
+	if (!is_array($prof)) {
+		return null;
+	}
+	$profile_id = (string)($prof["id"] ?? "");
+	$is_custom = layer7_profile_custom_id_valid($profile_id);
+	return array(
+		"profile_id" => $profile_id,
+		"is_new" => false,
+		"name" => (string)($prof["name"] ?? ""),
+		"description" => (string)($prof["description"] ?? ""),
+		"icon" => (string)($prof["icon"] ?? "fa-cube"),
+		"apps" => (isset($prof["ndpi_apps"]) && is_array($prof["ndpi_apps"])) ? $prof["ndpi_apps"] : array(),
+		"cats" => (isset($prof["ndpi_categories"]) && is_array($prof["ndpi_categories"])) ? $prof["ndpi_categories"] : array(),
+		"hosts" => (isset($prof["hosts"]) && is_array($prof["hosts"])) ? implode("\n", $prof["hosts"]) : "",
+		"hidden" => layer7_profile_edit_hidden_flag($profile_id, $prof, $custom_raw),
+		"is_custom" => $is_custom,
+		"connected" => layer7_profile_edit_connected($profile_id, $policies),
+		"show_delete" => $is_custom,
+	);
+}
+function layer7_profile_edit_confirm_map($profile_id, $policies, $prof, $custom_raw)
+{
+	$profile_id = trim((string)$profile_id);
+	if ($profile_id === "" || !is_array($prof)) {
+		return array();
+	}
+	$is_custom = layer7_profile_custom_id_valid($profile_id);
+	return array(
+		$profile_id => array(
+			"id" => $profile_id,
+			"name" => (string)($prof["name"] ?? ""),
+			"description" => (string)($prof["description"] ?? ""),
+			"icon" => (string)($prof["icon"] ?? "fa-cube"),
+			"apps" => (isset($prof["ndpi_apps"]) && is_array($prof["ndpi_apps"])) ? $prof["ndpi_apps"] : array(),
+			"cats" => (isset($prof["ndpi_categories"]) && is_array($prof["ndpi_categories"])) ? $prof["ndpi_categories"] : array(),
+			"hosts" => (isset($prof["hosts"]) && is_array($prof["hosts"])) ? implode("\n", $prof["hosts"]) : "",
+			"is_custom" => $is_custom,
+			"has_override" => layer7_profile_has_override($profile_id, $custom_raw),
+			"hidden" => layer7_profile_edit_hidden_flag($profile_id, $prof, $custom_raw),
+			"connected" => layer7_profile_edit_connected($profile_id, $policies),
+		),
+	);
+}
+function layer7_profile_edit_filter_html($input_id, $list_id, $label, $placeholder)
+{
+	$html = '<label for="' . htmlspecialchars($input_id) . '">' .
+		htmlspecialchars($label) . '</label>';
+	$html .= '<div class="input-group l7-edit-filter-group">';
+	$html .= '<input type="text" id="' . htmlspecialchars($input_id) .
+		'" class="form-control l7-filter" placeholder="' . htmlspecialchars($placeholder) .
+		'" onkeyup="l7filter(this,' . htmlspecialchars(json_encode($list_id), ENT_QUOTES) . ')" />';
+	$html .= '<span class="input-group-btn"><button type="button" class="btn btn-default" onclick="l7clearEditFilter(' .
+		htmlspecialchars(json_encode($input_id), ENT_QUOTES) . ',' .
+		htmlspecialchars(json_encode($list_id), ENT_QUOTES) . ');">' .
+		htmlspecialchars(l7_t("Limpar")) . '</button></span>';
+	$html .= '</div>';
+	return $html;
+}
+function layer7_profile_edit_set_dom_hidden($element, $hidden)
+{
+	if (!$element) {
+		return;
+	}
+	if ($hidden) {
+		$element->setAttribute("hidden", "hidden");
+		$element->addClass("hidden");
+	} else {
+		$element->setAttribute("hidden", null);
+		$element->removeClass("hidden");
+	}
+}
+
+function layer7_profile_edit_checkbox_html($input_name, $catalog_items, $selected, $list_id)
+{
+	$sel = array();
+	foreach ((array)$selected as $v) {
+		$sel[(string)$v] = true;
+	}
+	$html = '<div class="l7-multiselect-wrap" id="' . htmlspecialchars($list_id) . '">';
+	foreach ($catalog_items as $item) {
+		$val = (string)$item;
+		$chk = isset($sel[$val]) ? ' checked="checked"' : '';
+		$html .= '<label><input type="checkbox" name="' . htmlspecialchars($input_name) .
+			'" value="' . htmlspecialchars($val) . '"' . $chk . ' /> ' .
+			htmlspecialchars($val) . '</label>';
+	}
+	$html .= '</div>';
+	return $html;
+}
+function layer7_render_profile_edit_form($state, $catalog, $ctx)
+{
+	$show_custom = !empty($state["is_new"]) || !empty($state["is_custom"]);
+	$show_factory = empty($state["is_new"]) && empty($state["is_custom"]);
+	$show_delete = ($ctx === "page" && !empty($state["show_delete"]));
+	$icon_val = array_key_exists("icon", $state) ? (string)$state["icon"] : "fa-cube";
+
+	$form = new Form(false);
+	$form->setAction("layer7_policies.php#l7-policies");
+	$form->setAttribute("id", "l7ProfileEditForm");
+	$form->setAttribute("onsubmit", "return l7confirmProfileEditSave(event);");
+
+	$sec_hidden = new Form_Section("NOTITLE", "", 0);
+	$pid_in = new Form_Input(
+		"edit_profile_id",
+		"",
+		"hidden",
+		(string)($state["profile_id"] ?? "")
+	);
+	$pid_in->setAttribute("id", "l7EditProfileId");
+	$sec_hidden->addInput($pid_in);
+	$is_new_in = new Form_Input(
+		"edit_profile_is_new",
+		"",
+		"hidden",
+		!empty($state["is_new"]) ? "1" : "0"
+	);
+	$is_new_in->setAttribute("id", "l7EditProfileIsNew");
+	$sec_hidden->addInput($is_new_in);
+	$form->add($sec_hidden);
+
+	$sec_custom = new Form_Section("NOTITLE", "", 0);
+	$sec_custom->addClass("l7-edit-custom-only");
+	if (!$show_custom) {
+		layer7_profile_edit_set_dom_hidden($sec_custom, true);
+	}
+	$name_in = new Form_Input(
+		"edit_profile_name",
+		l7_t("Nome"),
+		"text",
+		(string)($state["name"] ?? "")
+	);
+	$name_in->setAttribute("id", "l7EditProfileName");
+	$name_in->setAttribute("maxlength", "120");
+	$sec_custom->addInput($name_in);
+	$desc_in = new Form_Input(
+		"edit_profile_description",
+		l7_t("Descricao"),
+		"text",
+		(string)($state["description"] ?? "")
+	);
+	$desc_in->setAttribute("id", "l7EditProfileDesc");
+	$desc_in->setAttribute("maxlength", "400");
+	$sec_custom->addInput($desc_in);
+	$icon_in = new Form_Input(
+		"edit_profile_icon",
+		l7_t("Icone FA 4.7"),
+		"text",
+		$icon_val
+	);
+	$icon_in->setAttribute("id", "l7EditProfileIcon");
+	$icon_in->setAttribute("placeholder", "fa-cube");
+	$icon_in->setAttribute("maxlength", "45");
+	$icon_in->setHelp(l7_t("Ex.: fa-youtube, fa-facebook (FontAwesome 4.7)."));
+	$sec_custom->addInput($icon_in);
+	$form->add($sec_custom);
+
+	$sec_factory = new Form_Section("NOTITLE", "", 0);
+	$sec_factory->addClass("l7-edit-factory-note");
+	if (!$show_factory) {
+		layer7_profile_edit_set_dom_hidden($sec_factory, true);
+	}
+	$sec_factory->addInput(new Form_StaticText(
+		"",
+		'<p class="help-block">' .
+		htmlspecialchars(l7_t("Perfil de fabrica: edite apps e hosts (overlay). O catalogo de fabrica permanece intacto nos upgrades.")) .
+		'</p>'
+	));
+	$form->add($sec_factory);
+
+	$sec_apps = new Form_Section("NOTITLE", "", 0);
+	$apps_html = layer7_profile_edit_filter_html(
+		"l7EditAppsFilter",
+		"l7EditAppsList",
+		l7_t("Pesquisar apps"),
+		l7_t("Pesquisar apps...")
+	);
+	$apps_html .= layer7_profile_edit_checkbox_html(
+		"edit_profile_apps[]",
+		$catalog["apps"] ?? array(),
+		$state["apps"] ?? array(),
+		"l7EditAppsList"
+	);
+	$sec_apps->addInput(new Form_StaticText(
+		l7_t("Apps nDPI"),
+		$apps_html .
+		'<p class="help-block">' .
+		htmlspecialchars(l7_t("Selecao do catalogo de fabrica (max. 64).")) .
+		'</p>'
+	));
+	$form->add($sec_apps);
+
+	$sec_cats = new Form_Section("NOTITLE", "", 0);
+	$sec_cats->addClass("l7-edit-custom-only");
+	if (!$show_custom) {
+		layer7_profile_edit_set_dom_hidden($sec_cats, true);
+	}
+	$cats_html = layer7_profile_edit_filter_html(
+		"l7EditCatsFilter",
+		"l7EditCatsList",
+		l7_t("Pesquisar categorias"),
+		l7_t("Pesquisar categorias...")
+	);
+	$cats_html .= layer7_profile_edit_checkbox_html(
+		"edit_profile_cats[]",
+		$catalog["categories"] ?? array(),
+		$state["cats"] ?? array(),
+		"l7EditCatsList"
+	);
+	$sec_cats->addInput(new Form_StaticText(
+		l7_t("Categorias nDPI"),
+		$cats_html .
+		'<p class="help-block">' . htmlspecialchars(l7_t("Max. 8 categorias.")) . '</p>'
+	));
+	$form->add($sec_cats);
+
+	$sec_hosts = new Form_Section("NOTITLE", "", 0);
+	$hosts_in = new Form_Textarea(
+		"edit_profile_hosts",
+		l7_t("Hosts / dominios"),
+		(string)($state["hosts"] ?? "")
+	);
+	$hosts_in->setAttribute("id", "l7EditProfileHosts");
+	$hosts_in->setRows(4);
+	$hosts_in->setAttribute("placeholder", "example.com");
+	$hosts_in->setHelp(l7_t("Um dominio por linha (max. 64). Texto livre validado."));
+	$sec_hosts->addInput($hosts_in);
+	$form->add($sec_hosts);
+
+	$sec_hide = new Form_Section("NOTITLE", "", 0);
+	$hidden_cb = new Form_Checkbox(
+		"edit_profile_hidden",
+		l7_t("Ocultar perfil"),
+		l7_t("Ocultar da biblioteca (politica ligada permanece activa)"),
+		!empty($state["hidden"]),
+		"1"
+	);
+	$hidden_cb->setAttribute("id", "l7EditProfileHidden");
+	$sec_hide->addInput($hidden_cb);
+	$form->add($sec_hide);
+
+	$sec_actions = new Form_Section("NOTITLE", "", 0);
+	$btns = '<button type="submit" name="save_profile_edit" value="1" class="btn btn-success">' .
+		htmlspecialchars(l7_t("Guardar")) . '</button> ';
+	if ($ctx === "modal") {
+		$btns .= '<button type="button" class="btn btn-default" onclick="l7hideProfileEditModal();">' .
+			htmlspecialchars(l7_t("Cancelar")) . '</button>';
+	} else {
+		$btns .= '<a href="layer7_policies.php?library=1#l7-profiles" class="btn btn-default">' .
+			htmlspecialchars(l7_t("Cancelar")) . '</a>';
+	}
+	$delete_btn_class = "btn btn-danger" . ($show_delete ? "" : " hidden");
+	$delete_btn_hidden = $show_delete ? "" : ' hidden';
+	$btns .= ' <button type="submit" name="delete_custom_profile" value="1" id="l7EditProfileDeleteBtn" class="' .
+		$delete_btn_class . '"' . $delete_btn_hidden .
+		' onclick="return confirm(' .
+		htmlspecialchars(json_encode(l7_t("Apagar este perfil personalizado?")), ENT_QUOTES) . ');">' .
+		htmlspecialchars(l7_t("Apagar")) . '</button>';
+	$sec_actions->addInput(new Form_StaticText("", $btns));
+	$form->add($sec_actions);
+
+	ob_start();
+	print($form);
+	return ob_get_clean();
+}
+
+$l7_ef = array(
+	"id" => "",
+	"name" => "",
+	"priority" => "0",
+	"action" => "monitor",
+	"enabled" => false,
+	"ifaces" => array(),
+	"ifaces_from_post" => false,
+	"src_hosts" => "",
+	"src_cidrs" => "",
+	"ad_users" => "",
+	"ad_groups" => "",
+	"groups" => array(),
+	"exc_groups" => array(),
+	"exc_cidrs" => "",
+	"hosts" => "",
+	"apps" => array(),
+	"apps_csv" => "",
+	"cats" => array(),
+	"cats_csv" => "",
+	"tag_table" => "layer7_tagged",
+	"sched_days" => array(),
+	"sched_start" => "",
+	"sched_end" => "",
+	"scope_global" => false,
+	"quarantine" => false,
+);
+if ($edit_policy !== null) {
+	$l7_ef["id"] = isset($edit_policy["id"]) ? (string)$edit_policy["id"] : "";
+	$l7_ef["name"] = isset($edit_policy["name"]) ? (string)$edit_policy["name"] : "";
+	$l7_ef["priority"] = isset($edit_policy["priority"]) ? (string)(int)$edit_policy["priority"] : "0";
+	$l7_ef["action"] = isset($edit_policy["action"]) ? (string)$edit_policy["action"] : "monitor";
+	if (!isset($l7_action_opts[$l7_ef["action"]])) {
+		$l7_ef["action"] = "monitor";
+	}
+	$l7_ef["enabled"] = !empty($edit_policy["enabled"]);
+	$l7_ef["ifaces"] = (isset($edit_policy["interfaces"]) && is_array($edit_policy["interfaces"]))
+		? $edit_policy["interfaces"] : array();
+	$l7_ef["src_hosts"] = layer7_policies_lines($edit_policy["match"]["src_hosts"] ?? null);
+	$l7_ef["src_cidrs"] = layer7_policies_lines($edit_policy["match"]["src_cidrs"] ?? null);
+	$l7_ef["ad_users"] = layer7_policies_lines($edit_policy["match"]["ad_users"] ?? null);
+	$l7_ef["ad_groups"] = layer7_policies_lines($edit_policy["match"]["ad_groups"] ?? null);
+	$l7_ef["groups"] = (isset($edit_policy["match"]["groups"]) && is_array($edit_policy["match"]["groups"]))
+		? $edit_policy["match"]["groups"] : array();
+	$l7_ef["exc_groups"] = (isset($edit_policy["match"]["src_exclude_groups"]) &&
+	    is_array($edit_policy["match"]["src_exclude_groups"]))
+		? $edit_policy["match"]["src_exclude_groups"] : array();
+	$l7_ef["exc_cidrs"] = layer7_policies_lines($edit_policy["match"]["src_exclude_cidrs"] ?? null);
+	$l7_ef["hosts"] = layer7_policies_lines($edit_policy["match"]["hosts"] ?? null);
+	$l7_ef["apps"] = (isset($edit_policy["match"]["ndpi_app"]) && is_array($edit_policy["match"]["ndpi_app"]))
+		? $edit_policy["match"]["ndpi_app"] : array();
+	$l7_ef["apps_csv"] = implode(", ", $l7_ef["apps"]);
+	$l7_ef["cats"] = (isset($edit_policy["match"]["ndpi_category"]) && is_array($edit_policy["match"]["ndpi_category"]))
+		? $edit_policy["match"]["ndpi_category"] : array();
+	$l7_ef["cats_csv"] = implode(", ", $l7_ef["cats"]);
+	$l7_ef["tag_table"] = isset($edit_policy["tag_table"]) ? (string)$edit_policy["tag_table"] : "";
+	if ($l7_ef["tag_table"] === "") {
+		$l7_ef["tag_table"] = "layer7_tagged";
+	}
+	if (isset($edit_policy["schedule"]) && is_array($edit_policy["schedule"])) {
+		$l7_ef["sched_days"] = isset($edit_policy["schedule"]["days"]) && is_array($edit_policy["schedule"]["days"])
+			? $edit_policy["schedule"]["days"] : array();
+		$l7_ef["sched_start"] = isset($edit_policy["schedule"]["start"]) ? (string)$edit_policy["schedule"]["start"] : "";
+		$l7_ef["sched_end"] = isset($edit_policy["schedule"]["end"]) ? (string)$edit_policy["schedule"]["end"] : "";
+	}
+	$l7_ef["scope_global"] = !empty($edit_policy["scope_global"]);
+	$l7_ef["quarantine"] = !empty($edit_policy["quarantine_origin"]);
+}
+if ($l7_edit_retry) {
+	$l7_ef["name"] = layer7_policies_posted_text("edit_name");
+	$l7_ef["priority"] = layer7_policies_posted_text("edit_priority");
+	$l7_ef["action"] = layer7_policies_posted_text("edit_action");
+	$l7_ef["enabled"] = layer7_policies_posted_checked("edit_enabled");
+	$l7_ef["ifaces"] = layer7_policies_posted_list("edit_ifaces");
+	$l7_ef["ifaces_from_post"] = true;
+	$l7_ef["src_hosts"] = layer7_policies_posted_text("edit_src_hosts");
+	$l7_ef["src_cidrs"] = layer7_policies_posted_text("edit_src_cidrs");
+	if ($l7_has_identity) {
+		$l7_ef["ad_users"] = layer7_policies_posted_text("edit_ad_users");
+		$l7_ef["ad_groups"] = layer7_policies_posted_text("edit_ad_groups");
+	}
+	$l7_ef["groups"] = layer7_policies_posted_list("edit_groups");
+	$l7_ef["exc_groups"] = layer7_policies_posted_list("edit_src_exclude_groups");
+	$l7_ef["exc_cidrs"] = layer7_policies_posted_text("edit_src_exclude_cidrs");
+	$l7_ef["hosts"] = layer7_policies_posted_text("edit_match_hosts");
+	$l7_ef["apps"] = layer7_policies_posted_list("edit_ndpi_apps");
+	$l7_ef["apps_csv"] = layer7_policies_posted_text("edit_ndpi_apps_csv");
+	$l7_ef["cats"] = layer7_policies_posted_list("edit_ndpi_category");
+	$l7_ef["cats_csv"] = layer7_policies_posted_text("edit_ndpi_category_csv");
+	$l7_ef["tag_table"] = layer7_policies_posted_text("edit_tag_table");
+	$l7_ef["sched_days"] = array();
+	foreach (array_keys($l7_sched_days) as $dk) {
+		if (layer7_policies_posted_checked("edit_sched_" . $dk)) {
+			$l7_ef["sched_days"][] = $dk;
+		}
+	}
+	$l7_ef["sched_start"] = layer7_policies_posted_text("edit_sched_start");
+	$l7_ef["sched_end"] = layer7_policies_posted_text("edit_sched_end");
+	$l7_ef["scope_global"] = layer7_policies_posted_checked("edit_scope_global");
+	$l7_ef["quarantine"] = layer7_policies_posted_checked("edit_quarantine_origin");
+}
+
+$l7_nf = array(
+	"id" => "",
+	"name" => "",
+	"priority" => "50",
+	"action" => "monitor",
+	"enabled" => true,
+	"ifaces" => array(),
+	"src_hosts" => "",
+	"src_cidrs" => "",
+	"ad_users" => "",
+	"ad_groups" => "",
+	"groups" => array(),
+	"exc_groups" => array(),
+	"exc_cidrs" => "",
+	"hosts" => "",
+	"apps" => array(),
+	"apps_csv" => "",
+	"cats" => array(),
+	"cats_csv" => "",
+	"tag_table" => "",
+	"sched_days" => array(),
+	"sched_start" => "",
+	"sched_end" => "",
+	"scope_global" => false,
+	"quarantine" => false,
+);
+if ($l7_add_retry) {
+	$l7_nf["id"] = layer7_policies_posted_text("new_id");
+	$l7_nf["name"] = layer7_policies_posted_text("new_name");
+	$l7_nf["priority"] = layer7_policies_posted_text("new_priority");
+	$l7_nf["action"] = layer7_policies_posted_text("new_action");
+	$l7_nf["enabled"] = layer7_policies_posted_checked("new_enabled");
+	$l7_nf["ifaces"] = layer7_policies_posted_list("new_ifaces");
+	$l7_nf["src_hosts"] = layer7_policies_posted_text("new_src_hosts");
+	$l7_nf["src_cidrs"] = layer7_policies_posted_text("new_src_cidrs");
+	if ($l7_has_identity) {
+		$l7_nf["ad_users"] = layer7_policies_posted_text("new_ad_users");
+		$l7_nf["ad_groups"] = layer7_policies_posted_text("new_ad_groups");
+	}
+	$l7_nf["groups"] = layer7_policies_posted_list("new_groups");
+	$l7_nf["exc_groups"] = layer7_policies_posted_list("new_src_exclude_groups");
+	$l7_nf["exc_cidrs"] = layer7_policies_posted_text("new_src_exclude_cidrs");
+	$l7_nf["hosts"] = layer7_policies_posted_text("new_match_hosts");
+	$l7_nf["apps"] = layer7_policies_posted_list("new_ndpi_apps");
+	$l7_nf["apps_csv"] = layer7_policies_posted_text("new_ndpi_apps_csv");
+	$l7_nf["cats"] = layer7_policies_posted_list("new_ndpi_category");
+	$l7_nf["cats_csv"] = layer7_policies_posted_text("new_ndpi_category_csv");
+	$l7_nf["tag_table"] = layer7_policies_posted_text("new_tag_table");
+	$l7_nf["sched_days"] = array();
+	foreach (array_keys($l7_sched_days) as $dk) {
+		if (layer7_policies_posted_checked("new_sched_" . $dk)) {
+			$l7_nf["sched_days"][] = $dk;
+		}
+	}
+	$l7_nf["sched_start"] = layer7_policies_posted_text("new_sched_start");
+	$l7_nf["sched_end"] = layer7_policies_posted_text("new_sched_end");
+	$l7_nf["scope_global"] = layer7_policies_posted_checked("new_scope_global");
+	$l7_nf["quarantine"] = layer7_policies_posted_checked("new_quarantine_origin");
+}
+
+$l7_del_sel = "0";
+if (!empty($input_errors) && ($_POST["delete_policy"] ?? false) && isset($_POST["delete_policy_index"])) {
+	$posted_del = (string)(int)$_POST["delete_policy_index"];
+	if (isset($policies[(int)$posted_del])) {
+		$l7_del_sel = $posted_del;
+	}
+}
+
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Policies"));
+if ($l7_policy_mode === "edit") {
+	$pgtitle[] = l7_t("Editar");
+} elseif ($l7_policy_mode === "new") {
+	$pgtitle[] = l7_t("Adicionar politica");
+} elseif ($l7_policy_mode === "view") {
+	$pgtitle[] = l7_t("Detalhe");
+}
 include("head.inc");
-layer7_render_styles();
 
 function layer7_policy_match_summary($policy) {
 	$matches = array();
@@ -990,65 +1942,169 @@ function layer7_policy_match_summary($policy) {
 	return count($matches) > 0 ? $matches : array(l7_t("Sem filtros especificos."));
 }
 ?>
-<div class="panel panel-default layer7-page">
-	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - politicas"); ?></h2>
-	</div>
-	<div class="panel-body">
-		<?php layer7_render_tabs("policies"); ?>
-		<div class="layer7-content">
-			<?php layer7_render_messages(); ?>
-			<?php layer7_render_policies_subnav("policies"); ?>
+<?php layer7_render_tabs("policies"); ?>
+<?php layer7_render_messages(); ?>
+<?php layer7_render_policies_subnav("policies"); ?>
+<div class="alert alert-info">
+	<?= htmlspecialchars(l7_t("Gerir politicas de classificacao e bloqueio.")); ?>
+</div>
+<?php
+$_nav_data = layer7_load_or_default();
+$_nav_groups = isset($_nav_data["layer7"]["groups"]) ? count($_nav_data["layer7"]["groups"]) : 0;
+$_nav_exceptions = isset($_nav_data["layer7"]["exceptions"]) ? count($_nav_data["layer7"]["exceptions"]) : 0;
+?>
+<p>
+	<a href="layer7_groups.php" class="btn btn-default btn-sm"><i class="fa fa-users"></i> <?= l7_t("Grupos"); ?> (<?= $_nav_groups; ?>)</a>
+	<a href="layer7_exceptions.php" class="btn btn-default btn-sm"><i class="fa fa-shield"></i> <?= l7_t("Excecoes"); ?> (<?= $_nav_exceptions; ?>)</a>
+	<a href="layer7_categories.php" class="btn btn-default btn-sm"><i class="fa fa-th-list"></i> <?= l7_t("Categorias nDPI"); ?></a>
+	<a href="layer7_test.php" class="btn btn-default btn-sm"><i class="fa fa-play-circle"></i> <?= l7_t("Simular teste"); ?></a>
+</p>
 
-			<p class="layer7-lead"><?= l7_t("Gerir politicas de classificacao e bloqueio."); ?></p>
+		<?php if ($l7_policy_mode === "list") { ?>
+		<div class="panel panel-default" id="l7-policies">
+			<div class="panel-heading">
+				<h2 class="panel-title"><?= htmlspecialchars(l7_t("Politicas aplicadas")); ?></h2>
+			</div>
+			<div class="panel-body">
+			<p id="l7-add">
+				<a href="layer7_policies.php?new=1" class="btn btn-success"><?= htmlspecialchars(l7_t("Adicionar politica")); ?></a>
+				<?php if ($l7_library_available) { ?>
+				<a href="layer7_policies.php?library=1#l7-profiles" class="btn btn-default"><?= htmlspecialchars(l7_t("Abrir biblioteca de perfis")); ?></a>
+				<?php } ?>
+			</p>
+			<?php if ($l7_library_available) { ?>
+			<p class="help-block">
+				<span id="l7-profiles" tabindex="-1"></span>
+				<a href="layer7_policies.php?library=1#l7-profiles"><?= htmlspecialchars(l7_t("Biblioteca de perfis")); ?></a>
+				&middot;
+				<span id="l7-ra" tabindex="-1"></span>
+				<a href="layer7_policies.php?library=1#l7-ra"><?= htmlspecialchars(l7_t("Acesso remoto (biblioteca)")); ?></a>
+			</p>
+			<?php } ?>
+			<?php if (count($policies) === 0) { ?>
+			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
+			<?php } else { ?>
+			<form method="post" action="layer7_policies.php#l7-policies">
+				<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th><?= l7_t("Ativa"); ?></th>
+								<th><?= l7_t("Prioridade"); ?></th>
+								<th><?= l7_t("Nome"); ?></th>
+								<th><?= l7_t("Acao"); ?></th>
+								<th><?= l7_t("Correspondencia"); ?></th>
+								<th><code>id</code></th>
+								<th><?= l7_t("Acoes"); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ($policies as $i => $policy) {
+							$pid = isset($policy["id"]) ? (string)$policy["id"] : "";
+							$name = isset($policy["name"]) ? (string)$policy["name"] : "";
+							$action = isset($policy["action"]) ? (string)$policy["action"] : "";
+							$priority = isset($policy["priority"]) ? (int)$policy["priority"] : 0;
+							$enabled = !empty($policy["enabled"]);
+							$matches = layer7_policy_match_summary($policy);
+							$pon_id = "pon_" . (int)$i;
+							$pon_label = l7_t("Politica activa") . ": " . ($name !== "" ? $name : $pid);
+						?>
+							<tr>
+								<td>
+									<label class="sr-only" for="<?= htmlspecialchars($pon_id); ?>"><?= htmlspecialchars($pon_label); ?></label>
+									<input type="checkbox" id="<?= htmlspecialchars($pon_id); ?>" name="pon[<?= (int)$i; ?>]" value="1" aria-label="<?= htmlspecialchars($pon_label); ?>" <?= $enabled ? 'checked="checked"' : ''; ?> />
+								</td>
+								<td><?= htmlspecialchars((string)$priority); ?></td>
+								<td><?= htmlspecialchars($name); ?></td>
+								<td><span class="label label-default"><?= htmlspecialchars($action); ?></span></td>
+								<td class="small"><?= htmlspecialchars(implode(" | ", $matches)); ?></td>
+								<td><code><?= htmlspecialchars($pid); ?></code></td>
+								<td>
+									<a href="layer7_policies.php?view=<?= (int)$i; ?>" class="btn btn-xs btn-default"><?= l7_t("Ver listas"); ?></a>
+									<a href="layer7_policies.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
+								</td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					<button type="submit" name="save_policies" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das politicas"); ?></button>
+				</p>
+			</form>
 
-		<?php
-		$_nav_data = layer7_load_or_default();
-		$_nav_groups = isset($_nav_data["layer7"]["groups"]) ? count($_nav_data["layer7"]["groups"]) : 0;
-		$_nav_exceptions = isset($_nav_data["layer7"]["exceptions"]) ? count($_nav_data["layer7"]["exceptions"]) : 0;
-		?>
-		<div class="layer7-toolbar" style="margin-bottom:16px;">
-			<a href="layer7_groups.php" class="btn btn-default btn-sm"><i class="fa fa-users"></i> <?= l7_t("Grupos"); ?> (<?= $_nav_groups; ?>)</a>
-			<a href="layer7_exceptions.php" class="btn btn-default btn-sm"><i class="fa fa-shield"></i> <?= l7_t("Excecoes"); ?> (<?= $_nav_exceptions; ?>)</a>
-			<a href="layer7_categories.php" class="btn btn-default btn-sm"><i class="fa fa-th-list"></i> <?= l7_t("Categorias nDPI"); ?></a>
-			<a href="layer7_test.php" class="btn btn-default btn-sm"><i class="fa fa-play-circle"></i> <?= l7_t("Simular teste"); ?></a>
+			<?php
+			$del_opts = array();
+			foreach ($policies as $i => $policy) {
+				$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
+				$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
+				$del_opts[(string)(int)$i] = $pid . ($pname !== "" ? " - " . $pname : "");
+			}
+			$del_form = new Form(false);
+			$del_form->setAction("layer7_policies.php#l7-policies");
+			$del_form->setAttribute("onsubmit", "return confirm(" . json_encode(l7_t("Remover esta politica do JSON?")) . ");");
+			$sec_del = new Form_Section(l7_t("Remover politica"));
+			$del_sel = new Form_Select("delete_policy_index", l7_t("Politica a remover"), $l7_del_sel, $del_opts);
+			$del_sel->setAttribute("id", "delete_policy_index");
+			$sec_del->addInput($del_sel);
+			$del_form->add($sec_del);
+			$del_btn = new Form_Button("delete_policy", l7_t("Remover"), null, "fa fa-trash");
+			$del_btn->addClass("btn-danger");
+			$del_form->addGlobal($del_btn);
+			print($del_form);
+			?>
+			<?php } ?>
+			</div>
 		</div>
+		<?php } ?>
 
-		<?php
-		$l7_profiles = layer7_load_profiles();
-		if (!empty($l7_profiles) && !$at_limit) {
+		<?php if ($l7_policy_mode === "library") { ?>
+		<p>
+			<a href="layer7_policies.php#l7-policies" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a lista")); ?></a>
+		</p>
+		<?php if (!$l7_library_available) { ?>
+		<div class="alert alert-warning"><?php
+		if ($l7_library_unavail_reason === "limit24") {
+			echo l7_t("Limite de 24 politicas atingido. A biblioteca de perfis so fica disponivel com menos de 24 politicas aplicadas.");
+		} else {
+			echo l7_t("Catalogo de perfis indisponivel. Nenhum perfil foi carregado.");
+		}
+		?></div>
+		<?php } else {
+		$l7_profiles = $l7_profiles_catalog;
 		$prof_ifaces = layer7_get_pfsense_interfaces();
-		?>
-		<?php
 		/* A4: contadores de hits por perfil a partir das stats do daemon. */
 		$l7_prof_hits = layer7_profile_hit_counts($l7_profiles, layer7_read_stats());
 		?>
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Perfis rapidos"); ?></div>
-			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Categorias comecam fechadas — clique no titulo para abrir. Ligue ou desligue perfis na grelha; as alteracoes ficam em rascunho. Clique em Aplicar para gravar e activar tudo de uma vez (um unico reload). Use 'Opcoes' para accao, interfaces e sub-redes. Edite ou crie perfis personalizados em profiles-custom.json (preservado nos upgrades)."); ?></p>
-			<div class="l7-profiles-toolbar" style="margin-bottom:14px;">
-				<div class="l7-profiles-search-wrap">
-					<input type="text" id="l7ProfileSearch" class="form-control input-sm" placeholder="<?= l7_t("Pesquisar perfil..."); ?>" autocomplete="off" oninput="l7filterProfileGrid();" />
-					<label class="l7-profiles-active-only" title="<?= l7_t("Mostrar apenas perfis ligados"); ?>">
-						<input type="checkbox" id="l7ProfileActiveOnly" onchange="l7filterProfileGrid();" />
-						<?= l7_t("So ligados"); ?>
-					</label>
-					<span class="l7-profiles-fold-actions">
-						<button type="button" class="btn btn-default btn-xs" onclick="l7setAllProfileGroups(true);"><?= l7_t("Expandir tudo"); ?></button>
-						<button type="button" class="btn btn-default btn-xs" onclick="l7setAllProfileGroups(false);"><?= l7_t("Recolher tudo"); ?></button>
-					</span>
-				</div>
-				<button type="button" class="btn btn-primary btn-sm" onclick="l7showProfileEditModal('', true);">
-					<i class="fa fa-plus"></i> <?= l7_t("Criar perfil"); ?>
-				</button>
+		<div class="panel panel-default" id="l7-profiles">
+			<div class="panel-heading">
+				<h2 class="panel-title"><?= htmlspecialchars(l7_t("Biblioteca de perfis")); ?></h2>
 			</div>
-			<div id="l7ProfileDraftBar" class="l7-profile-draft-bar" hidden>
-				<span id="l7ProfileDraftMsg" class="l7-profile-draft-msg"></span>
-				<span class="l7-profile-draft-actions">
+			<div class="panel-body">
+			<p><?= l7_t("Categorias comecam fechadas — clique no titulo para abrir. Ligue ou desligue perfis na grelha; as alteracoes ficam em rascunho. Clique em Aplicar para gravar e activar tudo de uma vez (um unico reload). Use 'Opcoes' para accao, interfaces e sub-redes. Edite ou crie perfis personalizados em profiles-custom.json (preservado nos upgrades)."); ?></p>
+			<p>
+				<label class="sr-only" for="l7ProfileSearch"><?= htmlspecialchars(l7_t("Pesquisar perfil...")); ?></label>
+				<input type="text" id="l7ProfileSearch" class="form-control" placeholder="<?= l7_t("Pesquisar perfil..."); ?>" autocomplete="off" aria-label="<?= htmlspecialchars(l7_t("Pesquisar perfil...")); ?>" oninput="l7filterProfileGrid();" />
+			</p>
+			<p>
+				<label>
+					<input type="checkbox" id="l7ProfileActiveOnly" onchange="l7filterProfileGrid();" />
+					<?= l7_t("So ligados"); ?>
+				</label>
+			</p>
+			<p>
+				<button type="button" class="btn btn-default btn-sm" onclick="l7setAllProfileGroups(true);"><?= l7_t("Expandir tudo"); ?></button>
+				<button type="button" class="btn btn-default btn-sm" onclick="l7setAllProfileGroups(false);"><?= l7_t("Recolher tudo"); ?></button>
+				<a href="layer7_policies.php?profile_new=1" class="btn btn-primary btn-sm" onclick="return l7showProfileEditModal('', true, event);">
+					<i class="fa fa-plus"></i> <?= l7_t("Criar perfil"); ?>
+				</a>
+			</p>
+			<div id="l7ProfileDraftBar" class="alert alert-warning" hidden>
+				<p id="l7ProfileDraftMsg"></p>
+				<p>
 					<button type="button" class="btn btn-default btn-sm" id="l7ProfileDraftDiscard" onclick="l7discardProfileDraft();"><?= l7_t("Descartar"); ?></button>
-					<button type="button" class="btn btn-success btn-sm" id="l7ProfileDraftApply" onclick="l7applyProfileDraft();"><i class="fa fa-check"></i> <?= l7_t("Aplicar alteracoes"); ?></button>
-				</span>
+					<button type="button" class="btn btn-success btn-sm" id="l7ProfileDraftApply" onclick="l7applyProfileDraft();"><?= l7_t("Aplicar alteracoes"); ?></button>
+				</p>
 			</div>
 
 		<?php
@@ -1350,47 +2406,51 @@ function layer7_policy_match_summary($policy) {
 			if ($is_hidden) {
 				$card_classes .= " l7-profile-card-hidden";
 			}
+			$toggle_name = $prof_exists ? "toggle_profile_off" : "toggle_profile_on";
+			$toggle_label = $prof_exists ? l7_t("Desligar") : l7_t("Ligar");
+			$toggle_btn = $prof_exists ? "btn-success" : "btn-default";
 		?>
-			<div class="<?= $card_classes; ?>" title="<?= $card_title; ?>"
+			<tr class="<?= $card_classes; ?>" title="<?= $card_title; ?>"
 				data-profile-name="<?= strtolower($prof_name); ?>"
 				data-profile-active="<?= $prof_exists ? "1" : "0"; ?>"
 				data-profile-search="<?= htmlspecialchars(strtolower($prof_name . " " . $search_hosts), ENT_QUOTES); ?>">
-				<div class="l7-profile-icon-ios" style="background:<?= $icon_bg; ?>;color:<?= $icon_fg; ?>;">
+				<td>
 					<?= layer7_profile_icon_html($icon_raw); ?>
-				</div>
-				<div class="l7-profile-body">
-					<div class="l7-profile-name-row">
-						<span class="l7-profile-name"><?= $prof_name; ?></span>
-						<?php if ($prof_is_custom) { ?>
-						<span class="l7-badge-dot l7-badge-dot-custom" title="<?= l7_t("personalizado"); ?>"></span>
-						<?php } elseif ($prof_is_edited) { ?>
-						<span class="l7-badge-dot l7-badge-dot-edited" title="<?= l7_t("editado"); ?>"></span>
-						<?php } ?>
-					</div>
-					<div class="l7-profile-meta"><?= implode(" &middot; ", $meta_parts); ?></div>
-				</div>
-				<div class="l7-profile-actions">
-				<button type="button"
-					class="l7-switch <?= $prof_exists ? "l7-switch-on" : "l7-switch-off"; ?>"
-					data-profile-id="<?= htmlspecialchars($prof_id_raw, ENT_QUOTES); ?>"
-					data-saved="<?= $prof_exists ? "1" : "0"; ?>"
-					data-desired="<?= $prof_exists ? "1" : "0"; ?>"
-					data-scoped="<?= $l7_quick_scoped ? "1" : "0"; ?>"
-					title="<?= $prof_exists ? l7_t("Desligar") : l7_t("Ligar"); ?>"
-					aria-label="<?= $prof_exists ? l7_t("Desligar") : l7_t("Ligar"); ?>"
-					onclick="l7toggleProfileDraft(this);"><span class="l7-switch-track"></span></button>
-				<?php if (!$prof_exists) { ?>
-				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Opcoes"); ?>" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof["name"] ?? $prof_id_raw), ENT_QUOTES) ?>);"><i class="fa fa-cog"></i></button>
-				<?php } ?>
-				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i></button>
-				<?php if ($is_hidden) { ?>
-				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">
+					<?= $prof_name; ?>
+					<?php if ($prof_is_custom) { ?>
+					<span class="label label-info"><?= l7_t("personalizado"); ?></span>
+					<?php } elseif ($prof_is_edited) { ?>
+					<span class="label label-warning"><?= l7_t("editado"); ?></span>
+					<?php } ?>
+				</td>
+				<td class="small"><?= htmlspecialchars(implode(" | ", $meta_parts)); ?></td>
+				<td>
+				<form method="post" action="layer7_policies.php#l7-profiles">
 					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
-					<button type="submit" name="unhide_profile" value="1" class="l7-profile-icon-btn" title="<?= l7_t("Mostrar"); ?>"><i class="fa fa-eye"></i></button>
+					<button type="submit" name="<?= $toggle_name; ?>" value="1"
+						class="btn btn-xs <?= $toggle_btn; ?>"
+						data-profile-id="<?= htmlspecialchars($prof_id_raw, ENT_QUOTES); ?>"
+						data-saved="<?= $prof_exists ? "1" : "0"; ?>"
+						data-desired="<?= $prof_exists ? "1" : "0"; ?>"
+						data-scoped="<?= $l7_quick_scoped ? "1" : "0"; ?>"
+						title="<?= $toggle_label; ?>"
+						aria-label="<?= $toggle_label; ?>"
+						onclick="l7toggleProfileDraft(this); return false;"><?= htmlspecialchars($toggle_label); ?></button>
+				</form>
+				</td>
+				<td>
+				<?php if (!$prof_exists) { ?>
+				<a href="layer7_policies.php?profile_options=<?= rawurlencode($prof_id_raw); ?>" class="btn btn-xs btn-default" title="<?= l7_t("Opcoes"); ?>" onclick="return l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof["name"] ?? $prof_id_raw), ENT_QUOTES) ?>, event);"><?= l7_t("Opcoes"); ?></a>
+				<?php } ?>
+				<a href="layer7_policies.php?profile_edit=<?= rawurlencode($prof_id_raw); ?>" class="btn btn-xs btn-default" title="<?= l7_t("Editar perfil"); ?>" onclick="return l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false, event);"><?= l7_t("Editar"); ?></a>
+				<?php if ($is_hidden) { ?>
+				<form method="post" action="layer7_policies.php#l7-profiles">
+					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
+					<button type="submit" name="unhide_profile" value="1" class="btn btn-xs btn-default" title="<?= l7_t("Mostrar"); ?>"><?= l7_t("Mostrar"); ?></button>
 				</form>
 				<?php } ?>
-				</div>
-			</div>
+				</td>
+			</tr>
 		<?php
 		};
 		$l7_group_slug = function ($gname) {
@@ -1415,9 +2475,7 @@ function layer7_policy_match_summary($policy) {
 			$is_presets = !empty($opts["presets"]);
 			$is_hidden_section = !empty($opts["hidden_section"]);
 			$is_ra_group = !empty($opts["remote_access"]);
-			/* Sempre colapsado na primeira vista — o operador expande ao clicar. */
-			$initial_open = false;
-			$group_classes = "l7-profile-group l7-profile-group-collapsed";
+			$group_classes = "panel panel-default l7-profile-group";
 			if ($is_presets) {
 				$group_classes .= " l7-profile-group-presets";
 			}
@@ -1426,31 +2484,42 @@ function layer7_policy_match_summary($policy) {
 			}
 			$anchor_attr = $is_ra_group ? ' id="l7-ra"' : "";
 		?>
-			<div class="<?= $group_classes; ?>"<?= $anchor_attr; ?> data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="0">
-				<div class="l7-profile-group-header" role="button" tabindex="0" aria-expanded="false" onclick="l7toggleProfileGroup(this);" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();l7toggleProfileGroup(this);}">
-					<span class="l7-profile-group-chevron fa fa-chevron-down" aria-hidden="true"></span>
-					<span class="l7-profile-group-title"><?= htmlspecialchars($gname); ?></span>
-					<span class="l7-profile-group-meta">
+			<details class="<?= $group_classes; ?>"<?= $anchor_attr; ?> data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="0">
+				<summary class="panel-heading l7-profile-group-header">
+					<h2 class="panel-title">
+						<?= htmlspecialchars($gname); ?>
 						<span class="l7-profile-group-count"><?= count($gprofs); ?> <?= l7_t("perfis"); ?></span>
 						<?php if ($active_n > 0) { ?>
-						<span class="l7-profile-group-active-badge"><?= $active_n; ?> <?= l7_t("ligados"); ?></span>
+						<span class="label label-success l7-profile-group-active-badge"><?= $active_n; ?> <?= l7_t("ligados"); ?></span>
 						<?php } ?>
-						<span class="l7-profile-group-pending-badge" hidden></span>
-					</span>
-				</div>
-				<div class="l7-profile-group-body">
+						<span class="label label-warning l7-profile-group-pending-badge" hidden></span>
+					</h2>
+				</summary>
+				<div class="panel-body l7-profile-group-body">
 				<?php if ($is_hidden_section) { ?>
-				<p class="help-block l7-hidden-profiles-help"><?= l7_t("Estes perfis nao aparecem na grelha principal. A politica ligada permanece activa."); ?></p>
+				<p class="help-block"><?= l7_t("Estes perfis nao aparecem na grelha principal. A politica ligada permanece activa."); ?></p>
 				<?php } ?>
-				<div class="l7-profiles-grid">
+				<div class="table-responsive">
+				<table class="table table-striped table-condensed table-hover">
+					<thead>
+						<tr>
+							<th><?= l7_t("Nome"); ?></th>
+							<th><?= l7_t("Correspondencia"); ?></th>
+							<th><?= l7_t("Ativa"); ?></th>
+							<th><?= l7_t("Acoes"); ?></th>
+						</tr>
+					</thead>
+					<tbody>
 				<?php
 				foreach ($gprofs as $prof) {
 					$l7_render_profile_card($prof, $is_hidden_section);
 				}
 				?>
+					</tbody>
+				</table>
 				</div>
 				</div>
-			</div>
+			</details>
 		<?php
 		};
 		foreach ($l7_group_order as $l7_gname) {
@@ -1494,319 +2563,155 @@ function layer7_policy_match_summary($policy) {
 		</div>
 		</div>
 
-		<div id="l7ProfileModal" class="l7-modal-overlay" style="display:none;">
-			<div class="l7-modal-box">
-				<h4 id="l7ProfileModalTitle"></h4>
-				<form method="post" action="layer7_policies.php#l7-policies" class="form-horizontal">
-					<input type="hidden" name="profile_id" id="l7ProfileId" value="" />
-					<input type="hidden" name="add_profile_policy" value="1" />
-
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("Accao"); ?></label>
-						<div class="col-sm-8">
-							<select name="profile_action" class="form-control">
-								<option value="block" selected="selected"><?= l7_t("block"); ?></option>
-								<option value="monitor"><?= l7_t("monitor"); ?></option>
-								<option value="allow"><?= l7_t("allow"); ?></option>
-							</select>
-						</div>
+		<div class="modal fade" id="l7ProfileModal" tabindex="-1" role="dialog" aria-labelledby="l7ProfileModalTitle">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="<?= htmlspecialchars(l7_t("Fechar")); ?>"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="l7ProfileModalTitle"></h4>
 					</div>
-
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("Aplicar a"); ?></label>
-						<div class="col-sm-8">
-							<p class="text-muted small"><strong><?= l7_t("Interfaces"); ?></strong></p>
-						<?php foreach ($prof_ifaces as $ifc) { ?>
-							<label class="checkbox-inline">
-								<input type="checkbox" name="profile_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
-								<?= htmlspecialchars($ifc["descr"]); ?>
-							</label>
-						<?php } ?>
-							<p class="help-block"><?= l7_t("Nenhuma = todas."); ?></p>
-
-							<p class="text-muted small" style="margin-top:10px;"><strong><?= l7_t("Grupos"); ?></strong></p>
-						<?php if (empty($l7_groups)) { ?>
-							<p class="help-block">
-								<a href="layer7_groups.php" class="btn btn-xs btn-default"><?= l7_t("Criar grupo (ex.: Gestores)"); ?></a>
-							</p>
-						<?php } else { ?>
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-						?>
-							<label class="checkbox-inline">
-								<input type="checkbox" name="profile_groups[]" value="<?= $gid; ?>" />
-								<?= $gname; ?>
-							</label>
-						<?php } ?>
-							<p class="help-block"><?= l7_t("Preferivel a CIDRs manuais."); ?></p>
-						<?php } ?>
-						</div>
+					<div class="modal-body">
+						<?= layer7_render_profile_options_form($l7_profile_options_state, $prof_ifaces, $l7_groups, "modal"); ?>
 					</div>
-
-					<div class="form-group l7-modal-section-vip">
-						<label class="col-sm-4 control-label"><?= l7_t("Isentos (nunca bloqueados)"); ?></label>
-						<div class="col-sm-8">
-							<p class="help-block"><?= l7_t("Isencao global: estes IPs/dispositivos nunca sao bloqueados por nenhum perfil Layer7. Gere a excepcao partilhada vip-isentos."); ?></p>
-							<p class="help-block">
-								<a href="layer7_exceptions.php#l7-vip-list" class="btn btn-xs btn-default">
-									<i class="fa fa-list"></i> <?= l7_t("Gerir Lista VIP"); ?>
-								</a>
-							</p>
-							<p class="help-block text-warning small"><?= l7_t("Isencao total de bloqueios Layer7; sinkhole DNS so coberto apos Bloco D."); ?></p>
-							<?php if (!empty($l7_groups)) { ?>
-							<p class="text-muted small"><strong><?= l7_t("Grupos isentos"); ?></strong></p>
-							<?php foreach ($l7_groups as $grp) {
-								$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-								$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-								$gchk = in_array($grp["id"] ?? "", $l7_vip_groups_sel, true) ? ' checked="checked"' : "";
-							?>
-							<label class="checkbox-inline">
-								<input type="checkbox" name="profile_vip_groups[]" value="<?= $gid; ?>"<?= $gchk; ?> />
-								<?= $gname; ?>
-							</label>
-							<?php } ?>
-							<?php } ?>
-							<label class="control-label small" style="margin-top:8px;"><?= l7_t("IPs isentos"); ?></label>
-							<textarea name="profile_vip_hosts" class="form-control" rows="2" placeholder="192.168.1.50"><?= htmlspecialchars($l7_vip_hosts_val); ?></textarea>
-							<label class="control-label small" style="margin-top:8px;"><?= l7_t("CIDRs isentos"); ?></label>
-							<textarea name="profile_vip_cidrs" class="form-control" rows="2" placeholder="192.168.1.0/24"><?= htmlspecialchars($l7_vip_cidrs_val); ?></textarea>
-							<p class="help-block"><?= l7_t("Desligar um perfil nao remove a excepcao VIP — continua editavel em Excepcoes."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-8">
-							<a data-toggle="collapse" href="#l7ProfileModalAdvanced" style="cursor:pointer;">
-								<i class="fa fa-cog"></i> <?= l7_t("Avancado"); ?>
-							</a>
-						</div>
-					</div>
-					<div id="l7ProfileModalAdvanced" class="collapse">
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("CIDRs de origem"); ?></label>
-						<div class="col-sm-8">
-							<textarea name="profile_src_cidrs" class="form-control" rows="2" placeholder="192.168.10.0/24"></textarea>
-							<p class="help-block"><?= l7_t("Vazio = qualquer sub-rede. Use apenas se grupos nao forem suficientes."); ?></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
-						<div class="col-sm-8">
-							<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
-						<?php if (!empty($l7_groups)) { ?>
-							<p class="text-muted small"><strong><?= l7_t("Grupos excluidos"); ?></strong></p>
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-						?>
-							<label class="checkbox-inline">
-								<input type="checkbox" name="profile_src_exclude_groups[]" value="<?= $gid; ?>" />
-								<?= $gname; ?>
-							</label>
-						<?php } ?>
-						<?php } ?>
-							<label class="control-label small" style="margin-top:8px;"><?= l7_t("CIDRs excluidos"); ?></label>
-							<textarea name="profile_src_exclude_cidrs" class="form-control" rows="2" placeholder="192.168.1.50"></textarea>
-						</div>
-					</div>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-8">
-							<a href="layer7_test.php" class="btn btn-link btn-sm" style="padding-left:0;">
-								<i class="fa fa-search"></i> <?= l7_t("Verificador de politica efectiva"); ?>
-							</a>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-8">
-							<button type="submit" class="btn btn-success"><?= l7_t("Criar politica"); ?></button>
-							<button type="button" class="btn btn-default" onclick="l7hideProfileModal();"><?= l7_t("Cancelar"); ?></button>
-						</div>
-					</div>
-				</form>
-		</div>
+				</div>
+			</div>
 		</div>
 
-		<div id="l7ProfileEditModal" class="l7-modal-overlay" style="display:none;">
-			<div class="l7-modal-box l7-modal-box-wide">
-				<h4 id="l7ProfileEditModalTitle"><?= l7_t("Editar perfil"); ?></h4>
-				<div id="l7ProfileEditReconnectWarn" class="alert alert-warning" style="display:none;"></div>
-				<form method="post" action="layer7_policies.php#l7-policies" class="form-horizontal" id="l7ProfileEditForm" onsubmit="return l7confirmProfileEditSave(event);">
-					<input type="hidden" name="edit_profile_id" id="l7EditProfileId" value="" />
-					<input type="hidden" name="edit_profile_is_new" id="l7EditProfileIsNew" value="0" />
-
-					<div class="form-group l7-edit-custom-only">
-						<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" name="edit_profile_name" id="l7EditProfileName" class="form-control" maxlength="120" />
-						</div>
+		<div class="modal fade" id="l7ProfileEditModal" tabindex="-1" role="dialog" aria-labelledby="l7ProfileEditModalTitle">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="<?= htmlspecialchars(l7_t("Fechar")); ?>"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="l7ProfileEditModalTitle"><?= l7_t("Editar perfil"); ?></h4>
 					</div>
-					<div class="form-group l7-edit-custom-only">
-						<label class="col-sm-3 control-label"><?= l7_t("Descricao"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" name="edit_profile_description" id="l7EditProfileDesc" class="form-control" maxlength="400" />
-						</div>
+					<div class="modal-body">
+						<div id="l7ProfileEditReconnectWarn" class="alert alert-warning hidden" hidden></div>
+						<?php
+						$l7_pe_modal_state = array(
+							"profile_id" => "",
+							"is_new" => false,
+							"name" => "",
+							"description" => "",
+							"icon" => "fa-cube",
+							"apps" => array(),
+							"cats" => array(),
+							"hosts" => "",
+							"hidden" => false,
+							"is_custom" => true,
+							"connected" => false,
+							"show_delete" => false,
+						);
+						echo layer7_render_profile_edit_form($l7_pe_modal_state, $l7_profile_catalog, "modal");
+						?>
 					</div>
-					<div class="form-group l7-edit-custom-only">
-						<label class="col-sm-3 control-label"><?= l7_t("Icone FA 4.7"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" name="edit_profile_icon" id="l7EditProfileIcon" class="form-control" placeholder="fa-cube" maxlength="45" />
-							<p class="help-block"><?= l7_t("Ex.: fa-youtube, fa-facebook (FontAwesome 4.7)."); ?></p>
-						</div>
-					</div>
-					<div class="form-group l7-edit-factory-note" style="display:none;">
-						<div class="col-sm-offset-3 col-sm-9">
-							<p class="help-block"><?= l7_t("Perfil de fabrica: edite apps e hosts (overlay). O catalogo de fabrica permanece intacto nos upgrades."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Apps nDPI"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'l7EditAppsList')" style="max-width:400px" />
-							<div class="l7-multiselect-wrap" id="l7EditAppsList" style="max-width:400px;max-height:160px;overflow:auto;">
-							<?php foreach ($l7_profile_catalog["apps"] as $app) { ?>
-								<label><input type="checkbox" name="edit_profile_apps[]" value="<?= htmlspecialchars($app); ?>" /> <?= htmlspecialchars($app); ?></label>
-							<?php } ?>
-							</div>
-							<p class="help-block"><?= l7_t("Selecao do catalogo de fabrica (max. 64)."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group l7-edit-custom-only">
-						<label class="col-sm-3 control-label"><?= l7_t("Categorias nDPI"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'l7EditCatsList')" style="max-width:400px" />
-							<div class="l7-multiselect-wrap" id="l7EditCatsList" style="max-width:400px;max-height:120px;overflow:auto;">
-							<?php foreach ($l7_profile_catalog["categories"] as $cat) { ?>
-								<label><input type="checkbox" name="edit_profile_cats[]" value="<?= htmlspecialchars($cat); ?>" /> <?= htmlspecialchars($cat); ?></label>
-							<?php } ?>
-							</div>
-							<p class="help-block"><?= l7_t("Max. 8 categorias."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Hosts / dominios"); ?></label>
-						<div class="col-sm-9">
-							<textarea name="edit_profile_hosts" id="l7EditProfileHosts" class="form-control" rows="4" placeholder="example.com"></textarea>
-							<p class="help-block"><?= l7_t("Um dominio por linha (max. 64). Texto livre validado."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Ocultar cartao"); ?></label>
-						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="edit_profile_hidden" id="l7EditProfileHidden" value="1" />
-								<?= l7_t("Ocultar da grelha (politica ligada permanece activa)"); ?>
-							</label>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-offset-3 col-sm-9">
-							<button type="submit" name="save_profile_edit" value="1" class="btn btn-success"><?= l7_t("Guardar"); ?></button>
-							<button type="button" class="btn btn-default" onclick="l7hideProfileEditModal();"><?= l7_t("Cancelar"); ?></button>
-							<button type="submit" name="delete_custom_profile" value="1" id="l7EditProfileDeleteBtn" class="btn btn-danger" style="display:none;" onclick="return confirm(<?= htmlspecialchars(json_encode(l7_t("Apagar este perfil personalizado?")), ENT_QUOTES); ?>);"><?= l7_t("Apagar"); ?></button>
-						</div>
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 		<script>var l7ProfileEditData = <?= json_encode($l7_profile_edit_data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;</script>
 
 		</div>
 		<?php } ?>
+		<?php } ?>
 
-		<div class="layer7-admin-block" id="l7-policies">
-			<div class="layer7-admin-block__header"><?= l7_t("Politicas atuais"); ?></div>
-			<div class="layer7-admin-block__body">
-			<?php if (count($policies) === 0) { ?>
-			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
-			<?php } else { ?>
-			<div class="layer7-form-card">
-			<form method="post" action="layer7_policies.php#l7-policies">
-				<div class="table-responsive">
-					<table class="table table-striped table-hover">
-						<thead>
-							<tr>
-								<th><?= l7_t("Ativa"); ?></th>
-								<th><?= l7_t("Prioridade"); ?></th>
-								<th><?= l7_t("Nome"); ?></th>
-								<th><?= l7_t("Acao"); ?></th>
-								<th><?= l7_t("Correspondencia"); ?></th>
-								<th><code>id</code></th>
-								<th><?= l7_t("Acoes"); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-						<?php foreach ($policies as $i => $policy) {
-							$pid = isset($policy["id"]) ? (string)$policy["id"] : "";
-							$name = isset($policy["name"]) ? (string)$policy["name"] : "";
-							$action = isset($policy["action"]) ? (string)$policy["action"] : "";
-							$priority = isset($policy["priority"]) ? (int)$policy["priority"] : 0;
-							$enabled = !empty($policy["enabled"]);
-							$matches = layer7_policy_match_summary($policy);
-						?>
-							<tr>
-								<td><input type="checkbox" name="pon[<?= (int)$i; ?>]" value="1" <?= $enabled ? 'checked="checked"' : ''; ?> /></td>
-								<td><?= htmlspecialchars((string)$priority); ?></td>
-								<td><?= htmlspecialchars($name); ?></td>
-								<td><span class="label label-default"><?= htmlspecialchars($action); ?></span></td>
-								<td class="small"><?= htmlspecialchars(implode(" | ", $matches)); ?></td>
-								<td><code><?= htmlspecialchars($pid); ?></code></td>
-								<td class="layer7-table-actions">
-									<a href="layer7_policies.php?view=<?= (int)$i; ?>" class="btn btn-xs btn-default"><?= l7_t("Ver listas"); ?></a>
-									<a href="layer7_policies.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
-								</td>
-							</tr>
-						<?php } ?>
-						</tbody>
-					</table>
-				</div>
-				<div class="layer7-toolbar">
-					<button type="submit" name="save_policies" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das politicas"); ?></button>
-				</div>
-			</form>
+		<?php if ($l7_policy_mode === "profile_options") {
+		$l7_po_ifaces = layer7_get_pfsense_interfaces();
+		$l7_po_name = $l7_profile_options_profile
+			? (string)($l7_profile_options_profile["name"] ?? $l7_profile_options_id)
+			: (string)$l7_profile_options_id;
+		if (!$l7_po_from_post && $l7_profile_options_profile !== null) {
+			$l7_profile_options_state["profile_id"] = (string)$l7_profile_options_id;
+		}
+		?>
+		<p>
+			<a href="layer7_policies.php?library=1#l7-profiles" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a biblioteca")); ?></a>
+		</p>
+		<?php if (!$l7_library_available) { ?>
+		<div class="alert alert-warning"><?php
+		if ($l7_library_unavail_reason === "limit24") {
+			echo l7_t("Limite de 24 politicas atingido. A biblioteca de perfis so fica disponivel com menos de 24 politicas aplicadas.");
+		} else {
+			echo l7_t("Catalogo de perfis indisponivel. Nenhum perfil foi carregado.");
+		}
+		?></div>
+		<?php } elseif ($l7_profile_options_profile === null && !$l7_po_from_post) { ?>
+		<div class="alert alert-danger"><?= htmlspecialchars(l7_t("Perfil nao encontrado.")); ?></div>
+		<?php } else { ?>
+		<div class="panel panel-default" id="l7-profile-options">
+			<div class="panel-heading">
+				<h2 class="panel-title"><?= htmlspecialchars(sprintf(l7_t("Opcoes: %s"), $l7_po_name)); ?></h2>
 			</div>
-
-			<div style="margin-top:12px;">
-				<a data-toggle="collapse" href="#l7-delete-policy" style="cursor:pointer; color:#d9534f;">
-					<i class="fa fa-trash"></i> <?= l7_t("Remover politica"); ?>
-				</a>
-			</div>
-			<div id="l7-delete-policy" class="collapse" style="margin-top:8px;">
-				<form method="post" action="layer7_policies.php#l7-policies" class="form-inline"
-					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
-					<select name="delete_policy_index" class="form-control input-sm">
-						<?php foreach ($policies as $i => $policy) {
-							$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
-							$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
-							$label = $pid . ($pname !== "" ? " - " . $pname : "");
-						?>
-						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-						<?php } ?>
-					</select>
-					<button type="submit" name="delete_policy" value="1" class="btn btn-sm btn-danger"><?= l7_t("Remover"); ?></button>
-				</form>
-			</div>
-			<?php } ?>
+			<div class="panel-body">
+				<?= layer7_render_profile_options_form($l7_profile_options_state, $l7_po_ifaces, $l7_groups, "page"); ?>
 			</div>
 		</div>
+		<?php } ?>
+		<?php } ?>
 
-		<?php if ($view_policy !== null && $view_idx !== null) { ?>
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Listas da politica"); ?></div>
-			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
-			<div class="layer7-toolbar">
-				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Fechar"); ?></a>
-				<a href="layer7_policies.php?edit=<?= (int)$view_idx; ?>" class="btn btn-info"><?= l7_t("Editar esta politica"); ?></a>
+		<?php if ($l7_policy_mode === "profile_edit") {
+		$l7_pe_catalog = layer7_profiles_catalog();
+		$l7_pe_title = l7_t("Editar perfil");
+		if ($l7_pe_is_new) {
+			$l7_pe_title = l7_t("Criar perfil personalizado");
+		} elseif (is_array($l7_profile_edit_state)) {
+			$l7_pe_title = l7_t("Editar perfil") . ": " . (string)($l7_profile_edit_state["name"] ?? $l7_profile_edit_id);
+		} elseif ($l7_profile_edit_id !== null) {
+			$l7_pe_title = l7_t("Editar perfil") . ": " . (string)$l7_profile_edit_id;
+		}
+		?>
+		<p>
+			<a href="layer7_policies.php?library=1#l7-profiles" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a biblioteca")); ?></a>
+		</p>
+		<?php if (!$l7_library_available) { ?>
+		<div class="alert alert-warning"><?php
+		if ($l7_library_unavail_reason === "limit24") {
+			echo l7_t("Limite de 24 politicas atingido. A biblioteca de perfis so fica disponivel com menos de 24 politicas aplicadas.");
+		} else {
+			echo l7_t("Catalogo de perfis indisponivel. Nenhum perfil foi carregado.");
+		}
+		?></div>
+		<?php } elseif (!$l7_pe_is_new && !$l7_pe_from_post && $l7_profile_edit_profile === null) { ?>
+		<div class="alert alert-danger"><?= htmlspecialchars(l7_t("Perfil nao encontrado.")); ?></div>
+		<?php } elseif (is_array($l7_profile_edit_state)) {
+		$l7_pe_confirm_prof = $l7_profile_edit_profile;
+		if ($l7_pe_confirm_prof === null && !$l7_pe_is_new) {
+			$l7_pe_confirm_prof = layer7_policies_find_profile(
+				(string)($l7_profile_edit_state["profile_id"] ?? ""));
+		}
+		$l7_pe_confirm_data = (!$l7_pe_is_new && is_array($l7_pe_confirm_prof))
+			? layer7_profile_edit_confirm_map(
+				(string)($l7_profile_edit_state["profile_id"] ?? ""),
+				$policies,
+				$l7_pe_confirm_prof,
+				$l7_profiles_custom_for_edit
+			)
+			: array();
+		?>
+		<script>var l7ProfileEditData = <?= json_encode($l7_pe_confirm_data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;</script>
+		<div class="panel panel-default" id="l7-profile-edit">
+			<div class="panel-heading">
+				<h2 class="panel-title"><?= htmlspecialchars($l7_pe_title); ?></h2>
 			</div>
+			<div class="panel-body">
+				<?php if (!empty($l7_profile_edit_state["connected"])) { ?>
+				<div class="alert alert-warning"><?= htmlspecialchars(l7_t("Este perfil esta ligado — ao guardar, a politica sera actualizada automaticamente com o novo snapshot.")); ?></div>
+				<?php } ?>
+				<?= layer7_render_profile_edit_form($l7_profile_edit_state, $l7_pe_catalog, "page"); ?>
+			</div>
+		</div>
+		<?php } ?>
+		<?php } ?>
+
+		<?php if ($l7_policy_mode === "view") { ?>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 class="panel-title"><?= htmlspecialchars(l7_t("Listas da politica")); ?></h2>
+			</div>
+			<div class="panel-body">
+			<p><?= l7_t("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
+			<p>
+				<a href="layer7_policies.php" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a lista")); ?></a>
+				<a href="layer7_policies.php?edit=<?= (int)$view_idx; ?>" class="btn btn-info"><?= l7_t("Editar esta politica"); ?></a>
+			</p>
 			<dl class="dl-horizontal layer7-detail-grid">
 				<dt><code>id</code></dt>
 				<dd><code><?= htmlspecialchars((string)($view_policy["id"] ?? "")); ?></code></dd>
@@ -1839,690 +2744,400 @@ function layer7_policy_match_summary($policy) {
 		</div>
 		<?php } ?>
 
-		<?php if ($edit_policy !== null && $edit_idx !== null) {
-			$edit_id = isset($edit_policy["id"]) ? (string)$edit_policy["id"] : "";
-			$edit_name = isset($edit_policy["name"]) ? (string)$edit_policy["name"] : "";
-			$edit_priority = isset($edit_policy["priority"]) ? (int)$edit_policy["priority"] : 0;
-			$edit_action = isset($edit_policy["action"]) ? (string)$edit_policy["action"] : "monitor";
-			if (!in_array($edit_action, array("monitor", "allow", "block", "tag"), true)) {
-				$edit_action = "monitor";
-			}
-			$edit_enabled = !empty($edit_policy["enabled"]);
-			$edit_apps = "";
-			if (isset($edit_policy["match"]["ndpi_app"]) && is_array($edit_policy["match"]["ndpi_app"])) {
-				$edit_apps = implode(", ", $edit_policy["match"]["ndpi_app"]);
-			}
-			$edit_categories = "";
-			if (isset($edit_policy["match"]["ndpi_category"]) && is_array($edit_policy["match"]["ndpi_category"])) {
-				$edit_categories = implode(", ", $edit_policy["match"]["ndpi_category"]);
-			}
-			$edit_hosts_match_val = "";
-			if (isset($edit_policy["match"]["hosts"]) && is_array($edit_policy["match"]["hosts"])) {
-				$edit_hosts_match_val = implode("\n", $edit_policy["match"]["hosts"]);
-			}
-			$edit_tag_table = isset($edit_policy["tag_table"]) ? (string)$edit_policy["tag_table"] : "";
-			$edit_sched_days = array();
-			$edit_sched_start = "";
-			$edit_sched_end = "";
-			if (isset($edit_policy["schedule"]) && is_array($edit_policy["schedule"])) {
-				$edit_sched_days = isset($edit_policy["schedule"]["days"]) && is_array($edit_policy["schedule"]["days"]) ? $edit_policy["schedule"]["days"] : array();
-				$edit_sched_start = isset($edit_policy["schedule"]["start"]) ? (string)$edit_policy["schedule"]["start"] : "";
-				$edit_sched_end = isset($edit_policy["schedule"]["end"]) ? (string)$edit_policy["schedule"]["end"] : "";
-			}
-		?>
-		<div class="layer7-admin-block" id="l7-edit">
-			<div class="layer7-admin-block__header"><?= l7_t("Editar politica"); ?></div>
-			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON."); ?></p>
-			<div class="layer7-toolbar">
-				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
-			</div>
-			<form method="post" action="layer7_policies.php#l7-edit" class="form-horizontal">
-				<input type="hidden" name="edit_policy_index" value="<?= (int)$edit_idx; ?>" />
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>id</code></label>
-					<div class="col-sm-9">
-						<p class="form-control-static"><code><?= htmlspecialchars($edit_id !== "" ? $edit_id : "(vazio)"); ?></code></p>
-						<p class="help-block"><?= l7_t("O id nao pode ser alterado pela GUI."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
-					<div class="col-sm-9">
-						<input type="text" name="edit_name" class="form-control" maxlength="160" value="<?= htmlspecialchars($edit_name); ?>" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
-					<div class="col-sm-3">
-						<input type="number" name="edit_priority" class="form-control" value="<?= (int)$edit_priority; ?>" min="0" max="99999" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
-					<div class="col-sm-4">
-						<select name="edit_action" class="form-control">
-							<option value="monitor" <?= $edit_action === "monitor" ? 'selected="selected"' : ''; ?>><?= l7_t("monitor"); ?></option>
-							<option value="allow" <?= $edit_action === "allow" ? 'selected="selected"' : ''; ?>><?= l7_t("allow"); ?></option>
-							<option value="block" <?= $edit_action === "block" ? 'selected="selected"' : ''; ?>><?= l7_t("block"); ?></option>
-							<option value="tag" <?= $edit_action === "tag" ? 'selected="selected"' : ''; ?>><?= l7_t("tag"); ?></option>
-						</select>
-					</div>
-				</div>
-
-				<?php
-				$edit_policy_ifaces = array();
-				if (isset($edit_policy["interfaces"]) && is_array($edit_policy["interfaces"])) {
-					$edit_policy_ifaces = $edit_policy["interfaces"];
-				}
-				$edit_src_hosts_val = "";
-				if (isset($edit_policy["match"]["src_hosts"]) && is_array($edit_policy["match"]["src_hosts"])) {
-					$edit_src_hosts_val = implode("\n", $edit_policy["match"]["src_hosts"]);
-				}
-				$edit_src_cidrs_val = "";
-				if (isset($edit_policy["match"]["src_cidrs"]) && is_array($edit_policy["match"]["src_cidrs"])) {
-					$edit_src_cidrs_val = implode("\n", $edit_policy["match"]["src_cidrs"]);
-				}
-				$edit_ad_users_val = "";
-				if (isset($edit_policy["match"]["ad_users"]) && is_array($edit_policy["match"]["ad_users"])) {
-					$edit_ad_users_val = implode("\n", $edit_policy["match"]["ad_users"]);
-				}
-				$edit_ad_groups_val = "";
-				if (isset($edit_policy["match"]["ad_groups"]) && is_array($edit_policy["match"]["ad_groups"])) {
-					$edit_ad_groups_val = implode("\n", $edit_policy["match"]["ad_groups"]);
-				}
-				$ep_ifaces = layer7_get_pfsense_interfaces();
-				?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
-					<div class="col-sm-9">
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
-						</div>
-						<div id="edit_ifaces_list">
-						<?php foreach ($ep_ifaces as $ifc) {
-							$chk = (in_array($ifc["real"], $edit_policy_ifaces, true) ||
-							    in_array($ifc["ifid"], $edit_policy_ifaces, true))
-							    ? 'checked="checked"' : '';
-						?>
-						<label class="checkbox-inline">
-							<input type="checkbox" name="edit_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />
-							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
-						</label>
-						<?php } ?>
-						</div>
-						<p class="help-block"><?= l7_t("Nenhuma = aplica a todas."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("IPs de origem"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="edit_src_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_src_hosts_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("CIDRs de origem"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="edit_src_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_src_cidrs_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
-					</div>
-				</div>
-
-				<?php if ($l7_has_identity) { ?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="edit_ad_users" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_ad_users_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."); ?></p>
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Grupos AD"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="edit_ad_groups" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_ad_groups_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."); ?></p>
-					</div>
-				</div>
-				<?php } elseif ($edit_ad_users_val !== "" || $edit_ad_groups_val !== "") { ?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Alvos Identity"); ?></label>
-					<div class="col-sm-9">
-						<p class="help-block text-warning"><?= l7_t("Esta politica tem ad_users/ad_groups gravados; o entitlement Identity esta bloqueado — os alvos AD sao preservados sem edicao."); ?></p>
-					</div>
-				</div>
-				<?php } ?>
-
-				<?php if (!empty($l7_groups)) {
-					$edit_grps_arr = array();
-					if (isset($edit_policy["match"]["groups"]) && is_array($edit_policy["match"]["groups"])) {
-						$edit_grps_arr = $edit_policy["match"]["groups"];
-					}
-				?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Grupos"); ?></label>
-					<div class="col-sm-9">
-						<div class="l7-multiselect-wrap" id="edit_groups_list" style="max-width:400px;max-height:160px;">
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-							$gchk = in_array($grp["id"] ?? "", $edit_grps_arr, true) ? 'checked="checked"' : '';
-						?>
-							<label><input type="checkbox" name="edit_groups[]" value="<?= $gid; ?>" <?= $gchk; ?> /> <?= $gname; ?> <span class="text-muted">(<?= $gid; ?>)</span></label>
-						<?php } ?>
-						</div>
-						<p class="help-block"><?= l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem."); ?></p>
-					</div>
-				</div>
-				<?php } ?>
-
-				<?php
-				$edit_exc_cidrs_val = "";
-				if (isset($edit_policy["match"]["src_exclude_cidrs"]) &&
-				    is_array($edit_policy["match"]["src_exclude_cidrs"])) {
-					$edit_exc_cidrs_val = implode("\n",
-					    $edit_policy["match"]["src_exclude_cidrs"]);
-				}
-				$edit_exc_grps_arr = array();
-				if (isset($edit_policy["match"]["src_exclude_groups"]) &&
-				    is_array($edit_policy["match"]["src_exclude_groups"])) {
-					$edit_exc_grps_arr = $edit_policy["match"]["src_exclude_groups"];
-				}
-				?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
-					<div class="col-sm-9">
-						<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
-					<?php if (!empty($l7_groups)) { ?>
-						<div class="l7-multiselect-wrap" id="edit_exc_groups_list" style="max-width:400px;max-height:120px;">
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-							$gchk = in_array($grp["id"] ?? "", $edit_exc_grps_arr, true) ? 'checked="checked"' : '';
-						?>
-							<label><input type="checkbox" name="edit_src_exclude_groups[]" value="<?= $gid; ?>" <?= $gchk; ?> /> <?= $gname; ?></label>
-						<?php } ?>
-						</div>
-					<?php } ?>
-						<textarea name="edit_src_exclude_cidrs" class="form-control" rows="2" style="max-width:400px;margin-top:8px;" placeholder="192.168.1.50"><?= htmlspecialchars($edit_exc_cidrs_val); ?></textarea>
-						<p class="help-block"><?= l7_t("CIDRs excluidos (um por linha)."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="edit_match_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_match_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios. Maximo 64 hosts por politica."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Apps nDPI"); ?></label>
-					<div class="col-sm-9">
-						<?php
-						$edit_apps_arr = array();
-						if (isset($edit_policy["match"]["ndpi_app"]) && is_array($edit_policy["match"]["ndpi_app"])) {
-							$edit_apps_arr = $edit_policy["match"]["ndpi_app"];
-						}
-						if (!empty($ndpi_protos)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'edit_apps_list')" style="max-width:400px" />
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
-						</div>
-						<div class="l7-multiselect-wrap" id="edit_apps_list" style="max-width:400px">
-						<?php foreach ($ndpi_protos as $proto) {
-							$chk = in_array($proto, $edit_apps_arr, true) ? 'checked="checked"' : '';
-						?>
-							<label><input type="checkbox" name="edit_ndpi_apps[]" value="<?= htmlspecialchars($proto); ?>" <?= $chk; ?> /> <?= htmlspecialchars($proto); ?></label>
-						<?php } ?>
-						</div>
-						<?php } else { ?>
-						<input type="text" name="edit_ndpi_apps_csv" class="form-control" value="<?= htmlspecialchars($edit_apps); ?>" />
-						<?php } ?>
-						<p class="help-block"><?= l7_t("Selecione ate 12 aplicacoes."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Categorias nDPI"); ?></label>
-					<div class="col-sm-9">
-						<?php
-						$edit_cats_arr = array();
-						if (isset($edit_policy["match"]["ndpi_category"]) && is_array($edit_policy["match"]["ndpi_category"])) {
-							$edit_cats_arr = $edit_policy["match"]["ndpi_category"];
-						}
-						if (!empty($ndpi_cats)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'edit_cats_list')" style="max-width:400px" />
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
-						</div>
-						<div class="l7-multiselect-wrap" id="edit_cats_list" style="max-width:400px">
-						<?php foreach ($ndpi_cats as $cat) {
-							$chk = in_array($cat, $edit_cats_arr, true) ? 'checked="checked"' : '';
-						?>
-							<label><input type="checkbox" name="edit_ndpi_category[]" value="<?= htmlspecialchars($cat); ?>" <?= $chk; ?> /> <?= htmlspecialchars($cat); ?></label>
-						<?php } ?>
-						</div>
-						<?php } else { ?>
-						<input type="text" name="edit_ndpi_category_csv" class="form-control" value="<?= htmlspecialchars($edit_categories); ?>" />
-						<?php } ?>
-						<p class="help-block"><?= l7_t("Selecione ate 8 categorias."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>tag_table</code></label>
-					<div class="col-sm-6">
-						<input type="text" name="edit_tag_table" class="form-control" maxlength="63"
-							pattern="[A-Za-z0-9_]+" value="<?= htmlspecialchars($edit_tag_table !== "" ? $edit_tag_table : "layer7_tagged"); ?>" />
-						<p class="help-block"><?= l7_t("Obrigatorio quando a acao for tag."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Horario"); ?></label>
-					<div class="col-sm-9">
-						<?php $ed_days = array("mon" => "Seg", "tue" => "Ter", "wed" => "Qua", "thu" => "Qui", "fri" => "Sex", "sat" => "Sab", "sun" => "Dom"); ?>
-						<?php foreach ($ed_days as $dk => $dl) { ?>
-						<label class="checkbox-inline">
-							<input type="checkbox" name="edit_sched_<?= $dk; ?>" value="1" <?= in_array($dk, $edit_sched_days, true) ? 'checked="checked"' : ''; ?> />
-							<?= $dl; ?>
-						</label>
-						<?php } ?>
-						<div style="margin-top:8px;">
-							<label class="control-label" style="display:inline;"><?= l7_t("De"); ?></label>
-							<input type="time" name="edit_sched_start" value="<?= htmlspecialchars($edit_sched_start); ?>" class="form-control" style="width:120px;display:inline-block;" />
-							<label class="control-label" style="display:inline;margin-left:10px;"><?= l7_t("ate"); ?></label>
-							<input type="time" name="edit_sched_end" value="<?= htmlspecialchars($edit_sched_end); ?>" class="form-control" style="width:120px;display:inline-block;" />
-						</div>
-						<p class="help-block"><?= l7_t("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="edit_enabled" value="1" <?= $edit_enabled ? 'checked="checked"' : ''; ?> />
-							<?= l7_t("Regra habilitada"); ?>
-						</label>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Escopo global"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="edit_scope_global" value="1" <?= !empty($edit_policy["scope_global"]) ? 'checked="checked"' : ''; ?> />
-							<?= l7_t("Aplicar a toda a rede (sem origem definida)"); ?>
-						</label>
-						<p class="help-block"><?= l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."); ?></p>
-						<p class="help-block text-warning"><strong><?= l7_t("Atencao:"); ?></strong> <?= l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Quarentena origem"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="edit_quarantine_origin" value="1" <?= !empty($edit_policy["quarantine_origin"]) ? 'checked="checked"' : ''; ?> />
-							<?= l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"); ?>
-						</label>
-						<p class="help-block"><?= l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="save_policy_edit" value="1" class="btn btn-primary"><?= l7_t("Guardar alteracoes"); ?></button>
-					</div>
-				</div>
-			</form>
-			</div>
+		<?php if ($l7_policy_mode === "edit") { ?>
+		<div id="l7-edit">
+			<p><?= htmlspecialchars(l7_t("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON.")); ?></p>
+			<p>
+				<a href="layer7_policies.php" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a lista")); ?></a>
+			</p>
+<?php
+	$edit_form = new Form(false);
+	$edit_form->setAction("layer7_policies.php#l7-edit");
+	$sec_edit = new Form_Section(l7_t("Editar politica"));
+	$id_html = "<code>" . htmlspecialchars($l7_ef["id"] !== "" ? $l7_ef["id"] : "(vazio)") . "</code>";
+	$id_st = new Form_StaticText("id", $id_html);
+	$id_st->setHelp(l7_t("O id nao pode ser alterado pela GUI."));
+	$sec_edit->addInput($id_st);
+	$idx_hidden = new Form_Input("edit_policy_index", "", "hidden", (string)(int)$edit_idx);
+	$sec_edit->addInput($idx_hidden);
+	$edit_name = new Form_Input("edit_name", l7_t("Nome"), "text", $l7_ef["name"]);
+	$edit_name->setAttribute("maxlength", "160");
+	$sec_edit->addInput($edit_name);
+	$edit_prio = new Form_Input(
+		"edit_priority",
+		l7_t("Prioridade"),
+		"number",
+		$l7_ef["priority"],
+		array("min" => 0, "max" => 99999)
+	);
+	$sec_edit->addInput($edit_prio);
+	$sec_edit->addInput(new Form_Select(
+		"edit_action",
+		l7_t("Acao"),
+		$l7_ef["action"],
+		$l7_action_opts
+	));
+	$sec_edit->addInput(new Form_StaticText(
+		l7_t("Interfaces"),
+		layer7_policies_ifaces_html(
+			"edit_ifaces_list",
+			"edit_ifaces[]",
+			$l7_pf_ifaces,
+			$l7_ef["ifaces"],
+			!empty($l7_ef["ifaces_from_post"]),
+			l7_t("Nenhuma = aplica a todas.")
+		)
+	));
+	$edit_src_h = new Form_Textarea("edit_src_hosts", l7_t("IPs de origem"), $l7_ef["src_hosts"]);
+	$edit_src_h->setRows(3);
+	$edit_src_h->setHelp(l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."));
+	$sec_edit->addInput($edit_src_h);
+	$edit_src_c = new Form_Textarea("edit_src_cidrs", l7_t("CIDRs de origem"), $l7_ef["src_cidrs"]);
+	$edit_src_c->setRows(2);
+	$edit_src_c->setHelp(l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."));
+	$sec_edit->addInput($edit_src_c);
+	if ($l7_has_identity) {
+		$edit_adu = new Form_Textarea("edit_ad_users", l7_t("Utilizadores AD"), $l7_ef["ad_users"]);
+		$edit_adu->setRows(3);
+		$edit_adu->setHelp(l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."));
+		$sec_edit->addInput($edit_adu);
+		$edit_adg = new Form_Textarea("edit_ad_groups", l7_t("Grupos AD"), $l7_ef["ad_groups"]);
+		$edit_adg->setRows(2);
+		$edit_adg->setHelp(l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."));
+		$sec_edit->addInput($edit_adg);
+	} elseif ($l7_ef["ad_users"] !== "" || $l7_ef["ad_groups"] !== "") {
+		$sec_edit->addInput(new Form_StaticText(
+			l7_t("Alvos Identity"),
+			'<p class="help-block text-warning">' . htmlspecialchars(l7_t("Esta politica tem ad_users/ad_groups gravados; o entitlement Identity esta bloqueado — os alvos AD sao preservados sem edicao.")) . '</p>'
+		));
+	}
+	if (!empty($l7_groups)) {
+		$edit_grps = new Form_StaticText(
+			l7_t("Grupos"),
+			layer7_policies_group_boxes_html(
+				"edit_groups_list",
+				"edit_groups[]",
+				$l7_groups,
+				$l7_ef["groups"],
+				true
+			)
+		);
+		$edit_grps->setHelp(l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem."));
+		$sec_edit->addInput($edit_grps);
+	}
+	$exc_html = '<p class="help-block">' . htmlspecialchars(l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis.")) . '</p>';
+	if (!empty($l7_groups)) {
+		$exc_html .= layer7_policies_group_boxes_html(
+			"edit_exc_groups_list",
+			"edit_src_exclude_groups[]",
+			$l7_groups,
+			$l7_ef["exc_groups"],
+			false
+		);
+	}
+	$sec_edit->addInput(new Form_StaticText(l7_t("Excluir origens (so este perfil)"), $exc_html));
+	$edit_exc = new Form_Textarea("edit_src_exclude_cidrs", l7_t("CIDRs excluidos"), $l7_ef["exc_cidrs"]);
+	$edit_exc->setRows(2);
+	$edit_exc->setAttribute("placeholder", "192.168.1.50");
+	$edit_exc->setHelp(l7_t("CIDRs excluidos (um por linha)."));
+	$sec_edit->addInput($edit_exc);
+	$edit_hosts = new Form_Textarea("edit_match_hosts", l7_t("Sites/hosts"), $l7_ef["hosts"]);
+	$edit_hosts->setRows(3);
+	$edit_hosts->setHelp(l7_t("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios. Maximo 64 hosts por politica."));
+	$sec_edit->addInput($edit_hosts);
+	if (!empty($ndpi_protos)) {
+		$edit_apps_st = new Form_StaticText(
+			l7_t("Apps nDPI"),
+			layer7_policies_ndpi_list_html(
+				"edit_apps_list",
+				"edit_ndpi_apps[]",
+				$ndpi_protos,
+				$l7_ef["apps"],
+				l7_t("Pesquisar apps...")
+			)
+		);
+		$edit_apps_st->setHelp(l7_t("Selecione ate 12 aplicacoes."));
+		$sec_edit->addInput($edit_apps_st);
+	} else {
+		$edit_apps_in = new Form_Input("edit_ndpi_apps_csv", l7_t("Apps nDPI"), "text", $l7_ef["apps_csv"]);
+		$edit_apps_in->setHelp(l7_t("Selecione ate 12 aplicacoes."));
+		$sec_edit->addInput($edit_apps_in);
+	}
+	if (!empty($ndpi_cats)) {
+		$edit_cats_st = new Form_StaticText(
+			l7_t("Categorias nDPI"),
+			layer7_policies_ndpi_list_html(
+				"edit_cats_list",
+				"edit_ndpi_category[]",
+				$ndpi_cats,
+				$l7_ef["cats"],
+				l7_t("Pesquisar categorias...")
+			)
+		);
+		$edit_cats_st->setHelp(l7_t("Selecione ate 8 categorias."));
+		$sec_edit->addInput($edit_cats_st);
+	} else {
+		$edit_cats_in = new Form_Input("edit_ndpi_category_csv", l7_t("Categorias nDPI"), "text", $l7_ef["cats_csv"]);
+		$edit_cats_in->setHelp(l7_t("Selecione ate 8 categorias."));
+		$sec_edit->addInput($edit_cats_in);
+	}
+	$edit_tag = new Form_Input("edit_tag_table", "tag_table", "text", $l7_ef["tag_table"]);
+	$edit_tag->setAttribute("maxlength", "63");
+	$edit_tag->setPattern("[A-Za-z0-9_]+");
+	$edit_tag->setHelp(l7_t("Obrigatorio quando a acao for tag."));
+	$sec_edit->addInput($edit_tag);
+	$sec_edit->addInput(new Form_StaticText(
+		l7_t("Horario"),
+		layer7_policies_schedule_html(
+			"edit",
+			$l7_sched_days,
+			$l7_ef["sched_days"],
+			$l7_ef["sched_start"],
+			$l7_ef["sched_end"]
+		)
+	));
+	$edit_en = new Form_Checkbox(
+		"edit_enabled",
+		l7_t("Ativa"),
+		l7_t("Regra habilitada"),
+		!empty($l7_ef["enabled"]),
+		"1"
+	);
+	$sec_edit->addInput($edit_en);
+	$edit_scope = new Form_Checkbox(
+		"edit_scope_global",
+		l7_t("Escopo global"),
+		l7_t("Aplicar a toda a rede (sem origem definida)"),
+		!empty($l7_ef["scope_global"]),
+		"1"
+	);
+	$edit_scope->setHelp(l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."));
+	$sec_edit->addInput($edit_scope);
+	$sec_edit->addInput(new Form_StaticText(
+		"",
+		'<p class="help-block text-warning"><strong>' . htmlspecialchars(l7_t("Atencao:")) . '</strong> ' .
+		htmlspecialchars(l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas.")) .
+		'</p>'
+	));
+	$edit_quar = new Form_Checkbox(
+		"edit_quarantine_origin",
+		l7_t("Quarentena origem"),
+		l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"),
+		!empty($l7_ef["quarantine"]),
+		"1"
+	);
+	$edit_quar->setHelp(l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."));
+	$sec_edit->addInput($edit_quar);
+	$edit_form->add($sec_edit);
+	$save_btn = new Form_Button("save_policy_edit", l7_t("Guardar alteracoes"), null, "fa fa-save");
+	$save_btn->addClass("btn-primary");
+	$edit_form->addGlobal($save_btn);
+	print($edit_form);
+?>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-admin-block" id="l7-add">
-			<div class="layer7-admin-block__header"><?= l7_t("Adicionar politica"); ?></div>
-			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting."); ?></p>
+		<?php if ($l7_policy_mode === "new") { ?>
+		<div id="l7-add">
+			<p>
+				<a href="layer7_policies.php" class="btn btn-default"><?= htmlspecialchars(l7_t("Voltar a lista")); ?></a>
+			</p>
+			<p><?= htmlspecialchars(l7_t("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting.")); ?></p>
 			<?php if ($at_limit) { ?>
-			<div class="alert alert-warning"><?= l7_t("Limite de 24 politicas atingido."); ?></div>
-			<?php } else { ?>
-			<form method="post" action="layer7_policies.php#l7-add" class="form-horizontal">
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>id</code></label>
-					<div class="col-sm-6">
-						<input type="text" name="new_id" class="form-control" maxlength="80"
-							pattern="[a-zA-Z0-9_-]+" required="required" placeholder="p-exemplo-001" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
-					<div class="col-sm-9">
-						<input type="text" name="new_name" class="form-control" maxlength="160" placeholder="<?= l7_t("Ex.: Monitor geral"); ?>" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
-					<div class="col-sm-3">
-						<input type="number" name="new_priority" class="form-control" value="50" min="0" max="99999" />
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
-					<div class="col-sm-4">
-						<select name="new_action" class="form-control">
-							<option value="monitor"><?= l7_t("monitor"); ?></option>
-							<option value="allow"><?= l7_t("allow"); ?></option>
-							<option value="block"><?= l7_t("block"); ?></option>
-							<option value="tag"><?= l7_t("tag"); ?></option>
-						</select>
-					</div>
-				</div>
-
-				<?php $pf_ifaces = layer7_get_pfsense_interfaces(); ?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
-					<div class="col-sm-9">
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
-						</div>
-						<div id="new_ifaces_list">
-						<?php foreach ($pf_ifaces as $ifc) { ?>
-						<label class="checkbox-inline">
-							<input type="checkbox" name="new_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
-							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
-						</label>
-						<?php } ?>
-						</div>
-						<p class="help-block"><?= l7_t("Nenhuma selecionada = aplica a todas as interfaces."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("IPs de origem"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="new_src_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="192.168.1.50&#10;192.168.1.51"></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("CIDRs de origem"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="new_src_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.10.0/24"></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
-					</div>
-				</div>
-
-				<?php if ($l7_has_identity) { ?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="new_ad_users" class="form-control" rows="3" style="max-width:400px" placeholder="joao.silva&#10;DOMAIN\maria"></textarea>
-						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."); ?></p>
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Grupos AD"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="new_ad_groups" class="form-control" rows="2" style="max-width:400px" placeholder="TI&#10;VPN"></textarea>
-						<p class="help-block"><?= l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."); ?></p>
-					</div>
-				</div>
-				<?php } ?>
-
-				<?php if (!empty($l7_groups)) { ?>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Grupos"); ?></label>
-					<div class="col-sm-9">
-						<div class="l7-multiselect-wrap" id="new_groups_list" style="max-width:400px;max-height:160px;">
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-						?>
-							<label><input type="checkbox" name="new_groups[]" value="<?= $gid; ?>" /> <?= $gname; ?> <span class="text-muted">(<?= $gid; ?>)</span></label>
-						<?php } ?>
-						</div>
-						<p class="help-block"><?= l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem. Alternativa a digitar CIDRs manualmente."); ?></p>
-					</div>
-				</div>
-				<?php } ?>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
-					<div class="col-sm-9">
-						<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
-					<?php if (!empty($l7_groups)) { ?>
-						<div class="l7-multiselect-wrap" id="new_exc_groups_list" style="max-width:400px;max-height:120px;">
-						<?php foreach ($l7_groups as $grp) {
-							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
-							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
-						?>
-							<label><input type="checkbox" name="new_src_exclude_groups[]" value="<?= $gid; ?>" /> <?= $gname; ?></label>
-						<?php } ?>
-						</div>
-					<?php } ?>
-						<textarea name="new_src_exclude_cidrs" class="form-control" rows="2" style="max-width:400px;margin-top:8px;" placeholder="192.168.1.50"></textarea>
-						<p class="help-block"><?= l7_t("CIDRs excluidos (um por linha)."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
-					<div class="col-sm-9">
-						<textarea name="new_match_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="youtube.com&#10;api.whatsapp.com"></textarea>
-						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente. Maximo 64 hosts por politica."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Apps nDPI"); ?></label>
-					<div class="col-sm-9">
-						<?php if (!empty($ndpi_protos)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'new_apps_list')" style="max-width:400px" />
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
-						</div>
-						<div class="l7-multiselect-wrap" id="new_apps_list" style="max-width:400px">
-						<?php foreach ($ndpi_protos as $proto) { ?>
-							<label><input type="checkbox" name="new_ndpi_apps[]" value="<?= htmlspecialchars($proto); ?>" /> <?= htmlspecialchars($proto); ?></label>
-						<?php } ?>
-						</div>
-						<?php } else { ?>
-						<input type="text" name="new_ndpi_apps_csv" class="form-control" placeholder="HTTP, BitTorrent" />
-						<?php } ?>
-						<p class="help-block"><?= l7_t("Selecione ate 12 aplicacoes. Em branco = qualquer app."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Categorias nDPI"); ?></label>
-					<div class="col-sm-9">
-						<?php if (!empty($ndpi_cats)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'new_cats_list')" style="max-width:400px" />
-						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
-						</div>
-						<div class="l7-multiselect-wrap" id="new_cats_list" style="max-width:400px">
-						<?php foreach ($ndpi_cats as $cat) { ?>
-							<label><input type="checkbox" name="new_ndpi_category[]" value="<?= htmlspecialchars($cat); ?>" /> <?= htmlspecialchars($cat); ?></label>
-						<?php } ?>
-						</div>
-						<?php } else { ?>
-						<input type="text" name="new_ndpi_category_csv" class="form-control" placeholder="Web" />
-						<?php } ?>
-						<p class="help-block"><?= l7_t("Selecione ate 8 categorias."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><code>tag_table</code></label>
-					<div class="col-sm-6">
-						<input type="text" name="new_tag_table" class="form-control" maxlength="63"
-							pattern="[A-Za-z0-9_]+" placeholder="layer7_tagged" />
-						<p class="help-block"><?= l7_t("Obrigatorio quando a acao for tag."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Horario"); ?></label>
-					<div class="col-sm-9">
-						<?php $new_days = array("mon" => "Seg", "tue" => "Ter", "wed" => "Qua", "thu" => "Qui", "fri" => "Sex", "sat" => "Sab", "sun" => "Dom"); ?>
-						<?php foreach ($new_days as $dk => $dl) { ?>
-						<label class="checkbox-inline">
-							<input type="checkbox" name="new_sched_<?= $dk; ?>" value="1" />
-							<?= $dl; ?>
-						</label>
-						<?php } ?>
-						<div style="margin-top:8px;">
-							<label class="control-label" style="display:inline;"><?= l7_t("De"); ?></label>
-							<input type="time" name="new_sched_start" value="" class="form-control" style="width:120px;display:inline-block;" />
-							<label class="control-label" style="display:inline;margin-left:10px;"><?= l7_t("ate"); ?></label>
-							<input type="time" name="new_sched_end" value="" class="form-control" style="width:120px;display:inline-block;" />
-						</div>
-						<p class="help-block"><?= l7_t("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="new_enabled" value="1" checked="checked" />
-							<?= l7_t("Criar politica ja habilitada"); ?>
-						</label>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Escopo global"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="new_scope_global" value="1" />
-							<?= l7_t("Aplicar a toda a rede (sem origem definida)"); ?>
-						</label>
-						<p class="help-block"><?= l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."); ?></p>
-						<p class="help-block text-warning"><strong><?= l7_t("Atencao:"); ?></strong> <?= l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= l7_t("Quarentena origem"); ?></label>
-					<div class="col-sm-9">
-						<label class="checkbox-inline">
-							<input type="checkbox" name="new_quarantine_origin" value="1" />
-							<?= l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"); ?>
-						</label>
-						<p class="help-block"><?= l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."); ?></p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="add_policy" value="1" class="btn btn-success"><?= l7_t("Adicionar politica"); ?></button>
-					</div>
-				</div>
-			</form>
-			<?php } ?>
-
-			<p class="layer7-muted-note small"><?= l7_t("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
-			</div>
+			<div class="alert alert-warning"><?= htmlspecialchars(l7_t("Limite de 24 politicas atingido.")); ?></div>
+			<?php } else {
+	$add_form = new Form(false);
+	$add_form->setAction("layer7_policies.php#l7-add");
+	$sec_add = new Form_Section(l7_t("Adicionar politica"));
+	$new_id = new Form_Input("new_id", "id", "text", $l7_nf["id"]);
+	$new_id->setAttribute("maxlength", "80");
+	$new_id->setPattern("[a-zA-Z0-9_-]+");
+	$new_id->setIsRequired();
+	$new_id->setPlaceholder("p-exemplo-001");
+	$sec_add->addInput($new_id);
+	$new_name = new Form_Input("new_name", l7_t("Nome"), "text", $l7_nf["name"]);
+	$new_name->setAttribute("maxlength", "160");
+	$new_name->setPlaceholder(l7_t("Ex.: Monitor geral"));
+	$sec_add->addInput($new_name);
+	$new_prio = new Form_Input(
+		"new_priority",
+		l7_t("Prioridade"),
+		"number",
+		$l7_nf["priority"],
+		array("min" => 0, "max" => 99999)
+	);
+	$sec_add->addInput($new_prio);
+	$sec_add->addInput(new Form_Select(
+		"new_action",
+		l7_t("Acao"),
+		$l7_nf["action"],
+		$l7_action_opts
+	));
+	$sec_add->addInput(new Form_StaticText(
+		l7_t("Interfaces"),
+		layer7_policies_ifaces_html(
+			"new_ifaces_list",
+			"new_ifaces[]",
+			$l7_pf_ifaces,
+			$l7_nf["ifaces"],
+			!empty($l7_add_retry),
+			l7_t("Nenhuma selecionada = aplica a todas as interfaces.")
+		)
+	));
+	$new_src_h = new Form_Textarea("new_src_hosts", l7_t("IPs de origem"), $l7_nf["src_hosts"]);
+	$new_src_h->setRows(3);
+	$new_src_h->setAttribute("placeholder", "192.168.1.50\n192.168.1.51");
+	$new_src_h->setHelp(l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."));
+	$sec_add->addInput($new_src_h);
+	$new_src_c = new Form_Textarea("new_src_cidrs", l7_t("CIDRs de origem"), $l7_nf["src_cidrs"]);
+	$new_src_c->setRows(2);
+	$new_src_c->setAttribute("placeholder", "192.168.10.0/24");
+	$new_src_c->setHelp(l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."));
+	$sec_add->addInput($new_src_c);
+	if ($l7_has_identity) {
+		$new_adu = new Form_Textarea("new_ad_users", l7_t("Utilizadores AD"), $l7_nf["ad_users"]);
+		$new_adu->setRows(3);
+		$new_adu->setAttribute("placeholder", "joao.silva\nDOMAIN\\maria");
+		$new_adu->setHelp(l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."));
+		$sec_add->addInput($new_adu);
+		$new_adg = new Form_Textarea("new_ad_groups", l7_t("Grupos AD"), $l7_nf["ad_groups"]);
+		$new_adg->setRows(2);
+		$new_adg->setAttribute("placeholder", "TI\nVPN");
+		$new_adg->setHelp(l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."));
+		$sec_add->addInput($new_adg);
+	}
+	if (!empty($l7_groups)) {
+		$new_grps = new Form_StaticText(
+			l7_t("Grupos"),
+			layer7_policies_group_boxes_html(
+				"new_groups_list",
+				"new_groups[]",
+				$l7_groups,
+				$l7_nf["groups"],
+				true
+			)
+		);
+		$new_grps->setHelp(l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem. Alternativa a digitar CIDRs manualmente."));
+		$sec_add->addInput($new_grps);
+	}
+	$new_exc_html = '<p class="help-block">' . htmlspecialchars(l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis.")) . '</p>';
+	if (!empty($l7_groups)) {
+		$new_exc_html .= layer7_policies_group_boxes_html(
+			"new_exc_groups_list",
+			"new_src_exclude_groups[]",
+			$l7_groups,
+			$l7_nf["exc_groups"],
+			false
+		);
+	}
+	$sec_add->addInput(new Form_StaticText(l7_t("Excluir origens (so este perfil)"), $new_exc_html));
+	$new_exc = new Form_Textarea("new_src_exclude_cidrs", l7_t("CIDRs excluidos"), $l7_nf["exc_cidrs"]);
+	$new_exc->setRows(2);
+	$new_exc->setAttribute("placeholder", "192.168.1.50");
+	$new_exc->setHelp(l7_t("CIDRs excluidos (um por linha)."));
+	$sec_add->addInput($new_exc);
+	$new_hosts = new Form_Textarea("new_match_hosts", l7_t("Sites/hosts"), $l7_nf["hosts"]);
+	$new_hosts->setRows(3);
+	$new_hosts->setAttribute("placeholder", "youtube.com\napi.whatsapp.com");
+	$new_hosts->setHelp(l7_t("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente. Maximo 64 hosts por politica."));
+	$sec_add->addInput($new_hosts);
+	if (!empty($ndpi_protos)) {
+		$new_apps_st = new Form_StaticText(
+			l7_t("Apps nDPI"),
+			layer7_policies_ndpi_list_html(
+				"new_apps_list",
+				"new_ndpi_apps[]",
+				$ndpi_protos,
+				$l7_nf["apps"],
+				l7_t("Pesquisar apps...")
+			)
+		);
+		$new_apps_st->setHelp(l7_t("Selecione ate 12 aplicacoes. Em branco = qualquer app."));
+		$sec_add->addInput($new_apps_st);
+	} else {
+		$new_apps_in = new Form_Input("new_ndpi_apps_csv", l7_t("Apps nDPI"), "text", $l7_nf["apps_csv"]);
+		$new_apps_in->setPlaceholder("HTTP, BitTorrent");
+		$new_apps_in->setHelp(l7_t("Selecione ate 12 aplicacoes. Em branco = qualquer app."));
+		$sec_add->addInput($new_apps_in);
+	}
+	if (!empty($ndpi_cats)) {
+		$new_cats_st = new Form_StaticText(
+			l7_t("Categorias nDPI"),
+			layer7_policies_ndpi_list_html(
+				"new_cats_list",
+				"new_ndpi_category[]",
+				$ndpi_cats,
+				$l7_nf["cats"],
+				l7_t("Pesquisar categorias...")
+			)
+		);
+		$new_cats_st->setHelp(l7_t("Selecione ate 8 categorias."));
+		$sec_add->addInput($new_cats_st);
+	} else {
+		$new_cats_in = new Form_Input("new_ndpi_category_csv", l7_t("Categorias nDPI"), "text", $l7_nf["cats_csv"]);
+		$new_cats_in->setPlaceholder("Web");
+		$new_cats_in->setHelp(l7_t("Selecione ate 8 categorias."));
+		$sec_add->addInput($new_cats_in);
+	}
+	$new_tag = new Form_Input("new_tag_table", "tag_table", "text", $l7_nf["tag_table"]);
+	$new_tag->setAttribute("maxlength", "63");
+	$new_tag->setPattern("[A-Za-z0-9_]+");
+	$new_tag->setPlaceholder("layer7_tagged");
+	$new_tag->setHelp(l7_t("Obrigatorio quando a acao for tag."));
+	$sec_add->addInput($new_tag);
+	$sec_add->addInput(new Form_StaticText(
+		l7_t("Horario"),
+		layer7_policies_schedule_html(
+			"new",
+			$l7_sched_days,
+			$l7_nf["sched_days"],
+			$l7_nf["sched_start"],
+			$l7_nf["sched_end"]
+		)
+	));
+	$new_en = new Form_Checkbox(
+		"new_enabled",
+		l7_t("Ativa"),
+		l7_t("Criar politica ja habilitada"),
+		!empty($l7_nf["enabled"]),
+		"1"
+	);
+	$sec_add->addInput($new_en);
+	$new_scope = new Form_Checkbox(
+		"new_scope_global",
+		l7_t("Escopo global"),
+		l7_t("Aplicar a toda a rede (sem origem definida)"),
+		!empty($l7_nf["scope_global"]),
+		"1"
+	);
+	$new_scope->setHelp(l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."));
+	$sec_add->addInput($new_scope);
+	$sec_add->addInput(new Form_StaticText(
+		"",
+		'<p class="help-block text-warning"><strong>' . htmlspecialchars(l7_t("Atencao:")) . '</strong> ' .
+		htmlspecialchars(l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas.")) .
+		'</p>'
+	));
+	$new_quar = new Form_Checkbox(
+		"new_quarantine_origin",
+		l7_t("Quarentena origem"),
+		l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"),
+		!empty($l7_nf["quarantine"]),
+		"1"
+	);
+	$new_quar->setHelp(l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."));
+	$sec_add->addInput($new_quar);
+	$add_form->add($sec_add);
+	$add_btn = new Form_Button("add_policy", l7_t("Adicionar politica"), null, "fa fa-plus");
+	$add_btn->addClass("btn-success");
+	$add_form->addGlobal($add_btn);
+	print($add_form);
+			} ?>
+			<p class="help-block"><?= htmlspecialchars(l7_t("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente.")); ?></p>
 		</div>
-		</div>
-	</div>
-</div>
-<style>
-.l7-profiles-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
-.l7-profiles-search-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; flex: 1 1 220px; min-width: 0; }
-.l7-profiles-search-wrap .form-control { max-width: 280px; min-width: 160px; }
-.l7-profiles-active-only { font-size: 12px; font-weight: normal; margin: 0; white-space: nowrap; cursor: pointer; user-select: none; }
-.l7-profiles-active-only input { margin: 0 4px 0 0; vertical-align: -2px; }
-.l7-profiles-fold-actions { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.l7-profile-group { margin-bottom: 10px; border: 1px solid #e3e3e3; border-radius: 6px; background: #fff; overflow: hidden; }
-.l7-profile-group-presets { background: #f4fbf9; border-color: #d4ece6; }
-.l7-profile-group-hidden-section { margin-top: 16px; opacity: 0.95; }
-.l7-profile-group-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer; user-select: none; background: #fafafa; border-bottom: 1px solid transparent; }
-.l7-profile-group:not(.l7-profile-group-collapsed) .l7-profile-group-header { border-bottom-color: #eee; }
-.l7-profile-group-presets .l7-profile-group-header { background: #eef8f5; }
-.l7-profile-group-header:hover { background: #f3f3f3; }
-.l7-profile-group-presets .l7-profile-group-header:hover { background: #e6f3ef; }
-.l7-profile-group-chevron { font-size: 11px; color: #888; transition: transform 0.15s ease; width: 12px; text-align: center; flex-shrink: 0; }
-.l7-profile-group-collapsed .l7-profile-group-chevron { transform: rotate(-90deg); }
-.l7-profile-group-collapsed .l7-profile-group-body { display: none; }
-.l7-profile-group-title { font-weight: 600; font-size: 15px; flex: 1 1 auto; min-width: 0; }
-.l7-profile-group-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.l7-profile-group-count { font-size: 11px; color: #999; white-space: nowrap; }
-.l7-profile-group-active-badge { font-size: 11px; font-weight: 600; color: #fff; background: #5cb85c; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
-.l7-profile-group-pending-badge { font-size: 11px; font-weight: 600; color: #6a5500; background: #ffe8a3; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
-.l7-profile-group-pending-badge[hidden] { display: none !important; }
-.l7-profile-group-body { padding: 12px 14px 14px; }
-.l7-hidden-profiles-help { margin: 0 0 10px 0; font-size: 12px; }
-.l7-profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: stretch; }
-.l7-profile-card { position: relative; display: flex; flex-direction: row; align-items: center; gap: 10px; border: 1px solid #ddd; border-left-width: 1px; border-radius: 6px; padding: 10px 12px; min-height: 64px; width: 100%; max-width: 100%; background: #fdfdfd; transition: box-shadow 0.15s, border-color 0.15s; box-sizing: border-box; }
-.l7-profile-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.l7-profile-card.l7-profile-on { border-left: 3px solid #5cb85c; padding-left: 10px; }
-.l7-profile-card.l7-profile-card-hidden { opacity: 0.92; }
-.l7-profile-icon-ios { width: 36px; height: 36px; border-radius: 8px; margin: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.14); flex-shrink: 0; }
-.l7-profile-icon-ios .fa,
-.l7-profile-icon-ios .fab,
-.l7-profile-icon-ios .fas,
-.l7-profile-icon-ios .far { font-size: 17px; line-height: 1; }
-.l7-profile-body { flex: 1 1 auto; min-width: 0; text-align: left; overflow: hidden; }
-.l7-profile-name-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.l7-profile-name { font-weight: 600; font-size: 13px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.l7-profile-meta { font-size: 11px; color: #888; margin-top: 2px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.l7-badge-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.l7-badge-dot-custom { background: #8E44AD; }
-.l7-badge-dot-edited { background: #f0ad4e; }
-.l7-profile-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
-.l7-profile-icon-btn { border: none; background: transparent; color: #666; padding: 4px 6px; line-height: 1; border-radius: 4px; cursor: pointer; font-size: 14px; }
-.l7-profile-icon-btn:hover { background: #eee; color: #333; }
-.l7-profile-toggle-form { display: inline-block; line-height: 0; }
-.l7-profile-draft-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 14px; padding: 10px 12px; background: #fff8e6; border: 1px solid #f0d78c; border-radius: 6px; position: sticky; top: 8px; z-index: 20; }
-.l7-profile-draft-bar[hidden] { display: none !important; }
-.l7-profile-draft-msg { font-size: 13px; font-weight: 600; color: #6a5500; }
-.l7-profile-draft-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.l7-profile-card.l7-profile-pending { outline: 2px dashed #f0ad4e; outline-offset: 1px; }
-.l7-profile-draft-busy { opacity: 0.7; pointer-events: none; }
-.l7-switch { position: relative; display: inline-block; width: 36px; height: 20px; padding: 0; border: none; background: transparent; cursor: pointer; vertical-align: middle; }
-.l7-switch-track { position: absolute; inset: 0; border-radius: 20px; background: #ccc; transition: background 0.2s; }
-.l7-switch-track:before { content: ""; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s; }
-.l7-switch-on .l7-switch-track { background: #5cb85c; }
-.l7-switch-on .l7-switch-track:before { transform: translateX(16px); }
-.l7-switch-off .l7-switch-track { background: #ccc; }
-.l7-switch-off .l7-switch-track:before { transform: translateX(0); }
-.l7-profile-group.l7-profile-group-filter-hidden { display: none; }
-.l7-profile-card.l7-profile-filter-hidden { display: none !important; }
-@media (max-width: 480px) {
-	.l7-profiles-grid { grid-template-columns: 1fr; }
-	.l7-profile-card { max-width: 100%; }
-	.l7-profiles-search-wrap .form-control { max-width: 100%; width: 100%; }
-}
-.l7-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-.l7-modal-box { background: #fff; border-radius: 6px; padding: 24px 28px; min-width: 420px; max-width: 560px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
-.l7-modal-box-wide { max-width: 640px; min-width: 480px; }
-.l7-modal-box h4 { margin: 0 0 18px; font-size: 18px; font-weight: 600; }
-</style>
+		<?php } ?>
 <script>
+var l7LegacyLibraryRedirectOk = <?= $l7_legacy_library_redirect_ok ? "true" : "false"; ?>;
 var l7ProfileDraftBusy = false;
 var l7ProfileDraftStrings = {
 	pendingOne: <?= json_encode(l7_t("%d alteracao por aplicar")) ?>,
@@ -2545,13 +3160,15 @@ function l7toggleProfileDraft(btn) {
 		return;
 	}
 	btn.setAttribute('data-desired', next ? '1' : '0');
-	btn.classList.toggle('l7-switch-on', next);
-	btn.classList.toggle('l7-switch-off', !next);
-	btn.title = next ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+	btn.classList.toggle('btn-success', next);
+	btn.classList.toggle('btn-default', !next);
+	btn.textContent = next ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+	btn.title = btn.textContent;
 	btn.setAttribute('aria-label', btn.title);
 	var card = btn.closest('.l7-profile-card');
 	if (card) {
 		card.classList.toggle('l7-profile-pending', next !== saved);
+		card.classList.toggle('warning', next !== saved);
 		card.classList.toggle('l7-profile-on', next);
 	}
 	l7updateProfileDraftBar();
@@ -2560,7 +3177,7 @@ function l7toggleProfileDraft(btn) {
 function l7collectProfileDraft() {
 	var enableIds = [];
 	var disableIds = [];
-	document.querySelectorAll('.l7-switch[data-profile-id]').forEach(function(btn) {
+	document.querySelectorAll('button[data-profile-id]').forEach(function(btn) {
 		var id = btn.getAttribute('data-profile-id') || '';
 		if (!id) return;
 		var saved = btn.getAttribute('data-saved') === '1';
@@ -2609,16 +3226,18 @@ function l7updateProfileGroupPendingBadges() {
 
 function l7discardProfileDraft() {
 	if (l7ProfileDraftBusy) return;
-	document.querySelectorAll('.l7-switch[data-profile-id]').forEach(function(btn) {
+	document.querySelectorAll('button[data-profile-id]').forEach(function(btn) {
 		var saved = btn.getAttribute('data-saved') === '1';
 		btn.setAttribute('data-desired', saved ? '1' : '0');
-		btn.classList.toggle('l7-switch-on', saved);
-		btn.classList.toggle('l7-switch-off', !saved);
-		btn.title = saved ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+		btn.classList.toggle('btn-success', saved);
+		btn.classList.toggle('btn-default', !saved);
+		btn.textContent = saved ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+		btn.title = btn.textContent;
 		btn.setAttribute('aria-label', btn.title);
 		var card = btn.closest('.l7-profile-card');
 		if (card) {
 			card.classList.remove('l7-profile-pending');
+			card.classList.remove('warning');
 			card.classList.toggle('l7-profile-on', saved);
 		}
 	});
@@ -2706,19 +3325,52 @@ window.addEventListener('beforeunload', function(ev) {
 	}
 });
 
-function l7showProfileModal(profileId, profileName) {
-	document.getElementById('l7ProfileId').value = profileId;
-	document.getElementById('l7ProfileModalTitle').textContent = profileName;
-	document.getElementById('l7ProfileModal').style.display = '';
+function l7showProfileModal(profileId, profileName, ev) {
+	var modal = document.getElementById('l7ProfileModal');
+	var pid = document.getElementById('l7ProfileId');
+	var title = document.getElementById('l7ProfileModalTitle');
+	var hasModalApi = (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.modal);
+	if (!modal || !pid || !title || !hasModalApi) {
+		return true;
+	}
+	pid.value = profileId;
+	title.textContent = profileName;
+	jQuery(modal).modal('show');
+	if (ev && typeof ev.preventDefault === 'function') {
+		ev.preventDefault();
+	}
+	return false;
 }
 function l7hideProfileModal() {
-	document.getElementById('l7ProfileModal').style.display = 'none';
+	if (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.modal) {
+		jQuery('#l7ProfileModal').modal('hide');
+	}
 }
 
-function l7showProfileEditModal(profileId, isNew) {
+function l7profileEditSetVisible(el, show) {
+	if (!el) {
+		return;
+	}
+	if (show) {
+		el.removeAttribute('hidden');
+		el.classList.remove('hidden');
+	} else {
+		el.setAttribute('hidden', 'hidden');
+		el.classList.add('hidden');
+	}
+}
+
+function l7showProfileEditModal(profileId, isNew, ev) {
 	var modal = document.getElementById('l7ProfileEditModal');
 	var data = (typeof l7ProfileEditData !== 'undefined') ? l7ProfileEditData : {};
 	var p = isNew ? null : data[profileId];
+	var hasModalApi = (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.modal);
+	if (!modal || !hasModalApi) {
+		return true;
+	}
+	if (!isNew && (profileId === '' || !p)) {
+		return true;
+	}
 	document.getElementById('l7EditProfileIsNew').value = isNew ? '1' : '0';
 	document.getElementById('l7EditProfileId').value = isNew ? '' : profileId;
 	document.getElementById('l7EditProfileName').value = p ? (p.name || '') : '';
@@ -2736,32 +3388,55 @@ function l7showProfileEditModal(profileId, isNew) {
 	for (var j = 0; j < catBoxes.length; j++) {
 		catBoxes[j].checked = cats.indexOf(catBoxes[j].value) >= 0;
 	}
+	var appsFilter = document.getElementById('l7EditAppsFilter');
+	var catsFilter = document.getElementById('l7EditCatsFilter');
+	if (appsFilter) {
+		appsFilter.value = '';
+		l7filter(appsFilter, 'l7EditAppsList');
+	}
+	if (catsFilter) {
+		catsFilter.value = '';
+		l7filter(catsFilter, 'l7EditCatsList');
+	}
 	var customOnly = document.querySelectorAll('.l7-edit-custom-only');
 	var factoryNote = document.querySelector('.l7-edit-factory-note');
 	var isCustom = isNew || (p && p.is_custom);
 	for (var k = 0; k < customOnly.length; k++) {
-		customOnly[k].style.display = isCustom ? '' : 'none';
+		l7profileEditSetVisible(customOnly[k], isCustom);
 	}
-	if (factoryNote) {
-		factoryNote.style.display = (!isNew && p && !p.is_custom) ? '' : 'none';
-	}
-	document.getElementById('l7EditProfileDeleteBtn').style.display = (!isNew && p && p.is_custom) ? '' : 'none';
+	l7profileEditSetVisible(factoryNote, (!isNew && p && !p.is_custom));
+	l7profileEditSetVisible(document.getElementById('l7EditProfileDeleteBtn'), (!isNew && p && p.is_custom));
 	document.getElementById('l7ProfileEditModalTitle').textContent = isNew ?
 		<?= json_encode(l7_t("Criar perfil personalizado")); ?> :
 		(<?= json_encode(l7_t("Editar perfil")); ?> + ': ' + (p ? p.name : profileId));
 	var warn = document.getElementById('l7ProfileEditReconnectWarn');
 	if (p && p.connected) {
-		warn.style.display = '';
+		l7profileEditSetVisible(warn, true);
 		warn.textContent = <?= json_encode(l7_t("Este perfil esta ligado — ao guardar, a politica sera actualizada automaticamente com o novo snapshot.")); ?>;
 	} else {
-		warn.style.display = 'none';
+		l7profileEditSetVisible(warn, false);
 		warn.textContent = '';
 	}
-	modal.style.display = '';
+	jQuery(modal).modal('show');
+	if (ev && typeof ev.preventDefault === 'function') {
+		ev.preventDefault();
+	}
+	return false;
 }
 
 function l7hideProfileEditModal() {
-	document.getElementById('l7ProfileEditModal').style.display = 'none';
+	if (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.modal) {
+		jQuery('#l7ProfileEditModal').modal('hide');
+	}
+}
+
+function l7clearEditFilter(inputId, listId) {
+	var input = document.getElementById(inputId);
+	if (!input) {
+		return;
+	}
+	input.value = '';
+	l7filter(input, listId);
 }
 
 function l7confirmProfileEditSave(ev) {
@@ -2789,14 +3464,22 @@ function l7filter(input, listId) {
 }
 
 function l7toggleProfileGroup(headerEl, forceOpen) {
-	var group = headerEl.closest('.l7-profile-group');
+	var group = headerEl ? headerEl.closest('.l7-profile-group') : null;
 	if (!group) return;
+	if (group.tagName === 'DETAILS') {
+		group.open = (typeof forceOpen === 'boolean') ? !!forceOpen : !group.open;
+		return;
+	}
 	var collapsed = group.classList.contains('l7-profile-group-collapsed');
 	var open = (typeof forceOpen === 'boolean') ? forceOpen : collapsed;
 	if (open) {
 		group.classList.remove('l7-profile-group-collapsed');
 	} else {
 		group.classList.add('l7-profile-group-collapsed');
+	}
+	var body = group.querySelector('.l7-profile-group-body');
+	if (body) {
+		body.hidden = !open;
 	}
 	if (headerEl && headerEl.setAttribute) {
 		headerEl.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -2806,6 +3489,10 @@ function l7toggleProfileGroup(headerEl, forceOpen) {
 function l7setAllProfileGroups(open) {
 	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group');
 	for (var i = 0; i < groups.length; i++) {
+		if (groups[i].tagName === 'DETAILS') {
+			groups[i].open = !!open;
+			continue;
+		}
 		var hdr = groups[i].querySelector('.l7-profile-group-header');
 		if (hdr) {
 			l7toggleProfileGroup(hdr, !!open);
@@ -2814,22 +3501,41 @@ function l7setAllProfileGroups(open) {
 }
 
 function l7initProfileGroups() {
+	if (l7LegacyLibraryRedirectOk && !document.getElementById('l7ProfileSearch') && document.getElementById('l7-policies')) {
+		var legacyHash = window.location.hash;
+		if (legacyHash === '#l7-profiles' || legacyHash === '#l7-ra') {
+			window.location.replace('layer7_policies.php?library=1' + legacyHash);
+			return;
+		}
+	}
 	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group');
 	for (var i = 0; i < groups.length; i++) {
 		var g = groups[i];
+		if (g.tagName === 'DETAILS') {
+			g.open = g.getAttribute('data-group-default-open') === '1';
+			continue;
+		}
 		g.classList.add('l7-profile-group-collapsed');
 		var hdr = g.querySelector('.l7-profile-group-header');
+		var body = g.querySelector('.l7-profile-group-body');
 		if (hdr) {
 			hdr.setAttribute('aria-expanded', 'false');
+		}
+		if (body) {
+			body.hidden = true;
 		}
 	}
 	/* Bookmark legado layer7_remote_access.php → #l7-ra */
 	if (window.location.hash === '#l7-ra') {
 		var ra = document.getElementById('l7-ra');
 		if (ra) {
-			var hdrRa = ra.querySelector('.l7-profile-group-header');
-			if (hdrRa) {
-				l7toggleProfileGroup(hdrRa, true);
+			if (ra.tagName === 'DETAILS') {
+				ra.open = true;
+			} else {
+				var hdrRa = ra.querySelector('.l7-profile-group-header');
+				if (hdrRa) {
+					l7toggleProfileGroup(hdrRa, true);
+				}
 			}
 			try {
 				ra.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2858,19 +3564,27 @@ function l7filterProfileGrid() {
 			var show = matchQ && matchActive;
 			if (show) {
 				card.classList.remove('l7-profile-filter-hidden');
+				card.hidden = false;
 				visible++;
 			} else {
 				card.classList.add('l7-profile-filter-hidden');
+				card.hidden = true;
 			}
 		}
 		if (visible === 0 && (q || activeOnly)) {
 			group.classList.add('l7-profile-group-filter-hidden');
+			group.hidden = true;
 		} else {
 			group.classList.remove('l7-profile-group-filter-hidden');
+			group.hidden = false;
 			if ((q || activeOnly) && visible > 0) {
-				var hdr = group.querySelector('.l7-profile-group-header');
-				if (hdr) {
-					l7toggleProfileGroup(hdr, true);
+				if (group.tagName === 'DETAILS') {
+					group.open = true;
+				} else {
+					var hdr = group.querySelector('.l7-profile-group-header');
+					if (hdr) {
+						l7toggleProfileGroup(hdr, true);
+					}
 				}
 			}
 		}
@@ -2897,5 +3611,9 @@ if (document.readyState === 'loading') {
 	l7initProfileGroups();
 }
 </script>
-<?php layer7_render_footer(); ?>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 <?php require_once("foot.inc"); ?>
